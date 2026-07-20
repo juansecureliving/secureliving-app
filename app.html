@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>AssistLiving</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ─────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --pri:#1A7A6D;--pri-dark:#145F55;--pri-light:#E6F4F1;
+  --accent:#E07A52;--accent-dark:#C4623D;
+  --bg:#F7F4EF;--card:#FFFFFF;--card-hover:#FAFAF7;
+  --text:#2D3436;--muted:#7A8B8D;--border:#E2DFD8;
+  --success:#27AE60;--warning:#F39C12;--danger:#E74C3C;
+  --radius:12px;--shadow:0 2px 12px rgba(0,0,0,0.06);
+  --font-body:'Inter',sans-serif;
+  --font-display:'DM Serif Display',serif;
+}
+html,body{font-family:var(--font-body);background:var(--bg);color:var(--text);
+  font-size:15px;line-height:1.5;min-height:100vh;-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-family:inherit;font-size:inherit}
+button{cursor:pointer;border:none;background:none}
+
+/* ── Loading & Toast ──────────────────────────── */
+#loading-overlay{position:fixed;inset:0;background:rgba(247,244,239,0.85);
+  display:flex;align-items:center;justify-content:center;z-index:9999}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--pri);
+  border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  padding:12px 24px;border-radius:8px;color:#fff;font-weight:500;
+  z-index:10000;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90%}
+#toast.show{opacity:1}
+#toast.success{background:var(--success)}
+#toast.error{background:var(--danger)}
+#toast.info{background:var(--pri)}
+
+/* ── Auth Screens ─────────────────────────────── */
+.auth-wrapper{min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px}
+.auth-logo{text-align:center;margin-bottom:32px}
+.auth-logo .logo-icon{width:72px;height:72px;background:var(--pri);color:#fff;
+  border-radius:20px;display:flex;align-items:center;justify-content:center;
+  font-size:32px;margin:0 auto 12px}
+.auth-logo h1{font-family:var(--font-display);font-size:28px;color:var(--pri)}
+.auth-logo p{color:var(--muted);font-size:13px;margin-top:4px}
+.auth-card{background:var(--card);border-radius:var(--radius);padding:28px;
+  width:100%;max-width:400px;box-shadow:var(--shadow)}
+.auth-card h2{font-family:var(--font-display);font-size:22px;margin-bottom:20px;text-align:center}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-weight:500;font-size:13px;color:var(--muted);
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:8px;font-size:15px;
+  background:var(--bg);transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  outline:none;border-color:var(--pri)}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 24px;border-radius:8px;font-weight:600;font-size:15px;
+  transition:all .2s;width:100%}
+.btn-pri{background:var(--pri);color:#fff}
+.btn-pri:hover{background:var(--pri-dark)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-dark)}
+.btn-outline{border:1.5px solid var(--border);color:var(--text);background:var(--card)}
+.btn-outline:hover{border-color:var(--pri);color:var(--pri)}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#c0392b}
+.auth-switch{text-align:center;margin-top:16px;font-size:14px;color:var(--muted)}
+.auth-switch a{color:var(--pri);font-weight:600;text-decoration:none}
+
+/* ── App Shell ────────────────────────────────── */
+#app{display:none;min-height:100vh;padding-bottom:80px}
+.top-bar{background:var(--pri);color:#fff;padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100}
+.top-bar h1{font-family:var(--font-display);font-size:20px;font-weight:400}
+.top-bar .user-pill{display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.15);padding:6px 14px;border-radius:20px;font-size:13px}
+.top-bar .user-pill .avatar{width:26px;height:26px;background:rgba(255,255,255,0.3);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+/* Tabs */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);
+  border-top:1px solid var(--border);display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom)}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:8px 4px 6px;gap:2px;font-size:10px;color:var(--muted);
+  font-weight:500;transition:color .2s}
+.tab-btn.active{color:var(--pri)}
+.tab-btn svg{width:22px;height:22px}
+.tab-btn.active svg{stroke-width:2.5}
+
+.tab-content{display:none;padding:16px;max-width:600px;margin:0 auto}
+.tab-content.active{display:block}
+
+/* ── Cards ────────────────────────────────────── */
+.card{background:var(--card);border-radius:var(--radius);padding:20px;
+  box-shadow:var(--shadow);margin-bottom:14px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-header h3{font-family:var(--font-display);font-size:18px}
+.section-title{font-family:var(--font-display);font-size:22px;margin:8px 0 16px}
+.subtitle{color:var(--muted);font-size:13px}
+
+/* ── Badges & Tags ────────────────────────────── */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-pending{background:#FEF3E2;color:#E67E22}
+.badge-confirmed{background:#E8F8EF;color:#27AE60}
+.badge-cancelled{background:#FDEDEC;color:#E74C3C}
+.badge-completed{background:var(--pri-light);color:var(--pri)}
+.badge-category{background:var(--pri-light);color:var(--pri)}
+
+/* ── Home Tab ─────────────────────────────────── */
+.hero-card{background:linear-gradient(135deg,var(--pri),var(--pri-dark));
+  color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:16px}
+.hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
+.hero-card p{opacity:.85;font-size:14px;line-height:1.5}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.quick-action{background:var(--card);border-radius:var(--radius);padding:18px 14px;
+  text-align:center;box-shadow:var(--shadow);transition:transform .15s}
+.quick-action:hover{transform:translateY(-2px)}
+.quick-action .qa-icon{width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 8px;font-size:22px}
+.quick-action .qa-label{font-weight:600;font-size:13px}
+.quick-action .qa-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.update-item{padding:14px 0;border-bottom:1px solid var(--border)}
+.update-item:last-child{border-bottom:none}
+.update-item .update-date{font-size:11px;color:var(--muted);margin-bottom:4px}
+.update-item h4{font-size:15px;margin-bottom:4px}
+.update-item p{font-size:13px;color:var(--muted);line-height:1.4}
+
+/* ── Products ─────────────────────────────────── */
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;
+  -webkit-overflow-scrolling:touch}
+.filter-btn{flex-shrink:0;padding:7px 16px;border-radius:20px;font-size:13px;
+  font-weight:500;border:1.5px solid var(--border);background:var(--card);color:var(--muted);
+  transition:all .2s}
+.filter-btn.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+.product-card{background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.product-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:48px}
+.product-img.cat-Mobility{background:linear-gradient(135deg,#E8F4FD,#D1ECF9)}
+.product-img.cat-Home-Care{background:linear-gradient(135deg,#FEF3E2,#FDEBD0)}
+.product-img.cat-Bathroom{background:linear-gradient(135deg,#E8F8EF,#D5F5E3)}
+.product-img.cat-Health-Monitoring{background:linear-gradient(135deg,#F5EEF8,#EBDEF0)}
+.product-img.cat-Respiratory{background:linear-gradient(135deg,#FDEDEC,#FADBD8)}
+.product-body{padding:16px}
+.product-body h4{font-size:16px;margin-bottom:4px}
+.product-body .product-cat{font-size:11px;color:var(--muted);margin-bottom:8px}
+.product-body .product-desc{font-size:13px;color:var(--muted);line-height:1.4;margin-bottom:12px}
+.price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.price-tag{font-size:13px}
+.price-tag strong{font-size:17px;color:var(--pri)}
+.price-tag .from{font-size:11px;color:var(--muted)}
+.product-actions{display:flex;gap:8px}
+.product-actions .btn{flex:1;padding:10px 12px;font-size:13px}
+
+/* ── Consultation ─────────────────────────────── */
+.appt-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.appt-type-btn{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);
+  padding:16px;text-align:center;transition:all .2s}
+.appt-type-btn:hover,.appt-type-btn.selected{border-color:var(--pri);background:var(--pri-light)}
+.appt-type-btn .type-icon{font-size:28px;margin-bottom:6px}
+.appt-type-btn .type-label{font-weight:600;font-size:13px}
+.appt-type-btn .type-dur{font-size:11px;color:var(--muted)}
+.appt-list-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.appt-list-item:last-child{border-bottom:none}
+.appt-date-box{flex-shrink:0;width:52px;text-align:center;background:var(--pri-light);
+  border-radius:8px;padding:8px 4px}
+.appt-date-box .appt-day{font-size:20px;font-weight:700;color:var(--pri);line-height:1}
+.appt-date-box .appt-mon{font-size:10px;color:var(--pri);text-transform:uppercase;font-weight:600}
+.appt-info{flex:1}
+.appt-info h4{font-size:14px;margin-bottom:2px}
+.appt-info p{font-size:12px;color:var(--muted)}
+
+/* ── Reports / BP ─────────────────────────────── */
+.bp-display{display:flex;gap:12px;margin-bottom:16px}
+.bp-stat{flex:1;text-align:center;background:var(--card);border-radius:var(--radius);
+  padding:16px 8px;box-shadow:var(--shadow)}
+.bp-stat .bp-val{font-size:28px;font-weight:700;font-family:var(--font-display)}
+.bp-stat .bp-label{font-size:11px;color:var(--muted);margin-top:2px}
+.bp-stat.normal .bp-val{color:var(--success)}
+.bp-stat.elevated .bp-val{color:var(--warning)}
+.bp-stat.high .bp-val{color:var(--danger)}
+.bp-chart{background:var(--card);border-radius:var(--radius);padding:16px;
+  box-shadow:var(--shadow);margin-bottom:16px;overflow-x:auto}
+.bp-chart canvas{width:100%!important;height:200px!important}
+.bp-history-item{display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--border);font-size:13px}
+.bp-history-item:last-child{border-bottom:none}
+.bp-reading-vals{font-weight:600;min-width:80px}
+.bp-reading-hr{color:var(--muted);min-width:60px}
+.bp-reading-date{color:var(--muted);flex:1;text-align:right;font-size:12px}
+.bp-reading-del{color:var(--danger);background:none;border:none;font-size:18px;padding:4px 8px}
+
+/* ── Health Profile ───────────────────────────── */
+.profile-header{text-align:center;padding:24px 0}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--pri);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:32px;font-family:var(--font-display);margin:0 auto 10px}
+.profile-header h2{font-family:var(--font-display);font-size:22px}
+.profile-header p{color:var(--muted);font-size:13px}
+.info-grid{display:grid;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden}
+.info-row{display:flex;justify-content:space-between;padding:12px 16px;background:var(--card);
+  font-size:14px}
+.info-row .info-label{color:var(--muted)}
+.info-row .info-val{font-weight:500;text-align:right;max-width:60%}
+
+/* ── Modals ───────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;
+  display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:24px;
+  width:100%;max-width:500px;max-height:85vh;overflow-y:auto;
+  animation:slideUp .25s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal h3{font-family:var(--font-display);font-size:20px;margin-bottom:16px}
+.modal-close{position:absolute;top:16px;right:16px;font-size:22px;color:var(--muted)}
+.modal .form-group{margin-bottom:14px}
+
+/* ── Admin badge ──────────────────────────────── */
+.admin-tab{position:relative}
+.admin-badge{position:absolute;top:-2px;right:-2px;width:8px;height:8px;
+  background:var(--accent);border-radius:50%}
+
+/* ── Empty state ──────────────────────────────── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state .empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+.empty-state p{font-size:14px}
+
+/* ── Order modal ──────────────────────────────── */
+.order-type-toggle{display:flex;border:2px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.order-type-toggle button{flex:1;padding:10px;font-weight:600;font-size:14px;
+  background:var(--card);color:var(--muted);border:none;transition:all .2s}
+.order-type-toggle button.active{background:var(--pri);color:#fff}
+
+/* ── Utilities ────────────────────────────────── */
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+.mb-8{margin-bottom:8px}.mb-16{margin-bottom:16px}
+.text-center{text-align:center}
+.text-muted{color:var(--muted)}
+.text-sm{font-size:13px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading-overlay" class="hidden"><div class="spinner"></div></div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ═══════════ AUTH SCREENS ═══════════ -->
+<div id="auth-screen">
+
+<!-- Login -->
+<div id="login-screen" class="auth-wrapper">
+  <div class="auth-logo">
+    <div class="logo-icon">🏠</div>
+    <h1>AssistLiving</h1>
+    <p>Supporting Independent Living</p>
+  </div>
+  <div class="auth-card">
+    <h2>Welcome Back</h2>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="login-phone" placeholder="e.g. 91234567">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pw" placeholder="Enter password">
+    </div>
+    <button class="btn btn-pri" onclick="doLogin()">Sign In</button>
+    <div class="auth-switch">
+      New here? <a href="#" onclick="showRegister()">Create an account</a>
+    </div>
+  </div>
+</div>
+
+<!-- Register -->
+<div id="register-screen" class="auth-wrapper hidden">
+  <div class="auth-logo">
+    <div class="logo-icon">🏠</div>
+    <h1>AssistLiving</h1>
+    <p>Create Your Account</p>
+  </div>
+  <div class="auth-card">
+    <h2>Register</h2>
+    <div class="form-group">
+      <label>Full Name *</label>
+      <input type="text" id="reg-name" placeholder="Your full name">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone *</label>
+        <input type="tel" id="reg-phone" placeholder="91234567">
+      </div>
+      <div class="form-group">
+        <label>Date of Birth</label>
+        <input type="date" id="reg-dob">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="reg-email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>Gender</label>
+      <select id="reg-gender">
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="password" id="reg-pw" placeholder="Min 6 chars">
+      </div>
+      <div class="form-group">
+        <label>Confirm *</label>
+        <input type="password" id="reg-pw2" placeholder="Repeat">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input type="text" id="reg-address" placeholder="Block, Street, Unit">
+    </div>
+    <div class="form-group">
+      <label>Postal Code</label>
+      <input type="text" id="reg-postal" placeholder="e.g. 520123">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Emergency Contact</label>
+        <input type="text" id="reg-ename" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label>Emergency Phone</label>
+        <input type="tel" id="reg-ephone" placeholder="Phone">
+      </div>
+    </div>
+    <button class="btn btn-pri" onclick="doRegister()">Create Account</button>
+    <div class="auth-switch">
+      Already have an account? <a href="#" onclick="showLogin()">Sign In</a>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <h1>AssistLiving</h1>
+  <div class="user-pill" onclick="switchTab('profile')">
+    <div class="avatar" id="top-avatar"></div>
+    <span id="top-name"></span>
+  </div>
+</div>
+
+<!-- ── TAB: Home ──────────────────────────── -->
+<div id="tab-home" class="tab-content active">
+  <div class="hero-card">
+    <h2 id="greeting">Welcome</h2>
+    <p>Your partner in independent living. We provide equipment, consultation, and ongoing support so you're prepared for whatever comes.</p>
+  </div>
+
+  <div class="quick-actions">
+    <button class="quick-action" onclick="switchTab('consult')">
+      <div class="qa-icon" style="background:#E8F4FD">📋</div>
+      <div class="qa-label">Book Consult</div>
+      <div class="qa-sub">Free assessment</div>
+    </button>
+    <button class="quick-action" onclick="switchTab('products')">
+      <div class="qa-icon" style="background:#FEF3E2">🛒</div>
+      <div class="qa-label">Equipment</div>
+      <div class="qa-sub">Rent or buy</div>
+    </button>
+    <button class="quick-action" onclick="switchTab('reports')">
+      <div class="qa-icon" style="background:#E8F8EF">📊</div>
+      <div class="qa-label">Health Log</div>
+      <div class="qa-sub">Track BP & more</div>
+    </button>
+    <button class="quick-action" onclick="switchTab('profile')">
+      <div class="qa-icon" style="background:#F5EEF8">👤</div>
+      <div class="qa-label">My Profile</div>
+      <div class="qa-sub">Health data</div>
+    </button>
+  </div>
+
+  <!-- Mission -->
+  <div class="card">
+    <h3 style="font-family:var(--font-display);margin-bottom:8px">Our Mission</h3>
+    <p class="text-sm text-muted" style="line-height:1.6">
+      As Singapore's population ages and more people live independently, we believe everyone
+      deserves access to quality assistive equipment and support — before an emergency happens.
+      We help you prepare, educate, and equip so that sudden disability or medical needs
+      never catch you off guard.
+    </p>
+    <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:100px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--pri)">🔧</div>
+        <div class="text-sm" style="font-weight:600;margin-top:4px">Rental</div>
+      </div>
+      <div style="flex:1;min-width:100px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--pri)">🛒</div>
+        <div class="text-sm" style="font-weight:600;margin-top:4px">Sales</div>
+      </div>
+      <div style="flex:1;min-width:100px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--pri)">🔩</div>
+        <div class="text-sm" style="font-weight:600;margin-top:4px">Repair</div>
+      </div>
+      <div style="flex:1;min-width:100px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--pri)">💬</div>
+        <div class="text-sm" style="font-weight:600;margin-top:4px">Consult</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Updates -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Latest Updates</h3>
+    </div>
+    <div id="updates-list"></div>
+  </div>
+</div>
+
+<!-- ── TAB: Consultation ──────────────────── -->
+<div id="tab-consult" class="tab-content">
+  <h2 class="section-title">Consultation</h2>
+
+  <div class="card">
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px">Book an Appointment</h3>
+    <p class="text-sm text-muted mb-16">Select the type of consultation you need:</p>
+    <div class="appt-type-grid" id="appt-type-grid">
+      <button class="appt-type-btn" onclick="selectApptType(this,'Home Assessment')" data-dur="60">
+        <div class="type-icon">🏠</div>
+        <div class="type-label">Home Assessment</div>
+        <div class="type-dur">~60 min</div>
+      </button>
+      <button class="appt-type-btn" onclick="selectApptType(this,'Equipment Consult')" data-dur="30">
+        <div class="type-icon">🦽</div>
+        <div class="type-label">Equipment Consult</div>
+        <div class="type-dur">~30 min</div>
+      </button>
+      <button class="appt-type-btn" onclick="selectApptType(this,'Health Review')" data-dur="45">
+        <div class="type-icon">🩺</div>
+        <div class="type-label">Health Review</div>
+        <div class="type-dur">~45 min</div>
+      </button>
+      <button class="appt-type-btn" onclick="selectApptType(this,'Repair / Service')" data-dur="30">
+        <div class="type-icon">🔧</div>
+        <div class="type-label">Repair / Service</div>
+        <div class="type-dur">~30 min</div>
+      </button>
+    </div>
+    <div id="appt-form" class="hidden">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="appt-date">
+        </div>
+        <div class="form-group">
+          <label>Preferred Time</label>
+          <select id="appt-time">
+            <option value="09:00">9:00 AM</option>
+            <option value="09:30">9:30 AM</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="10:30">10:30 AM</option>
+            <option value="11:00">11:00 AM</option>
+            <option value="11:30">11:30 AM</option>
+            <option value="13:00">1:00 PM</option>
+            <option value="13:30">1:30 PM</option>
+            <option value="14:00">2:00 PM</option>
+            <option value="14:30">2:30 PM</option>
+            <option value="15:00">3:00 PM</option>
+            <option value="15:30">3:30 PM</option>
+            <option value="16:00">4:00 PM</option>
+            <option value="16:30">4:30 PM</option>
+            <option value="17:00">5:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes / Special Requirements</label>
+        <textarea id="appt-notes" placeholder="Describe your needs or concerns..."></textarea>
+      </div>
+      <button class="btn btn-pri" onclick="bookAppt()">Confirm Booking</button>
+    </div>
+  </div>
+
+  <!-- Upcoming Appointments -->
+  <div class="card mt-16">
+    <div class="card-header">
+      <h3>My Appointments</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadAppointments()">Refresh</button>
+    </div>
+    <div id="appt-list"></div>
+  </div>
+</div>
+
+<!-- ── TAB: Reports ───────────────────────── -->
+<div id="tab-reports" class="tab-content">
+  <h2 class="section-title">Health Reports</h2>
+
+  <!-- Add BP Reading -->
+  <div class="card">
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px">Log Blood Pressure</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Systolic (top)</label>
+        <input type="number" id="bp-sys" placeholder="e.g. 120" min="60" max="250">
+      </div>
+      <div class="form-group">
+        <label>Diastolic (btm)</label>
+        <input type="number" id="bp-dia" placeholder="e.g. 80" min="30" max="150">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Heart Rate (bpm)</label>
+        <input type="number" id="bp-hr" placeholder="e.g. 72" min="30" max="220">
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="bp-date">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <input type="text" id="bp-notes" placeholder="e.g. After exercise, morning reading">
+    </div>
+    <button class="btn btn-pri" onclick="addBP()">Save Reading</button>
+  </div>
+
+  <!-- Latest BP -->
+  <div class="bp-display" id="bp-summary"></div>
+
+  <!-- BP Chart -->
+  <div class="bp-chart">
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px">Trend (Last 14 readings)</h3>
+    <canvas id="bp-canvas"></canvas>
+  </div>
+
+  <!-- BP History -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Reading History</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadBP()">Refresh</button>
+    </div>
+    <div id="bp-history"></div>
+  </div>
+
+  <!-- Health Summary -->
+  <div class="card mt-16">
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px">Health Summary</h3>
+    <div id="health-summary-report"></div>
+  </div>
+</div>
+
+<!-- ── TAB: Profile ───────────────────────── -->
+<div id="tab-profile" class="tab-content">
+  <div class="profile-header">
+    <div class="profile-avatar" id="profile-avatar"></div>
+    <h2 id="profile-name"></h2>
+    <p id="profile-phone" class="text-muted"></p>
+  </div>
+
+  <!-- Health Profile Card -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Health Profile</h3>
+      <button class="btn btn-sm btn-outline" onclick="openHealthModal()">Edit</button>
+    </div>
+    <div class="info-grid" id="health-info-grid"></div>
+  </div>
+
+  <!-- Account Info -->
+  <div class="card mt-16">
+    <div class="card-header">
+      <h3>Account Details</h3>
+      <button class="btn btn-sm btn-outline" onclick="openAccountModal()">Edit</button>
+    </div>
+    <div class="info-grid" id="account-info-grid"></div>
+  </div>
+
+  <!-- Orders -->
+  <div class="card mt-16">
+    <div class="card-header">
+      <h3>My Orders</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadOrders()">Refresh</button>
+    </div>
+    <div id="orders-list"></div>
+  </div>
+
+  <div class="text-center mt-24">
+    <button class="btn btn-outline" onclick="doLogout()" style="max-width:200px;margin:0 auto">Sign Out</button>
+  </div>
+</div>
+
+<!-- ── TAB: Products ──────────────────────── -->
+<div id="tab-products" class="tab-content">
+  <h2 class="section-title">Equipment</h2>
+  <p class="text-sm text-muted mb-16">Rent or purchase quality assistive equipment. We also offer repair and servicing for all items.</p>
+  <div class="filter-row" id="product-filters"></div>
+  <div id="product-list"></div>
+</div>
+
+<!-- ── TAB BAR ─────────────────────────────── -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('home')" data-tab="home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M9 21V9h6v12"/></svg>
+    Home
+  </button>
+  <button class="tab-btn" onclick="switchTab('consult')" data-tab="consult">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Consult
+  </button>
+  <button class="tab-btn" onclick="switchTab('reports')" data-tab="reports">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Reports
+  </button>
+  <button class="tab-btn" onclick="switchTab('profile')" data-tab="profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </button>
+  <button class="tab-btn" onclick="switchTab('products')" data-tab="products">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    Products
+  </button>
+</div>
+</div><!-- end #app -->
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Health Profile Modal -->
+<div id="health-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('health-modal')">
+<div class="modal" style="position:relative">
+  <button class="modal-close" onclick="closeModal('health-modal')">✕</button>
+  <h3>Edit Health Profile</h3>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Height (cm)</label>
+      <input type="number" id="hp-height" placeholder="e.g. 170">
+    </div>
+    <div class="form-group">
+      <label>Weight (kg)</label>
+      <input type="number" id="hp-weight" placeholder="e.g. 65">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Blood Type</label>
+    <select id="hp-blood">
+      <option value="">Select</option>
+      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+      <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Allergies</label>
+    <textarea id="hp-allergies" placeholder="List known allergies"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Medical Conditions</label>
+    <textarea id="hp-conditions" placeholder="e.g. Diabetes, Hypertension"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Current Medications</label>
+    <textarea id="hp-medications" placeholder="List medications and dosages"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Additional Notes</label>
+    <textarea id="hp-notes" placeholder="Any other health information"></textarea>
+  </div>
+  <button class="btn btn-pri" onclick="saveHealth()">Save Health Profile</button>
+</div>
+</div>
+
+<!-- Account Modal -->
+<div id="account-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('account-modal')">
+<div class="modal" style="position:relative">
+  <button class="modal-close" onclick="closeModal('account-modal')">✕</button>
+  <h3>Edit Account</h3>
+  <div class="form-group">
+    <label>Full Name</label>
+    <input type="text" id="acct-name">
+  </div>
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" id="acct-email">
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Date of Birth</label>
+      <input type="date" id="acct-dob">
+    </div>
+    <div class="form-group">
+      <label>Gender</label>
+      <select id="acct-gender">
+        <option value="">Select</option>
+        <option>Male</option><option>Female</option><option>Other</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Address</label>
+    <input type="text" id="acct-address">
+  </div>
+  <div class="form-group">
+    <label>Postal Code</label>
+    <input type="text" id="acct-postal">
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Emergency Contact</label>
+      <input type="text" id="acct-ename">
+    </div>
+    <div class="form-group">
+      <label>Emergency Phone</label>
+      <input type="tel" id="acct-ephone">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>New Password (leave blank to keep)</label>
+    <input type="password" id="acct-newpw" placeholder="New password">
+  </div>
+  <button class="btn btn-pri" onclick="saveAccount()">Save Changes</button>
+</div>
+</div>
+
+<!-- Order Modal -->
+<div id="order-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('order-modal')">
+<div class="modal" style="position:relative">
+  <button class="modal-close" onclick="closeModal('order-modal')">✕</button>
+  <h3 id="order-modal-title">Order</h3>
+  <p id="order-product-name" style="font-weight:600;margin-bottom:12px"></p>
+  <div class="order-type-toggle">
+    <button class="active" onclick="setOrderType('buy',this)">Purchase</button>
+    <button onclick="setOrderType('rent',this)">Rent</button>
+  </div>
+  <div id="order-buy-fields">
+    <div class="form-group">
+      <label>Quantity</label>
+      <input type="number" id="order-qty" value="1" min="1">
+    </div>
+    <div class="form-group">
+      <label>Price</label>
+      <p id="order-price-display" style="font-size:20px;font-weight:700;color:var(--pri)"></p>
+    </div>
+  </div>
+  <div id="order-rent-fields" class="hidden">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Start Date</label>
+        <input type="date" id="order-rent-start">
+      </div>
+      <div class="form-group">
+        <label>End Date</label>
+        <input type="date" id="order-rent-end">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Rental Rates</label>
+      <div id="rental-rates" class="text-sm text-muted" style="line-height:1.8"></div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Notes</label>
+    <textarea id="order-notes" placeholder="Delivery address, special requests..."></textarea>
+  </div>
+  <input type="hidden" id="order-product-id">
+  <input type="hidden" id="order-sale-price">
+  <button class="btn btn-accent" onclick="submitOrder()">Place Order</button>
+</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG — Replace with your deployment URL
+   ═══════════════════════════════════════════ */
+const API = 'https://script.google.com/macros/s/AKfycbxolRxdDO0-xGs6Z6LdSGr4cSJAQsZOZtNb0lTro-fYr235LeVAFRTymg-QAkk0nQaCvg/exec';
+
+/* ── State ────────────────────────────────── */
+let ME = null;         // logged-in member
+let healthProfile = null;
+let bpReadings = [];
+let products = [];
+let selectedApptType = '';
+let selectedApptDur = '';
+let orderType = 'buy';
+
+/* ── Helpers ──────────────────────────────── */
+function $(id) { return document.getElementById(id); }
+function show(id) { $(id).classList.remove('hidden'); }
+function hide(id) { $(id).classList.add('hidden'); }
+
+function toast(msg, type='info') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3000);
+}
+
+function loading(on) {
+  if (on) show('loading-overlay'); else hide('loading-overlay');
+}
+
+async function api(body) {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+function closeModal(id) { hide(id); }
+
+function formatDate(d) {
+  if (!d) return '-';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('en-SG', { day:'numeric', month:'short', year:'numeric' });
+}
+
+/* ── Auth ─────────────────────────────────── */
+function showLogin() { show('login-screen'); hide('register-screen'); }
+function showRegister() { hide('login-screen'); show('register-screen'); }
+
+async function doLogin() {
+  const phone = $('login-phone').value.trim();
+  const pw = $('login-pw').value;
+  if (!phone || !pw) return toast('Enter phone and password','error');
+  loading(true);
+  try {
+    const r = await api({ action:'login', phone, password:pw });
+    if (!r.ok) return toast(r.error,'error');
+    ME = r.member;
+    localStorage.setItem('al_member', JSON.stringify(ME));
+    enterApp();
+  } catch(e) { toast('Connection error','error'); }
+  finally { loading(false); }
+}
+
+async function doRegister() {
+  const name = $('reg-name').value.trim();
+  const phone = $('reg-phone').value.trim();
+  const pw = $('reg-pw').value;
+  const pw2 = $('reg-pw2').value;
+  if (!name || !phone || !pw) return toast('Fill required fields','error');
+  if (pw.length < 6) return toast('Password must be at least 6 characters','error');
+  if (pw !== pw2) return toast('Passwords do not match','error');
+
+  loading(true);
+  try {
+    const r = await api({
+      action:'register', name, phone, password:pw,
+      email: $('reg-email').value.trim(),
+      dob: $('reg-dob').value,
+      gender: $('reg-gender').value,
+      address: $('reg-address').value.trim(),
+      postalCode: $('reg-postal').value.trim(),
+      emergencyName: $('reg-ename').value.trim(),
+      emergencyPhone: $('reg-ephone').value.trim()
+    });
+    if (!r.ok) return toast(r.error,'error');
+    ME = r.member;
+    localStorage.setItem('al_member', JSON.stringify(ME));
+    toast('Account created!','success');
+    enterApp();
+  } catch(e) { toast('Connection error','error'); }
+  finally { loading(false); }
+}
+
+function doLogout() {
+  ME = null;
+  localStorage.removeItem('al_member');
+  hide('app');
+  show('auth-screen');
+  showLogin();
+}
+
+/* ── Enter App ────────────────────────────── */
+function enterApp() {
+  hide('auth-screen');
+  show('app');
+  const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  $('top-avatar').textContent = initials;
+  $('top-name').textContent = ME.name.split(' ')[0];
+
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+  $('greeting').textContent = `${greet}, ${ME.name.split(' ')[0]}`;
+
+  // Set default dates
+  const today = new Date().toISOString().split('T')[0];
+  $('appt-date').value = today;
+  $('bp-date').value = today;
+  $('order-rent-start').value = today;
+
+  switchTab('home');
+  loadUpdates();
+  loadHealthProfile();
+  loadBP();
+  loadAppointments();
+  loadProducts();
+  loadOrders();
+}
+
+/* ── Tab Navigation ───────────────────────── */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  $('tab-' + tab).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+  if (tab === 'profile') renderProfile();
+  if (tab === 'reports') renderBPChart();
+}
+
+/* ── Updates (Home) ───────────────────────── */
+async function loadUpdates() {
+  try {
+    const r = await api({ action:'getUpdates' });
+    if (!r.ok) return;
+    const el = $('updates-list');
+    if (!r.updates.length) {
+      el.innerHTML = '<div class="empty-state"><p>No updates yet</p></div>';
+      return;
+    }
+    el.innerHTML = r.updates.map(u => `
+      <div class="update-item">
+        <div class="update-date">${formatDate(u.date)}</div>
+        <h4>${esc(u.title)}</h4>
+        <p>${esc(u.content)}</p>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+/* ── Health Profile ───────────────────────── */
+async function loadHealthProfile() {
+  try {
+    const r = await api({ action:'getHealthProfile', memberId:ME.id });
+    if (r.ok) healthProfile = r.profile;
+    renderHealthSummary();
+  } catch(e) {}
+}
+
+function renderProfile() {
+  const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  $('profile-avatar').textContent = initials;
+  $('profile-name').textContent = ME.name;
+  $('profile-phone').textContent = ME.phone;
+
+  // Health info
+  const hp = healthProfile || {};
+  $('health-info-grid').innerHTML = [
+    row('Height', hp.height ? hp.height + ' cm' : '-'),
+    row('Weight', hp.weight ? hp.weight + ' kg' : '-'),
+    row('BMI', hp.bmi || '-'),
+    row('Blood Type', hp.bloodType || '-'),
+    row('Allergies', hp.allergies || '-'),
+    row('Conditions', hp.conditions || '-'),
+    row('Medications', hp.medications || '-'),
+  ].join('');
+
+  // Account info
+  $('account-info-grid').innerHTML = [
+    row('Name', ME.name),
+    row('Phone', ME.phone),
+    row('Email', ME.email || '-'),
+    row('Date of Birth', formatDate(ME.dob) || '-'),
+    row('Gender', ME.gender || '-'),
+    row('Address', ME.address || '-'),
+    row('Postal Code', ME.postalCode || '-'),
+    row('Emergency Contact', ME.emergencyName ? `${ME.emergencyName} (${ME.emergencyPhone})` : '-'),
+    row('Role', ME.role === 'admin' ? '⭐ Admin' : 'Member'),
+    row('Member Since', formatDate(ME.createdAt)),
+  ].join('');
+}
+
+function row(label, val) {
+  return `<div class="info-row"><span class="info-label">${label}</span><span class="info-val">${esc(String(val))}</span></div>`;
+}
+
+function openHealthModal() {
+  const hp = healthProfile || {};
+  $('hp-height').value = hp.height || '';
+  $('hp-weight').value = hp.weight || '';
+  $('hp-blood').value = hp.bloodType || '';
+  $('hp-allergies').value = hp.allergies || '';
+  $('hp-conditions').value = hp.conditions || '';
+  $('hp-medications').value = hp.medications || '';
+  $('hp-notes').value = hp.notes || '';
+  show('health-modal');
+}
+
+async function saveHealth() {
+  loading(true);
+  try {
+    const r = await api({
+      action:'saveHealthProfile', memberId:ME.id,
+      height: $('hp-height').value,
+      weight: $('hp-weight').value,
+      bloodType: $('hp-blood').value,
+      allergies: $('hp-allergies').value,
+      conditions: $('hp-conditions').value,
+      medications: $('hp-medications').value,
+      notes: $('hp-notes').value
+    });
+    if (r.ok) {
+      toast('Health profile saved','success');
+      closeModal('health-modal');
+      await loadHealthProfile();
+      renderProfile();
+    }
+  } catch(e) { toast('Error saving','error'); }
+  finally { loading(false); }
+}
+
+function openAccountModal() {
+  $('acct-name').value = ME.name;
+  $('acct-email').value = ME.email || '';
+  $('acct-dob').value = ME.dob || '';
+  $('acct-gender').value = ME.gender || '';
+  $('acct-address').value = ME.address || '';
+  $('acct-postal').value = ME.postalCode || '';
+  $('acct-ename').value = ME.emergencyName || '';
+  $('acct-ephone').value = ME.emergencyPhone || '';
+  $('acct-newpw').value = '';
+  show('account-modal');
+}
+
+async function saveAccount() {
+  loading(true);
+  try {
+    const body = {
+      action:'updateMember', memberId:ME.id,
+      name: $('acct-name').value.trim(),
+      email: $('acct-email').value.trim(),
+      dob: $('acct-dob').value,
+      gender: $('acct-gender').value,
+      address: $('acct-address').value.trim(),
+      postalCode: $('acct-postal').value.trim(),
+      emergencyName: $('acct-ename').value.trim(),
+      emergencyPhone: $('acct-ephone').value.trim()
+    };
+    if ($('acct-newpw').value) body.newPassword = $('acct-newpw').value;
+    const r = await api(body);
+    if (r.ok) {
+      toast('Account updated','success');
+      // Refresh member data
+      const mr = await api({ action:'getMember', memberId:ME.id });
+      if (mr.ok) { ME = mr.member; localStorage.setItem('al_member', JSON.stringify(ME)); }
+      closeModal('account-modal');
+      renderProfile();
+    }
+  } catch(e) { toast('Error saving','error'); }
+  finally { loading(false); }
+}
+
+/* ── Blood Pressure ───────────────────────── */
+async function loadBP() {
+  try {
+    const r = await api({ action:'getBPReadings', memberId:ME.id });
+    if (r.ok) bpReadings = r.readings;
+    renderBP();
+  } catch(e) {}
+}
+
+function renderBP() {
+  // Summary (latest reading)
+  const sum = $('bp-summary');
+  if (!bpReadings.length) {
+    sum.innerHTML = '<div class="empty-state" style="width:100%"><div class="empty-icon">💓</div><p>No readings yet. Add your first above.</p></div>';
+    $('bp-history').innerHTML = '';
+    renderHealthSummary();
+    return;
+  }
+  const latest = bpReadings[0];
+  const sysClass = latest.systolic < 120 ? 'normal' : latest.systolic < 140 ? 'elevated' : 'high';
+  const diaClass = latest.diastolic < 80 ? 'normal' : latest.diastolic < 90 ? 'elevated' : 'high';
+  const hrClass = (latest.heartRate >= 60 && latest.heartRate <= 100) ? 'normal' : 'elevated';
+
+  sum.innerHTML = `
+    <div class="bp-stat ${sysClass}"><div class="bp-val">${latest.systolic}</div><div class="bp-label">Systolic</div></div>
+    <div class="bp-stat ${diaClass}"><div class="bp-val">${latest.diastolic}</div><div class="bp-label">Diastolic</div></div>
+    <div class="bp-stat ${hrClass}"><div class="bp-val">${latest.heartRate || '-'}</div><div class="bp-label">Heart Rate</div></div>
+  `;
+
+  // History list
+  $('bp-history').innerHTML = bpReadings.slice(0, 20).map(r => `
+    <div class="bp-history-item">
+      <span class="bp-reading-vals">${r.systolic}/${r.diastolic}</span>
+      <span class="bp-reading-hr">${r.heartRate ? r.heartRate + ' bpm' : ''}</span>
+      <span class="bp-reading-date">${formatDate(r.date)} ${r.time || ''}</span>
+      <button class="bp-reading-del" onclick="deleteBP('${r.id}')" title="Delete">×</button>
+    </div>
+  `).join('');
+
+  renderBPChart();
+  renderHealthSummary();
+}
+
+function renderBPChart() {
+  const canvas = $('bp-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.parentElement.clientWidth - 32;
+  canvas.width = w * 2; canvas.height = 400;
+  canvas.style.width = w + 'px'; canvas.style.height = '200px';
+  ctx.scale(2, 2);
+  ctx.clearRect(0, 0, w, 200);
+
+  const data = bpReadings.slice(0, 14).reverse();
+  if (data.length < 2) {
+    ctx.fillStyle = '#7A8B8D';
+    ctx.font = '13px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('Need at least 2 readings to show trend', w/2, 100);
+    return;
+  }
+
+  const pad = { top:20, right:16, bottom:30, left:40 };
+  const cw = w - pad.left - pad.right;
+  const ch = 200 - pad.top - pad.bottom;
+
+  // Y range
+  const allVals = data.flatMap(d => [d.systolic, d.diastolic]);
+  const yMin = Math.min(...allVals) - 10;
+  const yMax = Math.max(...allVals) + 10;
+
+  const xStep = cw / (data.length - 1);
+  const toX = i => pad.left + i * xStep;
+  const toY = v => pad.top + ch - ((v - yMin) / (yMax - yMin)) * ch;
+
+  // Grid lines
+  ctx.strokeStyle = '#E2DFD8'; ctx.lineWidth = 0.5;
+  for (let v = Math.ceil(yMin/20)*20; v <= yMax; v += 20) {
+    const y = toY(v);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#7A8B8D'; ctx.font = '10px Inter'; ctx.textAlign = 'right';
+    ctx.fillText(v, pad.left - 6, y + 3);
+  }
+
+  // Normal zone (sys 90-120)
+  ctx.fillStyle = 'rgba(39,174,96,0.07)';
+  ctx.fillRect(pad.left, toY(120), cw, toY(90) - toY(120));
+
+  // Lines
+  function drawLine(key, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    data.forEach((d, i) => {
+      const x = toX(i), y = toY(d[key]);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    // Dots
+    data.forEach((d, i) => {
+      ctx.beginPath();
+      ctx.arc(toX(i), toY(d[key]), 3, 0, Math.PI * 2);
+      ctx.fillStyle = color; ctx.fill();
+    });
+  }
+  drawLine('systolic', '#E74C3C');
+  drawLine('diastolic', '#3498DB');
+
+  // X labels
+  ctx.fillStyle = '#7A8B8D'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    if (data.length <= 7 || i % 2 === 0) {
+      const lbl = d.date ? d.date.substring(5) : '';
+      ctx.fillText(lbl, toX(i), 200 - 8);
+    }
+  });
+
+  // Legend
+  ctx.font = '11px Inter';
+  ctx.fillStyle = '#E74C3C'; ctx.fillText('● Systolic', w/2 - 50, 200 - pad.bottom + 24);
+  ctx.fillStyle = '#3498DB'; ctx.fillText('● Diastolic', w/2 + 40, 200 - pad.bottom + 24);
+}
+
+async function addBP() {
+  const sys = $('bp-sys').value, dia = $('bp-dia').value;
+  if (!sys || !dia) return toast('Enter systolic and diastolic values','error');
+  loading(true);
+  try {
+    const r = await api({
+      action:'addBPReading', memberId:ME.id,
+      systolic: sys, diastolic: dia,
+      heartRate: $('bp-hr').value,
+      date: $('bp-date').value,
+      notes: $('bp-notes').value
+    });
+    if (r.ok) {
+      toast('Reading saved','success');
+      $('bp-sys').value = ''; $('bp-dia').value = '';
+      $('bp-hr').value = ''; $('bp-notes').value = '';
+      await loadBP();
+    }
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+async function deleteBP(id) {
+  if (!confirm('Delete this reading?')) return;
+  loading(true);
+  try {
+    await api({ action:'deleteBPReading', id });
+    await loadBP();
+    toast('Deleted','info');
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+function renderHealthSummary() {
+  const el = $('health-summary-report');
+  if (!el) return;
+  const hp = healthProfile || {};
+  const lines = [];
+
+  if (hp.bmi) {
+    const bmi = parseFloat(hp.bmi);
+    let cat = 'Normal';
+    if (bmi < 18.5) cat = 'Underweight';
+    else if (bmi >= 23) cat = 'Overweight';  // Asian BMI thresholds
+    else if (bmi >= 27.5) cat = 'Obese';
+    lines.push(`<strong>BMI:</strong> ${hp.bmi} (${cat})`);
+  }
+  if (hp.height && hp.weight) {
+    lines.push(`<strong>Height/Weight:</strong> ${hp.height} cm / ${hp.weight} kg`);
+  }
+  if (hp.bloodType) lines.push(`<strong>Blood Type:</strong> ${hp.bloodType}`);
+  if (hp.conditions) lines.push(`<strong>Conditions:</strong> ${esc(hp.conditions)}`);
+  if (hp.medications) lines.push(`<strong>Medications:</strong> ${esc(hp.medications)}`);
+  if (hp.allergies) lines.push(`<strong>Allergies:</strong> ${esc(hp.allergies)}`);
+
+  if (bpReadings.length) {
+    const latest = bpReadings[0];
+    let bpCat = 'Normal';
+    if (latest.systolic >= 140 || latest.diastolic >= 90) bpCat = 'High (Stage 1+)';
+    else if (latest.systolic >= 130 || latest.diastolic >= 80) bpCat = 'Elevated';
+    lines.push(`<strong>Latest BP:</strong> ${latest.systolic}/${latest.diastolic} mmHg — ${bpCat}`);
+    if (latest.heartRate) lines.push(`<strong>Heart Rate:</strong> ${latest.heartRate} bpm`);
+
+    // Average of last 7
+    const recent = bpReadings.slice(0, 7);
+    const avgSys = Math.round(recent.reduce((s,r)=>s+Number(r.systolic),0)/recent.length);
+    const avgDia = Math.round(recent.reduce((s,r)=>s+Number(r.diastolic),0)/recent.length);
+    lines.push(`<strong>7-reading avg:</strong> ${avgSys}/${avgDia} mmHg`);
+  }
+
+  if (!lines.length) {
+    el.innerHTML = '<p class="text-sm text-muted">Complete your health profile and add BP readings to see a summary here.</p>';
+  } else {
+    el.innerHTML = lines.map(l => `<p class="text-sm" style="margin-bottom:6px;line-height:1.5">${l}</p>`).join('');
+  }
+}
+
+/* ── Appointments ─────────────────────────── */
+function selectApptType(btn, type) {
+  document.querySelectorAll('.appt-type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedApptType = type;
+  selectedApptDur = btn.dataset.dur;
+  show('appt-form');
+}
+
+async function bookAppt() {
+  if (!selectedApptType) return toast('Select appointment type','error');
+  if (!$('appt-date').value) return toast('Select a date','error');
+  loading(true);
+  try {
+    const r = await api({
+      action:'bookAppointment', memberId:ME.id,
+      type: selectedApptType, date: $('appt-date').value,
+      time: $('appt-time').value, duration: selectedApptDur,
+      notes: $('appt-notes').value
+    });
+    if (r.ok) {
+      toast('Appointment booked!','success');
+      $('appt-notes').value = '';
+      document.querySelectorAll('.appt-type-btn').forEach(b => b.classList.remove('selected'));
+      hide('appt-form');
+      selectedApptType = '';
+      await loadAppointments();
+    }
+  } catch(e) { toast('Error booking','error'); }
+  finally { loading(false); }
+}
+
+async function loadAppointments() {
+  try {
+    const r = await api({ action:'getAppointments', memberId:ME.id });
+    if (!r.ok) return;
+    const el = $('appt-list');
+    if (!r.appointments.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No appointments yet</p></div>';
+      return;
+    }
+    el.innerHTML = r.appointments.map(a => {
+      const d = new Date(a.date);
+      const day = d.getDate();
+      const mon = d.toLocaleDateString('en-SG',{month:'short'});
+      const statusClass = a.status === 'confirmed' ? 'badge-confirmed' :
+                          a.status === 'cancelled' ? 'badge-cancelled' :
+                          a.status === 'completed' ? 'badge-completed' : 'badge-pending';
+      const cancelBtn = (a.status === 'pending' || a.status === 'confirmed')
+        ? `<button class="btn btn-sm btn-outline" style="margin-top:6px;width:auto;padding:4px 12px;font-size:11px;color:var(--danger);border-color:var(--danger)" onclick="cancelAppt('${a.id}')">Cancel</button>` : '';
+      return `
+        <div class="appt-list-item">
+          <div class="appt-date-box"><div class="appt-day">${day}</div><div class="appt-mon">${mon}</div></div>
+          <div class="appt-info">
+            <h4>${esc(a.type)}</h4>
+            <p>${a.time} · ${a.duration || 30} min ${a.consultant ? '· ' + esc(a.consultant) : ''}</p>
+            ${a.notes ? `<p style="margin-top:2px">${esc(a.notes)}</p>` : ''}
+            <span class="badge ${statusClass}" style="margin-top:4px">${a.status}</span>
+            ${cancelBtn}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) {}
+}
+
+async function cancelAppt(id) {
+  if (!confirm('Cancel this appointment?')) return;
+  loading(true);
+  try {
+    await api({ action:'cancelAppointment', id });
+    toast('Appointment cancelled','info');
+    await loadAppointments();
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+/* ── Products ─────────────────────────────── */
+const CAT_ICONS = {
+  'Mobility': '🦽', 'Home Care': '🛏️', 'Bathroom': '🚿',
+  'Health Monitoring': '💓', 'Respiratory': '🫁'
+};
+
+async function loadProducts() {
+  try {
+    const r = await api({ action:'getProducts' });
+    if (r.ok) {
+      products = r.products;
+      renderProductFilters();
+      renderProducts('all');
+    }
+  } catch(e) {}
+}
+
+function renderProductFilters() {
+  const cats = [...new Set(products.map(p => p.category))];
+  $('product-filters').innerHTML =
+    `<button class="filter-btn active" onclick="filterProducts('all',this)">All</button>` +
+    cats.map(c => `<button class="filter-btn" onclick="filterProducts('${c}',this)">${c}</button>`).join('');
+}
+
+function filterProducts(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProducts(cat);
+}
+
+function renderProducts(cat) {
+  const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+  if (!filtered.length) {
+    $('product-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>No products in this category</p></div>';
+    return;
+  }
+  $('product-list').innerHTML = filtered.map(p => {
+    const catClass = 'cat-' + p.category.replace(/\s+/g,'-');
+    const icon = CAT_ICONS[p.category] || '📦';
+    return `
+      <div class="product-card">
+        <div class="product-img ${catClass}">${icon}</div>
+        <div class="product-body">
+          <h4>${esc(p.name)}</h4>
+          <div class="product-cat">${esc(p.category)} · ${p.stock} in stock</div>
+          <div class="product-desc">${esc(p.description)}</div>
+          <div class="price-row">
+            <span class="price-tag">Buy: <strong>$${Number(p.salePrice).toFixed(0)}</strong></span>
+            <span class="price-tag"><span class="from">Rent from</span> <strong>$${Number(p.rentalPriceDay).toFixed(0)}</strong>/day</span>
+          </div>
+          <div class="product-actions">
+            <button class="btn btn-sm btn-pri" onclick="openOrderModal('${p.id}','buy')">Purchase</button>
+            <button class="btn btn-sm btn-accent" onclick="openOrderModal('${p.id}','rent')">Rent</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ── Orders ───────────────────────────────── */
+function openOrderModal(productId, type) {
+  const p = products.find(x => x.id === productId);
+  if (!p) return;
+  $('order-modal-title').textContent = type === 'rent' ? 'Rent Equipment' : 'Purchase Equipment';
+  $('order-product-name').textContent = p.name;
+  $('order-product-id').value = p.id;
+  $('order-sale-price').value = p.salePrice;
+  $('order-qty').value = 1;
+  $('order-price-display').textContent = '$' + Number(p.salePrice).toFixed(2);
+  $('rental-rates').innerHTML =
+    `Day: $${Number(p.rentalPriceDay).toFixed(0)} · Week: $${Number(p.rentalPriceWeek).toFixed(0)} · Month: $${Number(p.rentalPriceMonth).toFixed(0)}`;
+
+  orderType = type;
+  setOrderType(type);
+  show('order-modal');
+}
+
+function setOrderType(type, btn) {
+  orderType = type;
+  const btns = document.querySelectorAll('.order-type-toggle button');
+  btns.forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else {
+    btns[type === 'buy' ? 0 : 1].classList.add('active');
+  }
+  if (type === 'buy') { show('order-buy-fields'); hide('order-rent-fields'); }
+  else { hide('order-buy-fields'); show('order-rent-fields'); }
+}
+
+async function submitOrder() {
+  const productId = $('order-product-id').value;
+  const p = products.find(x => x.id === productId);
+  if (!p) return;
+
+  let totalPrice = 0;
+  if (orderType === 'buy') {
+    totalPrice = Number(p.salePrice) * Number($('order-qty').value);
+  } else {
+    // Calculate rental based on days
+    const start = new Date($('order-rent-start').value);
+    const end = new Date($('order-rent-end').value);
+    if (!$('order-rent-start').value || !$('order-rent-end').value) return toast('Select rental dates','error');
+    if (end <= start) return toast('End date must be after start','error');
+    const days = Math.ceil((end - start) / 86400000);
+    totalPrice = days * Number(p.rentalPriceDay);
+  }
+
+  loading(true);
+  try {
+    const r = await api({
+      action:'placeOrder', memberId:ME.id,
+      productId, type: orderType, qty: $('order-qty').value || 1,
+      totalPrice,
+      rentalStart: orderType === 'rent' ? $('order-rent-start').value : '',
+      rentalEnd: orderType === 'rent' ? $('order-rent-end').value : '',
+      notes: $('order-notes').value
+    });
+    if (r.ok) {
+      toast('Order placed! We will contact you shortly.','success');
+      closeModal('order-modal');
+      $('order-notes').value = '';
+      await loadOrders();
+    } else {
+      toast(r.error || 'Order failed','error');
+    }
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+async function loadOrders() {
+  try {
+    const r = await api({ action:'getOrders', memberId:ME.id });
+    if (!r.ok) return;
+    const el = $('orders-list');
+    if (!r.orders.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>No orders yet</p></div>';
+      return;
+    }
+    el.innerHTML = r.orders.map(o => {
+      const statusClass = o.status === 'completed' ? 'badge-completed' :
+                          o.status === 'cancelled' ? 'badge-cancelled' :
+                          o.status === 'confirmed' ? 'badge-confirmed' : 'badge-pending';
+      const rental = o.type === 'rent' ? `<br>Rental: ${formatDate(o.rentalStart)} — ${formatDate(o.rentalEnd)}` : '';
+      return `
+        <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <strong style="font-size:14px">${esc(o.productName)}</strong>
+              <p class="text-sm text-muted">${o.type === 'rent' ? 'Rental' : 'Purchase'} · Qty ${o.qty} · $${Number(o.totalPrice).toFixed(2)}${rental}</p>
+            </div>
+            <span class="badge ${statusClass}">${o.status}</span>
+          </div>
+          <p class="text-sm text-muted" style="margin-top:4px">${formatDate(o.date)}</p>
+        </div>
+      `;
+    }).join('');
+  } catch(e) {}
+}
+
+/* ── Utility ──────────────────────────────── */
+function esc(s) {
+  if (s == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+/* ── Init ─────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('al_member');
+  if (saved) {
+    try {
+      ME = JSON.parse(saved);
+      enterApp();
+    } catch(e) {
+      showLogin();
+    }
+  }
+  // Resize chart on orientation change
+  window.addEventListener('resize', () => { if (ME) renderBPChart(); });
+});
+</script>
+</body>
+</html>
