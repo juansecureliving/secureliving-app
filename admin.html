@@ -163,7 +163,7 @@ function toast(msg,type='info'){const t=$('toast');t.textContent=msg;t.className
 function loading(on){if(on)show('loading');else hide('loading')}
 
 async function api(body){
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'});
   return r.json();
 }
 
