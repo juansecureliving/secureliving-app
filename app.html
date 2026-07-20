@@ -893,29 +893,36 @@ function doLogout() {
 
 /* ── Enter App ────────────────────────────── */
 function enterApp() {
-  hide('auth-screen');
-  show('app');
-  const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  $('top-avatar').textContent = initials;
-  $('top-name').textContent = ME.name.split(' ')[0];
+  try {
+    hide('auth-screen');
+    show('app');
+    const name = ME.name || 'User';
+    const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    $('top-avatar').textContent = initials;
+    $('top-name').textContent = name.split(' ')[0];
 
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-  $('greeting').textContent = `${greet}, ${ME.name.split(' ')[0]}`;
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+    $('greeting').textContent = `${greet}, ${name.split(' ')[0]}`;
 
-  // Set default dates
-  const today = new Date().toISOString().split('T')[0];
-  $('appt-date').value = today;
-  $('bp-date').value = today;
-  $('order-rent-start').value = today;
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    if ($('appt-date')) $('appt-date').value = today;
+    if ($('bp-date')) $('bp-date').value = today;
+    if ($('order-rent-start')) $('order-rent-start').value = today;
 
-  switchTab('home');
-  loadUpdates();
-  loadHealthProfile();
-  loadBP();
-  loadAppointments();
-  loadProducts();
-  loadOrders();
+    switchTab('home');
+    loadUpdates();
+    loadHealthProfile();
+    loadBP();
+    loadAppointments();
+    loadProducts();
+    loadOrders();
+  } catch(e) {
+    console.error('enterApp error:', e);
+    toast('Error loading app, please login again', 'error');
+    doLogout();
+  }
 }
 
 /* ── Tab Navigation ───────────────────────── */
@@ -1521,8 +1528,14 @@ window.addEventListener('DOMContentLoaded', () => {
   if (saved) {
     try {
       ME = JSON.parse(saved);
-      enterApp();
+      if (ME && ME.id && ME.name) {
+        enterApp();
+      } else {
+        localStorage.removeItem('al_member');
+        showLogin();
+      }
     } catch(e) {
+      localStorage.removeItem('al_member');
       showLogin();
     }
   }
