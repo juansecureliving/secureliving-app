@@ -1540,61 +1540,71 @@ function doLogout() {
 }
 
 async function enterGuest() {
-  isGuest = true;
-  ME = null;
-  localStorage.setItem('al_guest', 'true');
-  hide('auth-screen');
-  
-  // Set up top bar for guest
-  $('top-avatar').textContent = '👤';
-  $('top-name').textContent = 'Guest';
-  
-  const t = LANG[currentLang] || LANG.en;
-  const hour = new Date().getHours();
-  const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
-  $('greeting').textContent = t[greetKey] || 'Welcome';
-  
-  // Set default dates
-  const today = new Date().toISOString().split('T')[0];
-  if ($('appt-date')) $('appt-date').value = today;
-  if ($('bp-date')) $('bp-date').value = today;
-  if ($('order-rent-start')) $('order-rent-start').value = today;
-  
-  // Restore saved language
-  const savedLang = localStorage.getItem('al_lang');
-  if (savedLang) currentLang = savedLang;
-  
-  switchTab('home');
-  
-  // Initialize weather and time
-  updateTime();
-  fetchWeather();
-  setInterval(updateTime, 1000);
-  
-  // Load public data only
-  await loadUpdates();
-  await loadProducts();
-  
-  // Lock member-only tabs
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    const tab = btn.getAttribute('data-tab');
-    if (tab === 'consult' || tab === 'reports' || tab === 'profile') {
-      btn.classList.add('locked');
-    }
-  });
-  
-  // Show guest prompts
-  show('guest-prompt-consult');
-  show('guest-prompt-reports');
-  show('guest-prompt-profile');
-  
-  applyLanguage();
-  show('app');
+  try {
+    show('loading-overlay');
+    isGuest = true;
+    ME = null;
+    localStorage.setItem('al_guest', 'true');
+    hide('auth-screen');
+    
+    // Set up top bar for guest
+    $('top-avatar').textContent = '👤';
+    $('top-name').textContent = 'Guest';
+    
+    const t = LANG[currentLang] || LANG.en;
+    const hour = new Date().getHours();
+    const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
+    $('greeting').textContent = t[greetKey] || 'Welcome';
+    
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    if ($('appt-date')) $('appt-date').value = today;
+    if ($('bp-date')) $('bp-date').value = today;
+    if ($('order-rent-start')) $('order-rent-start').value = today;
+    
+    // Restore saved language
+    const savedLang = localStorage.getItem('al_lang');
+    if (savedLang) currentLang = savedLang;
+    
+    switchTab('home');
+    
+    // Initialize weather and time
+    updateTime();
+    fetchWeather();
+    setInterval(updateTime, 1000);
+    
+    // Load public data only
+    await loadUpdates();
+    await loadProducts();
+    
+    // Lock member-only tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      const tab = btn.getAttribute('data-tab');
+      if (tab === 'consult' || tab === 'reports' || tab === 'profile') {
+        btn.classList.add('locked');
+      }
+    });
+    
+    // Show guest prompts
+    show('guest-prompt-consult');
+    show('guest-prompt-reports');
+    show('guest-prompt-profile');
+    
+    applyLanguage();
+    hide('loading-overlay');
+    show('app');
+  } catch(e) {
+    console.error('enterGuest error:', e);
+    hide('loading-overlay');
+    toast('Error loading guest mode', 'error');
+    showLogin();
+  }
 }
 
 /* ── Enter App ────────────────────────────── */
 async function enterApp() {
   try {
+    show('loading-overlay');
     hide('auth-screen');
     const name = ME.name || 'User';
     const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -1621,7 +1631,7 @@ async function enterApp() {
     // Initialize weather and time
     updateTime();
     fetchWeather();
-    setInterval(updateTime, 1000); // Update time every second
+    setInterval(updateTime, 1000);
     
     // Load data one by one with explicit logging
     console.log('Loading updates...');
@@ -1649,9 +1659,11 @@ async function enterApp() {
     console.log('Orders loaded');
     
     console.log('All data loaded, showing app');
+    hide('loading-overlay');
     show('app');
   } catch(e) {
     console.error('enterApp error:', e);
+    hide('loading-overlay');
     toast('Error loading app, please login again', 'error');
     doLogout();
   }
