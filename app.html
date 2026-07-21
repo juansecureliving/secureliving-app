@@ -303,16 +303,16 @@ button{cursor:pointer;border:none;background:none}
     <p>Supporting Independent Living</p>
   </div>
   <div class="auth-card">
-    <h2data-i18n="welcome_back">Welcome Back</h2>
+    <h2 data-i18n="welcome_back">Welcome Back</h2>
     <div class="form-group">
-      <labeldata-i18n="phone_number">Phone Number</label>
+      <label data-i18n="phone_number">Phone Number</label>
       <input type="tel" id="login-phone" placeholder="e.g. 91234567">
     </div>
     <div class="form-group">
-      <labeldata-i18n="password">Password</label>
+      <label data-i18n="password">Password</label>
       <input type="password" id="login-pw" placeholder="Enter password">
     </div>
-    <button class="btn btn-pri" onclick="doLogin()"data-i18n="sign_in">Sign In</button>
+    <button class="btn btn-pri" onclick="doLogin()" data-i18n="sign_in">Sign In</button>
     <div class="auth-switch">
       New here? <a href="#" onclick="showRegister()">Create an account</a>
     </div>
@@ -327,7 +327,7 @@ button{cursor:pointer;border:none;background:none}
     <p>Create Your Account</p>
   </div>
   <div class="auth-card">
-    <h2data-i18n="register">Register</h2>
+    <h2 data-i18n="register">Register</h2>
     <div class="form-group">
       <label>Full Name *</label>
       <input type="text" id="reg-name" placeholder="Your full name">
@@ -343,11 +343,11 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
     <div class="form-group">
-      <labeldata-i18n="email">Email</label>
+      <label data-i18n="email">Email</label>
       <input type="email" id="reg-email" placeholder="your@email.com">
     </div>
     <div class="form-group">
-      <labeldata-i18n="gender">Gender</label>
+      <label data-i18n="gender">Gender</label>
       <select id="reg-gender">
         <option value="">Select</option>
         <option>Male</option>
@@ -366,11 +366,11 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
     <div class="form-group">
-      <labeldata-i18n="address">Address</label>
+      <label data-i18n="address">Address</label>
       <input type="text" id="reg-address" placeholder="Block, Street, Unit">
     </div>
     <div class="form-group">
-      <labeldata-i18n="postal_code">Postal Code</label>
+      <label data-i18n="postal_code">Postal Code</label>
       <input type="text" id="reg-postal" placeholder="e.g. 520123">
     </div>
     <div class="form-row">
@@ -383,9 +383,9 @@ button{cursor:pointer;border:none;background:none}
         <input type="tel" id="reg-ephone" placeholder="Phone">
       </div>
     </div>
-    <button class="btn btn-pri" onclick="doRegister()"data-i18n="create_account_btn">Create Account</button>
+    <button class="btn btn-pri" onclick="doRegister()" data-i18n="create_account_btn">Create Account</button>
     <div class="auth-switch">
-      Already have an account? <a href="#" onclick="showLogin()"data-i18n="sign_in">Sign In</a>
+      Already have an account? <a href="#" onclick="showLogin()" data-i18n="sign_in">Sign In</a>
     </div>
   </div>
 </div>
@@ -527,33 +527,33 @@ button{cursor:pointer;border:none;background:none}
     <div class="appt-type-grid" id="appt-type-grid">
       <button class="appt-type-btn" onclick="selectApptType(this,'Home Assessment')" data-dur="60">
         <div class="type-icon">🏠</div>
-        <div class="type-label"data-i18n="home_assessment">Home Assessment</div>
+        <div class="type-label" data-i18n="home_assessment">Home Assessment</div>
         <div class="type-dur">~60 min</div>
       </button>
       <button class="appt-type-btn" onclick="selectApptType(this,'Equipment Consult')" data-dur="30">
         <div class="type-icon">🦽</div>
-        <div class="type-label"data-i18n="equipment_consult">Equipment Consult</div>
+        <div class="type-label" data-i18n="equipment_consult">Equipment Consult</div>
         <div class="type-dur">~30 min</div>
       </button>
       <button class="appt-type-btn" onclick="selectApptType(this,'Health Review')" data-dur="45">
         <div class="type-icon">🩺</div>
-        <div class="type-label"data-i18n="health_review">Health Review</div>
+        <div class="type-label" data-i18n="health_review">Health Review</div>
         <div class="type-dur">~45 min</div>
       </button>
       <button class="appt-type-btn" onclick="selectApptType(this,'Repair / Service')" data-dur="30">
         <div class="type-icon">🔧</div>
-        <div class="type-label"data-i18n="repair_service">Repair / Service</div>
+        <div class="type-label" data-i18n="repair_service">Repair / Service</div>
         <div class="type-dur">~30 min</div>
       </button>
     </div>
     <div id="appt-form" class="hidden">
       <div class="form-row">
         <div class="form-group">
-          <labeldata-i18n="date">Date</label>
+          <label data-i18n="date">Date</label>
           <input type="date" id="appt-date">
         </div>
         <div class="form-group">
-          <labeldata-i18n="preferred_time">Preferred Time</label>
+          <label data-i18n="preferred_time">Preferred Time</label>
           <select id="appt-time">
             <option value="09:00">9:00 AM</option>
             <option value="09:30">9:30 AM</option>
@@ -574,10 +574,10 @@ button{cursor:pointer;border:none;background:none}
         </div>
       </div>
       <div class="form-group">
-        <labeldata-i18n="notes_requirements">Notes / Special Requirements</label>
+        <label data-i18n="notes_requirements">Notes / Special Requirements</label>
         <textarea id="appt-notes" placeholder="Describe your needs or concerns..."></textarea>
       </div>
-      <button class="btn btn-pri" onclick="bookAppt()"data-i18n="confirm_booking">Confirm Booking</button>
+      <button class="btn btn-pri" onclick="bookAppt()" data-i18n="confirm_booking">Confirm Booking</button>
     </div>
   </div>
 
@@ -585,7 +585,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card mt-16">
     <div class="card-header">
       <h3 data-i18n="my_appointments">My Appointments</h3>
-      <button class="btn btn-sm btn-outline" onclick="loadAppointments()"data-i18n="refresh">Refresh</button>
+      <button class="btn btn-sm btn-outline" onclick="loadAppointments()" data-i18n="refresh">Refresh</button>
     </div>
     <div id="appt-list"></div>
   </div>
@@ -593,36 +593,36 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- ── TAB: Reports ───────────────────────── -->
 <div id="tab-reports" class="tab-content">
-  <h2 class="section-title"data-i18n="health_reports">Health Reports</h2>
+  <h2 class="section-title" data-i18n="health_reports">Health Reports</h2>
 
   <!-- Add BP Reading -->
   <div class="card">
     <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"><span data-i18n="log_bp">Log Blood Pressure</span></h3>
     <div class="form-row">
       <div class="form-group">
-        <labeldata-i18n="systolic">Systolic (top)</label>
+        <label data-i18n="systolic">Systolic (top)</label>
         <input type="number" id="bp-sys" placeholder="e.g. 120" min="60" max="250">
       </div>
       <div class="form-group">
-        <labeldata-i18n="diastolic">Diastolic (btm)</label>
+        <label data-i18n="diastolic">Diastolic (btm)</label>
         <input type="number" id="bp-dia" placeholder="e.g. 80" min="30" max="150">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <labeldata-i18n="heart_rate">Heart Rate (bpm)</label>
+        <label data-i18n="heart_rate">Heart Rate (bpm)</label>
         <input type="number" id="bp-hr" placeholder="e.g. 72" min="30" max="220">
       </div>
       <div class="form-group">
-        <labeldata-i18n="date">Date</label>
+        <label data-i18n="date">Date</label>
         <input type="date" id="bp-date">
       </div>
     </div>
     <div class="form-group">
-      <labeldata-i18n="notes">Notes</label>
+      <label data-i18n="notes">Notes</label>
       <input type="text" id="bp-notes" placeholder="e.g. After exercise, morning reading">
     </div>
-    <button class="btn btn-pri" onclick="addBP()"data-i18n="save_reading">Save Reading</button>
+    <button class="btn btn-pri" onclick="addBP()" data-i18n="save_reading">Save Reading</button>
   </div>
 
   <!-- Latest BP -->
@@ -630,7 +630,7 @@ button{cursor:pointer;border:none;background:none}
 
   <!-- BP Chart -->
   <div class="bp-chart">
-    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"data-i18n="trend_title">Trend (Last 14 readings)</h3>
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="trend_title">Trend (Last 14 readings)</h3>
     <canvas id="bp-canvas"></canvas>
   </div>
 
@@ -638,7 +638,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card">
     <div class="card-header">
       <h3 data-i18n="reading_history">Reading History</h3>
-      <button class="btn btn-sm btn-outline" onclick="loadBP()"data-i18n="refresh">Refresh</button>
+      <button class="btn btn-sm btn-outline" onclick="loadBP()" data-i18n="refresh">Refresh</button>
     </div>
     <div id="bp-history"></div>
   </div>
@@ -662,7 +662,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card">
     <div class="card-header">
       <h3 data-i18n="health_profile">Health Profile</h3>
-      <button class="btn btn-sm btn-outline" onclick="openHealthModal()"data-i18n="edit">Edit</button>
+      <button class="btn btn-sm btn-outline" onclick="openHealthModal()" data-i18n="edit">Edit</button>
     </div>
     <div class="info-grid" id="health-info-grid"></div>
   </div>
@@ -671,7 +671,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card mt-16">
     <div class="card-header">
       <h3 data-i18n="account_details">Account Details</h3>
-      <button class="btn btn-sm btn-outline" onclick="openAccountModal()"data-i18n="edit">Edit</button>
+      <button class="btn btn-sm btn-outline" onclick="openAccountModal()" data-i18n="edit">Edit</button>
     </div>
     <div class="info-grid" id="account-info-grid"></div>
   </div>
@@ -680,20 +680,20 @@ button{cursor:pointer;border:none;background:none}
   <div class="card mt-16">
     <div class="card-header">
       <h3 data-i18n="my_orders">My Orders</h3>
-      <button class="btn btn-sm btn-outline" onclick="loadOrders()"data-i18n="refresh">Refresh</button>
+      <button class="btn btn-sm btn-outline" onclick="loadOrders()" data-i18n="refresh">Refresh</button>
     </div>
     <div id="orders-list"></div>
   </div>
 
   <div class="text-center mt-24">
-    <button class="btn btn-outline" onclick="doLogout()" style="max-width:200px;margin:0 auto"data-i18n="sign_out">Sign Out</button>
+    <button class="btn btn-outline" onclick="doLogout()" style="max-width:200px;margin:0 auto" data-i18n="sign_out">Sign Out</button>
   </div>
 </div>
 
 <!-- ── TAB: Products ──────────────────────── -->
 <div id="tab-products" class="tab-content">
-  <h2 class="section-title"data-i18n="equipment_title">Equipment</h2>
-  <p class="text-sm text-muted mb-16"data-i18n="products_desc">Rent or purchase quality assistive equipment. We also offer repair and servicing for all items.</p>
+  <h2 class="section-title" data-i18n="equipment_title">Equipment</h2>
+  <p class="text-sm text-muted mb-16" data-i18n="products_desc">Rent or purchase quality assistive equipment. We also offer repair and servicing for all items.</p>
   <div class="filter-row" id="product-filters"></div>
   <div id="product-list"></div>
 </div>
@@ -729,19 +729,19 @@ button{cursor:pointer;border:none;background:none}
 <div id="health-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('health-modal')">
 <div class="modal" style="position:relative">
   <button class="modal-close" onclick="closeModal('health-modal')">✕</button>
-  <h3data-i18n="edit_health">Edit Health Profile</h3>
+  <h3 data-i18n="edit_health">Edit Health Profile</h3>
   <div class="form-row">
     <div class="form-group">
-      <labeldata-i18n="height_cm">Height (cm)</label>
+      <label data-i18n="height_cm">Height (cm)</label>
       <input type="number" id="hp-height" placeholder="e.g. 170">
     </div>
     <div class="form-group">
-      <labeldata-i18n="weight_kg">Weight (kg)</label>
+      <label data-i18n="weight_kg">Weight (kg)</label>
       <input type="number" id="hp-weight" placeholder="e.g. 65">
     </div>
   </div>
   <div class="form-group">
-    <labeldata-i18n="blood_type">Blood Type</label>
+    <label data-i18n="blood_type">Blood Type</label>
     <select id="hp-blood">
       <option value="">Select</option>
       <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
@@ -749,22 +749,22 @@ button{cursor:pointer;border:none;background:none}
     </select>
   </div>
   <div class="form-group">
-    <labeldata-i18n="allergies">Allergies</label>
+    <label data-i18n="allergies">Allergies</label>
     <textarea id="hp-allergies" placeholder="List known allergies"></textarea>
   </div>
   <div class="form-group">
-    <labeldata-i18n="conditions">Medical Conditions</label>
+    <label data-i18n="conditions">Medical Conditions</label>
     <textarea id="hp-conditions" placeholder="e.g. Diabetes, Hypertension"></textarea>
   </div>
   <div class="form-group">
-    <labeldata-i18n="medications">Current Medications</label>
+    <label data-i18n="medications">Current Medications</label>
     <textarea id="hp-medications" placeholder="List medications and dosages"></textarea>
   </div>
   <div class="form-group">
-    <labeldata-i18n="additional_notes">Additional Notes</label>
+    <label data-i18n="additional_notes">Additional Notes</label>
     <textarea id="hp-notes" placeholder="Any other health information"></textarea>
   </div>
-  <button class="btn btn-pri" onclick="saveHealth()"data-i18n="save_health">Save Health Profile</button>
+  <button class="btn btn-pri" onclick="saveHealth()" data-i18n="save_health">Save Health Profile</button>
 </div>
 </div>
 
@@ -772,13 +772,13 @@ button{cursor:pointer;border:none;background:none}
 <div id="account-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('account-modal')">
 <div class="modal" style="position:relative">
   <button class="modal-close" onclick="closeModal('account-modal')">✕</button>
-  <h3data-i18n="edit_account">Edit Account</h3>
+  <h3 data-i18n="edit_account">Edit Account</h3>
   <div class="form-group">
-    <labeldata-i18n="full_name">Full Name</label>
+    <label data-i18n="full_name">Full Name</label>
     <input type="text" id="acct-name">
   </div>
   <div class="form-group">
-    <labeldata-i18n="email">Email</label>
+    <label data-i18n="email">Email</label>
     <input type="email" id="acct-email">
   </div>
   <div class="form-row">
@@ -787,7 +787,7 @@ button{cursor:pointer;border:none;background:none}
       <input type="date" id="acct-dob">
     </div>
     <div class="form-group">
-      <labeldata-i18n="gender">Gender</label>
+      <label data-i18n="gender">Gender</label>
       <select id="acct-gender">
         <option value="">Select</option>
         <option>Male</option><option>Female</option><option>Other</option>
@@ -795,11 +795,11 @@ button{cursor:pointer;border:none;background:none}
     </div>
   </div>
   <div class="form-group">
-    <labeldata-i18n="address">Address</label>
+    <label data-i18n="address">Address</label>
     <input type="text" id="acct-address">
   </div>
   <div class="form-group">
-    <labeldata-i18n="postal_code">Postal Code</label>
+    <label data-i18n="postal_code">Postal Code</label>
     <input type="text" id="acct-postal">
   </div>
   <div class="form-row">
@@ -816,7 +816,7 @@ button{cursor:pointer;border:none;background:none}
     <label>New Password (leave blank to keep)</label>
     <input type="password" id="acct-newpw" placeholder="New password">
   </div>
-  <button class="btn btn-pri" onclick="saveAccount()"data-i18n="save_changes">Save Changes</button>
+  <button class="btn btn-pri" onclick="saveAccount()" data-i18n="save_changes">Save Changes</button>
 </div>
 </div>
 
@@ -832,7 +832,7 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div id="order-buy-fields">
     <div class="form-group">
-      <labeldata-i18n="quantity">Quantity</label>
+      <label data-i18n="quantity">Quantity</label>
       <input type="number" id="order-qty" value="1" min="1">
     </div>
     <div class="form-group">
@@ -857,12 +857,12 @@ button{cursor:pointer;border:none;background:none}
     </div>
   </div>
   <div class="form-group">
-    <labeldata-i18n="notes">Notes</label>
+    <label data-i18n="notes">Notes</label>
     <textarea id="order-notes" placeholder="Delivery address, special requests..."></textarea>
   </div>
   <input type="hidden" id="order-product-id">
   <input type="hidden" id="order-sale-price">
-  <button class="btn btn-accent" onclick="submitOrder()"data-i18n="place_order">Place Order</button>
+  <button class="btn btn-accent" onclick="submitOrder()" data-i18n="place_order">Place Order</button>
 </div>
 </div>
 
@@ -1242,11 +1242,12 @@ function applyLanguage() {
     renderProducts(activeCat);
   }
   
-  // Re-render profile and health data
+  // Re-render profile, health data, and updates
   if (ME) {
     renderProfile();
     renderHealthSummary();
     renderBP();
+    loadUpdates();
   }
 }
 
@@ -1549,14 +1550,45 @@ async function loadUpdates() {
       el.innerHTML = '<div class="empty-state"><p>No updates yet</p></div>';
       return;
     }
-    el.innerHTML = r.updates.map(u => `
+    el.innerHTML = r.updates.map(u => {
+      const title = getUpdateText(u.title, 'title') || u.title;
+      const content = getUpdateText(u.title, 'content') || u.content;
+      return `
       <div class="update-item">
         <div class="update-date">${formatDate(u.date)}</div>
-        <h4>${esc(u.title)}</h4>
-        <p>${esc(u.content)}</p>
+        <h4>${esc(title)}</h4>
+        <p>${esc(content)}</p>
       </div>
-    `).join('');
+    `}).join('');
   } catch(e) {}
+}
+
+const UPDATE_LANG = {
+  zh: {
+    'Welcome to AssistLiving': { title:'欢迎来到 Juan SecureLiving', content:'我们致力于支持独立生活。浏览我们的设备、预约咨询或追踪您的健康——一切尽在一处。' },
+    'Welcome to Juan SecureLiving': { title:'欢迎来到 Juan SecureLiving', content:'我们致力于支持独立生活。浏览我们的设备、预约咨询或追踪您的健康——一切尽在一处。' },
+    'Free Home Assessment': { title:'免费家居评估', content:'本月预约免费家居安全评估。我们的顾问将评估您的家居环境并推荐更安全的生活改造方案。' },
+    'New: Health Tracking': { title:'新功能：健康追踪', content:'您现在可以记录血压读数并追踪健康指标。保持健康，关注您的身体状况。' }
+  },
+  ms: {
+    'Welcome to AssistLiving': { title:'Selamat Datang ke Juan SecureLiving', content:'Kami di sini untuk menyokong kehidupan berdikari. Lihat peralatan kami, tempah perundingan, atau jejak kesihatan anda — semuanya di satu tempat.' },
+    'Welcome to Juan SecureLiving': { title:'Selamat Datang ke Juan SecureLiving', content:'Kami di sini untuk menyokong kehidupan berdikari. Lihat peralatan kami, tempah perundingan, atau jejak kesihatan anda — semuanya di satu tempat.' },
+    'Free Home Assessment': { title:'Penilaian Rumah Percuma', content:'Tempah penilaian keselamatan rumah percuma bulan ini. Perunding kami akan menilai rumah anda dan mencadangkan pengubahsuaian untuk kehidupan lebih selamat.' },
+    'New: Health Tracking': { title:'Baru: Penjejakan Kesihatan', content:'Anda kini boleh merekodkan bacaan tekanan darah dan menjejaki metrik kesihatan anda. Kekalkan kesejahteraan anda.' }
+  },
+  ta: {
+    'Welcome to AssistLiving': { title:'Juan SecureLiving-க்கு வரவேற்கிறோம்', content:'சுதந்திர வாழ்க்கையை ஆதரிக்க நாங்கள் இங்கே இருக்கிறோம். எங்கள் உபகரணங்களை பார்வையிடுங்கள், ஆலோசனை முன்பதிவு செய்யுங்கள், அல்லது உங்கள் ஆரோக்கியத்தை கண்காணியுங்கள்.' },
+    'Welcome to Juan SecureLiving': { title:'Juan SecureLiving-க்கு வரவேற்கிறோம்', content:'சுதந்திர வாழ்க்கையை ஆதரிக்க நாங்கள் இங்கே இருக்கிறோம். எங்கள் உபகரணங்களை பார்வையிடுங்கள், ஆலோசனை முன்பதிவு செய்யுங்கள், அல்லது உங்கள் ஆரோக்கியத்தை கண்காணியுங்கள்.' },
+    'Free Home Assessment': { title:'இலவச வீட்டு மதிப்பீடு', content:'இந்த மாதம் இலவச வீட்டு பாதுகாப்பு மதிப்பீடு முன்பதிவு செய்யுங்கள். எங்கள் ஆலோசகர்கள் உங்கள் வீட்டை மதிப்பீடு செய்து பாதுகாப்பான வாழ்க்கைக்கான மாற்றங்களை பரிந்துரைப்பார்கள்.' },
+    'New: Health Tracking': { title:'புதிய: சுகாதார கண்காணிப்பு', content:'இப்போது உங்கள் இரத்த அழுத்த வாசிப்புகளை பதிவு செய்து சுகாதார அளவீடுகளை கண்காணிக்கலாம். உங்கள் ஆரோக்கியத்தை கவனியுங்கள்.' }
+  }
+};
+
+function getUpdateText(originalTitle, field) {
+  if (currentLang === 'en') return null;
+  const langData = UPDATE_LANG[currentLang];
+  if (!langData || !langData[originalTitle]) return null;
+  return langData[originalTitle][field] || null;
 }
 
 /* ── Health Profile ───────────────────────── */
