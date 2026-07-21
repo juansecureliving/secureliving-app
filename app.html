@@ -282,6 +282,12 @@ button{cursor:pointer;border:none;background:none}
 .text-muted{color:var(--muted)}
 .text-sm{font-size:13px}
 .hidden{display:none!important}
+.tab-btn.locked{opacity:.4;pointer-events:none}
+.guest-prompt{text-align:center;padding:48px 24px}
+.guest-prompt .guest-icon{font-size:48px;margin-bottom:16px;opacity:.5}
+.guest-prompt h3{font-family:var(--font-display);font-size:20px;margin-bottom:8px}
+.guest-prompt p{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.5}
+.guest-prompt .btn{max-width:220px;margin:0 auto}
 </style>
 </head>
 <body>
@@ -314,7 +320,10 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <button class="btn btn-pri" onclick="doLogin()" data-i18n="sign_in">Sign In</button>
     <div class="auth-switch">
-      New here? <a href="#" onclick="showRegister()">Create an account</a>
+      New here? <a href="#" onclick="showRegister()" data-i18n="create_account">Create an account</a>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-outline" onclick="enterGuest()" data-i18n="continue_guest">Continue as Guest</button>
     </div>
   </div>
 </div>
@@ -404,7 +413,7 @@ button{cursor:pointer;border:none;background:none}
       <option value="ms" style="color:#333">Melayu</option>
       <option value="ta" style="color:#333">தமிழ்</option>
     </select>
-    <div class="user-pill" onclick="switchTab('profile')">
+    <div class="user-pill" onclick="isGuest ? doLogout() : switchTab('profile')">
       <div class="avatar" id="top-avatar"></div>
       <span id="top-name"></span>
     </div>
@@ -519,6 +528,12 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- ── TAB: Consultation ──────────────────── -->
 <div id="tab-consult" class="tab-content">
+  <div id="guest-prompt-consult" class="guest-prompt hidden">
+    <div class="guest-icon">🔒</div>
+    <h3 data-i18n="sign_in_required">Sign In Required</h3>
+    <p data-i18n="guest_appt_msg">Create an account or sign in to book appointments and consultations.</p>
+    <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
+  </div>
   <h2 class="section-title" data-i18n="appointment_title">Appointment</h2>
 
   <div class="card">
@@ -593,6 +608,12 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- ── TAB: Reports ───────────────────────── -->
 <div id="tab-reports" class="tab-content">
+  <div id="guest-prompt-reports" class="guest-prompt hidden">
+    <div class="guest-icon">🔒</div>
+    <h3 data-i18n="sign_in_required">Sign In Required</h3>
+    <p data-i18n="guest_reports_msg">Create an account or sign in to log blood pressure readings and track your health.</p>
+    <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
+  </div>
   <h2 class="section-title" data-i18n="health_reports">Health Reports</h2>
 
   <!-- Add BP Reading -->
@@ -652,6 +673,12 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- ── TAB: Profile ───────────────────────── -->
 <div id="tab-profile" class="tab-content">
+  <div id="guest-prompt-profile" class="guest-prompt hidden">
+    <div class="guest-icon">🔒</div>
+    <h3 data-i18n="sign_in_required">Sign In Required</h3>
+    <p data-i18n="guest_profile_msg">Create an account or sign in to manage your health profile and account details.</p>
+    <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
+  </div>
   <div class="profile-header">
     <div class="profile-avatar" id="profile-avatar"></div>
     <h2 id="profile-name"></h2>
@@ -995,7 +1022,13 @@ const LANG = {
     new_here:'New here?', create_account:'Create an account',
     register:'Register', confirm_pw:'Confirm',
     already_account:'Already have an account?',
-    create_account_btn:'Create Account'
+    create_account_btn:'Create Account',
+    continue_guest:'Continue as Guest',
+    sign_in_required:'Sign In Required',
+    sign_in_register:'Sign In / Register',
+    guest_appt_msg:'Create an account or sign in to book appointments and consultations.',
+    guest_reports_msg:'Create an account or sign in to log blood pressure readings and track your health.',
+    guest_profile_msg:'Create an account or sign in to manage your health profile and account details.'
   },
   zh: {
     hero_desc:'您的独立生活伙伴。我们提供设备、咨询和持续支持，让您随时做好准备。',
@@ -1059,7 +1092,13 @@ const LANG = {
     new_here:'新用户？', create_account:'创建账户',
     register:'注册', confirm_pw:'确认',
     already_account:'已有账户？',
-    create_account_btn:'创建账户'
+    create_account_btn:'创建账户',
+    continue_guest:'以访客身份继续',
+    sign_in_required:'需要登录',
+    sign_in_register:'登录 / 注册',
+    guest_appt_msg:'创建账户或登录以预约咨询服务。',
+    guest_reports_msg:'创建账户或登录以记录血压读数并追踪健康状况。',
+    guest_profile_msg:'创建账户或登录以管理您的健康档案和账户信息。'
   },
   ms: {
     hero_desc:'Rakan anda untuk kehidupan berdikari. Kami menyediakan peralatan, perundingan, dan sokongan berterusan supaya anda sentiasa bersedia.',
@@ -1123,7 +1162,13 @@ const LANG = {
     new_here:'Baru di sini?', create_account:'Daftar akaun',
     register:'Daftar', confirm_pw:'Sahkan',
     already_account:'Sudah ada akaun?',
-    create_account_btn:'Daftar Akaun'
+    create_account_btn:'Daftar Akaun',
+    continue_guest:'Teruskan sebagai Tetamu',
+    sign_in_required:'Log Masuk Diperlukan',
+    sign_in_register:'Log Masuk / Daftar',
+    guest_appt_msg:'Daftar akaun atau log masuk untuk menempah temu janji dan perundingan.',
+    guest_reports_msg:'Daftar akaun atau log masuk untuk merekod bacaan tekanan darah dan menjejak kesihatan.',
+    guest_profile_msg:'Daftar akaun atau log masuk untuk mengurus profil kesihatan dan butiran akaun.'
   },
   ta: {
     hero_desc:'சுதந்திரமான வாழ்க்கையில் உங்கள் துணை. உபகரணங்கள், ஆலோசனை, தொடர்ச்சியான ஆதரவை நாங்கள் வழங்குகிறோம்.',
@@ -1187,7 +1232,13 @@ const LANG = {
     new_here:'புதியவரா?', create_account:'கணக்கு உருவாக்கு',
     register:'பதிவு', confirm_pw:'உறுதிசெய்',
     already_account:'ஏற்கனவே கணக்கு உள்ளதா?',
-    create_account_btn:'கணக்கு உருவாக்கு'
+    create_account_btn:'கணக்கு உருவாக்கு',
+    continue_guest:'விருந்தினராக தொடரவும்',
+    sign_in_required:'உள்நுழைவு தேவை',
+    sign_in_register:'உள்நுழை / பதிவு',
+    guest_appt_msg:'சந்திப்புகள் மற்றும் ஆலோசனைகளை முன்பதிவு செய்ய கணக்கு உருவாக்கவும் அல்லது உள்நுழையவும்.',
+    guest_reports_msg:'இரத்த அழுத்த வாசிப்புகளை பதிவு செய்ய கணக்கு உருவாக்கவும் அல்லது உள்நுழையவும்.',
+    guest_profile_msg:'சுகாதார விவரம் மற்றும் கணக்கு விவரங்களை நிர்வகிக்க கணக்கு உருவாக்கவும்.'
   }
 };
 
@@ -1455,12 +1506,71 @@ async function doRegister() {
   finally { loading(false); }
 }
 
+let isGuest = false;
+
 function doLogout() {
   ME = null;
+  isGuest = false;
   localStorage.removeItem('al_member');
+  localStorage.removeItem('al_guest');
   hide('app');
   show('auth-screen');
   showLogin();
+  // Reset locked tabs
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('locked'));
+}
+
+async function enterGuest() {
+  isGuest = true;
+  ME = null;
+  localStorage.setItem('al_guest', 'true');
+  hide('auth-screen');
+  
+  // Set up top bar for guest
+  $('top-avatar').textContent = '👤';
+  $('top-name').textContent = 'Guest';
+  
+  const t = LANG[currentLang] || LANG.en;
+  const hour = new Date().getHours();
+  const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
+  $('greeting').textContent = t[greetKey] || 'Welcome';
+  
+  // Set default dates
+  const today = new Date().toISOString().split('T')[0];
+  if ($('appt-date')) $('appt-date').value = today;
+  if ($('bp-date')) $('bp-date').value = today;
+  if ($('order-rent-start')) $('order-rent-start').value = today;
+  
+  // Restore saved language
+  const savedLang = localStorage.getItem('al_lang');
+  if (savedLang) currentLang = savedLang;
+  
+  switchTab('home');
+  
+  // Initialize weather and time
+  updateTime();
+  fetchWeather();
+  setInterval(updateTime, 1000);
+  
+  // Load public data only
+  await loadUpdates();
+  await loadProducts();
+  
+  // Lock member-only tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    const tab = btn.getAttribute('data-tab');
+    if (tab === 'consult' || tab === 'reports' || tab === 'profile') {
+      btn.classList.add('locked');
+    }
+  });
+  
+  // Show guest prompts
+  show('guest-prompt-consult');
+  show('guest-prompt-reports');
+  show('guest-prompt-profile');
+  
+  applyLanguage();
+  show('app');
 }
 
 /* ── Enter App ────────────────────────────── */
@@ -1530,13 +1640,19 @@ async function enterApp() {
 
 /* ── Tab Navigation ───────────────────────── */
 function switchTab(tab) {
+  // Block member-only tabs for guests
+  if (isGuest && (tab === 'consult' || tab === 'reports' || tab === 'profile')) {
+    // Still show the tab but with guest prompt visible
+  }
+  
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   $('tab-' + tab).classList.add('active');
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+  if (tabBtn) tabBtn.classList.add('active');
 
-  if (tab === 'profile') renderProfile();
-  if (tab === 'reports') renderBPChart();
+  if (tab === 'profile' && !isGuest) renderProfile();
+  if (tab === 'reports' && !isGuest) renderBPChart();
   if (tab === 'products') setTimeout(() => addFilterSwipeListeners(), 100);
 }
 
@@ -2251,6 +2367,7 @@ function esc(s) {
 /* ── Init ─────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('al_member');
+  const guestMode = localStorage.getItem('al_guest');
   if (saved) {
     try {
       ME = JSON.parse(saved);
@@ -2264,6 +2381,8 @@ window.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('al_member');
       showLogin();
     }
+  } else if (guestMode === 'true') {
+    enterGuest();
   }
   // Resize chart on orientation change
   window.addEventListener('resize', () => { if (ME) renderBPChart(); });
