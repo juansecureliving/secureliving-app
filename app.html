@@ -275,6 +275,20 @@ button{cursor:pointer;border:none;background:none}
   background:var(--card);color:var(--muted);border:none;transition:all .2s}
 .order-type-toggle button.active{background:var(--pri);color:#fff}
 
+/* ── Tracking ──────────────────────────────── */
+.member-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.member-info{flex:1}
+.member-status{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.status-badge{font-size:11px;font-weight:600;padding:4px 8px;border-radius:12px}
+.status-online{background:var(--success);color:#fff}
+.status-offline{background:#ccc;color:#fff}
+.location-item{padding:12px;background:var(--pri-light);border-radius:8px;font-size:12px;border-left:3px solid var(--pri)}
+.location-item .location-time{color:var(--muted);margin-top:4px}
+.location-item .location-coord{font-size:11px;opacity:.7;margin-top:2px}
+.caregiver-card{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.safe-zone-card{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.zone-active{border-left:3px solid var(--success)}
+
 /* ── Utilities ────────────────────────────────── */
 .mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
 .mb-8{margin-bottom:8px}.mb-16{margin-bottom:16px}
@@ -589,6 +603,99 @@ button{cursor:pointer;border:none;background:none}
   </div>
 </div>
 
+<!-- ── TAB: Tracking ──────────────────────── -->
+<div id="tab-tracking" class="tab-content">
+  <div id="guest-prompt-tracking" class="guest-prompt hidden">
+    <div class="guest-icon">🔒</div>
+    <h3 data-i18n="sign_in_required">Sign In Required</h3>
+    <p data-i18n="guest_tracking_msg">Create an account or sign in to access tracking features.</p>
+    <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
+  </div>
+
+  <h2 class="section-title" data-i18n="tracking">Tracking</h2>
+
+  <!-- Member View (for caregivers/admin viewing tracked members) -->
+  <div id="tracking-member-view">
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="tracked_members">Tracked Members</h3>
+      <div id="tracked-members-list" style="display:grid;gap:10px"></div>
+    </div>
+
+    <!-- Live Map -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="live_map">Live Map</h3>
+      <div id="tracking-map" style="width:100%;height:300px;border-radius:12px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;">
+        Map will appear here (Part 2)
+      </div>
+    </div>
+
+    <!-- Location History -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="location_history">Location History</h3>
+      <div id="location-history-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- Member View (for members tracking themselves) -->
+  <div id="tracking-self-view" class="hidden">
+    <!-- Tracking Status -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="font-family:var(--font-display);font-size:16px" data-i18n="my_location">My Location</h3>
+        <div id="tracking-status-badge" style="background:var(--success);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600" data-i18n="tracking_enabled">Tracking Enabled</div>
+      </div>
+      <div id="current-location-display" style="padding:12px;background:var(--pri-light);border-radius:8px;font-size:13px;color:var(--text)">
+        Waiting for location...
+      </div>
+    </div>
+
+    <!-- SOS Panic Button -->
+    <div class="card">
+      <button class="btn" style="background:var(--danger);color:#fff;font-size:18px;padding:20px;width:100%;border:none;border-radius:12px;font-weight:700" onclick="triggerSOS()" data-i18n="sos_emergency">
+        🚨 SOS - EMERGENCY
+      </button>
+      <p class="text-sm text-muted" style="text-align:center;margin-top:8px" data-i18n="location_required">Location will be sent to caregivers</p>
+    </div>
+
+    <!-- Safe Zone Setup -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="safe_zone">Safe Zone</h3>
+      <div style="padding:12px;background:var(--pri-light);border-radius:8px;margin-bottom:12px">
+        <p class="text-sm" style="margin-bottom:8px"><strong data-i18n="setup_safe_zone">Setup Safe Zone</strong></p>
+        <input type="text" id="safe-zone-name" placeholder="Zone name" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px">
+        <button class="btn btn-sm btn-pri" onclick="saveSafeZone()" data-i18n="save_changes">Save</button>
+      </div>
+      <div id="safe-zones-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <!-- Add Caregiver -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="add_caregiver">Add Caregiver</h3>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input type="text" id="caregiver-name" placeholder="Name" data-i18n="placeholder" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+        <input type="tel" id="caregiver-phone" placeholder="Phone" data-i18n="placeholder" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+        <button class="btn btn-sm btn-pri" onclick="addCaregiver()" data-i18n="add_caregiver">Add Caregiver</button>
+      </div>
+      <div id="caregivers-list" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
+    </div>
+
+    <!-- Battery & Status -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="battery_status">Battery & Status</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
+          <div class="text-sm text-muted" data-i18n="battery_status">Battery</div>
+          <div style="font-size:20px;font-weight:700;color:var(--pri);margin-top:4px" id="battery-percent">--</div>
+        </div>
+        <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
+          <div class="text-sm text-muted" data-i18n="online_status">Online Status</div>
+          <div style="font-size:14px;font-weight:600;color:var(--success);margin-top:4px" id="online-status">🟢 Online</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── TAB: Reports ───────────────────────── -->
 <div id="tab-reports" class="tab-content">
   <div id="guest-prompt-reports" class="guest-prompt hidden">
@@ -721,6 +828,10 @@ button{cursor:pointer;border:none;background:none}
   <button class="tab-btn" onclick="switchTab('products')" data-tab="products">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     Products
+  </button>
+  <button class="tab-btn" onclick="switchTab('tracking')" data-tab="tracking">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M12 11v.01M15.51 11.83l.71-.71M18.364 9.879l.707-.707M20 9.172l-1 1M11 15.51l-.71.71M9.879 18.364l-.707.707M9.172 20l-1-1M11 8.49l-.71-.71M9.879 5.636l-.707-.707M9.172 4l-1 1M15.51 12.17l.71.71M18.364 14.121l.707.707M20 14.828l-1-1"/></svg>
+    Tracking
   </button>
   <button class="tab-btn" onclick="switchTab('reports')" data-tab="reports">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -942,6 +1053,18 @@ const LANG = {
     mission_desc:'As Singapore\'s population ages and more people live independently, we believe everyone deserves access to quality assistive equipment and support — before an emergency happens. We help you prepare, educate, and equip so that sudden disability or medical needs never catch you off guard.',
     prepare:'Prepare', educate:'Educate', equip:'Equip', support:'Support', sustain:'Sustain',
     latest_updates:'Latest Updates',
+    // Tracking
+    tracking:'Tracking', my_location:'My Location', member_tracking:'Member Tracking',
+    live_map:'Live Map', location_history:'Location History', battery_status:'Battery Status',
+    last_seen:'Last Seen', dwell_time:'Dwell Time', online_status:'Online Status',
+    safe_zone:'Safe Zone', geofence_alert:'Geofence Alert', panic_button:'Panic Button',
+    sos_emergency:'SOS - Emergency', left_safe_zone:'Left Safe Zone!',
+    member_location:'Member Location', tracked_members:'Tracked Members',
+    setup_safe_zone:'Setup Safe Zone', add_caregiver:'Add Caregiver',
+    caregiver_name:'Caregiver Name', caregiver_phone:'Caregiver Phone',
+    enable_tracking:'Enable Location Tracking', tracking_enabled:'Tracking Enabled',
+    tracking_disabled:'Tracking Disabled', location_permission:'Location Permission',
+    allow_location:'Allow Location Access', location_required:'Location tracking requires permission',
     // Appointment
     appointment_title:'Appointment', book_an_appt:'Book an Appointment',
     select_type:'<span data-i18n="select_type">Select the type of consultation you need:</span>',
@@ -995,7 +1118,7 @@ const LANG = {
     singapore:'Singapore', loading:'Loading...',
     // Tabs
     tab_home:'Home', tab_appt:'Appointment', tab_products:'Products',
-    tab_reports:'Reports', tab_profile:'Profile',
+    tab_reports:'Reports', tab_profile:'Profile', tab_tracking:'Tracking',
     // Greetings
     welcome:'Welcome', good_morning:'Good Morning',
     good_afternoon:'Good Afternoon', good_evening:'Good Evening',
@@ -1023,6 +1146,17 @@ const LANG = {
     mission_desc:'随着新加坡人口老龄化，越来越多人独立生活。我们相信每个人都应在紧急情况发生前获得优质辅助设备和支持。我们帮助您做好准备、教育和装备，让突发残疾或医疗需求不会让您措手不及。',
     prepare:'准备', educate:'教育', equip:'装备', support:'支持', sustain:'维护',
     latest_updates:'最新动态',
+    tracking:'追踪', my_location:'我的位置', member_tracking:'成员追踪',
+    live_map:'实时地图', location_history:'位置历史', battery_status:'电池状态',
+    last_seen:'最后见于', dwell_time:'停留时间', online_status:'在线状态',
+    safe_zone:'安全区域', geofence_alert:'地理围栏警报', panic_button:'紧急按钮',
+    sos_emergency:'SOS - 紧急', left_safe_zone:'离开安全区域！',
+    member_location:'成员位置', tracked_members:'被追踪的成员',
+    setup_safe_zone:'设置安全区域', add_caregiver:'添加照护者',
+    caregiver_name:'照护者姓名', caregiver_phone:'照护者电话',
+    enable_tracking:'启用位置追踪', tracking_enabled:'追踪已启用',
+    tracking_disabled:'追踪已禁用', location_permission:'位置权限',
+    allow_location:'允许位置访问', location_required:'位置追踪需要权限',
     appointment_title:'预约', book_an_appt:'预约服务',
     select_type:'请选择您需要的咨询类型：',
     home_assessment:'家居评估', equipment_consult:'设备咨询',
@@ -1067,7 +1201,7 @@ const LANG = {
     humidity:'湿度', wind:'风速', feels_like:'体感温度',
     singapore:'新加坡', loading:'加载中...',
     tab_home:'首页', tab_appt:'预约', tab_products:'设备',
-    tab_reports:'报告', tab_profile:'档案',
+    tab_reports:'报告', tab_profile:'档案', tab_tracking:'追踪',
     welcome:'欢迎', good_morning:'早上好',
     good_afternoon:'下午好', good_evening:'晚上好',
     welcome_back:'欢迎回来', phone_number:'手机号码',
@@ -1081,7 +1215,8 @@ const LANG = {
     sign_in_register:'登录 / 注册',
     guest_appt_msg:'创建账户或登录以预约咨询服务。',
     guest_reports_msg:'创建账户或登录以记录血压读数并追踪健康状况。',
-    guest_profile_msg:'创建账户或登录以管理您的健康档案和账户信息。'
+    guest_profile_msg:'创建账户或登录以管理您的健康档案和账户信息。',
+    guest_tracking_msg:'创建账户或登录以访问追踪功能。',
   },
   ms: {
     hero_desc:'Rakan anda untuk kehidupan berdikari. Kami menyediakan peralatan, perundingan, dan sokongan berterusan supaya anda sentiasa bersedia.',
@@ -1093,6 +1228,17 @@ const LANG = {
     mission_desc:'Apabila populasi Singapura semakin menua dan lebih ramai hidup berdikari, kami percaya semua orang berhak mendapat akses kepada peralatan bantuan dan sokongan berkualiti — sebelum kecemasan berlaku. Kami membantu anda bersedia, mendidik, dan melengkapkan supaya kecacatan mendadak atau keperluan perubatan tidak mengejutkan anda.',
     prepare:'Persediaan', educate:'Didik', equip:'Perlengkap', support:'Sokongan', sustain:'Keberterusan',
     latest_updates:'Berita Terkini',
+    tracking:'Penjejakan', my_location:'Lokasi Saya', member_tracking:'Penjejakan Ahli',
+    live_map:'Peta Langsung', location_history:'Sejarah Lokasi', battery_status:'Status Bateri',
+    last_seen:'Terakhir Dilihat', dwell_time:'Masa Tinggal', online_status:'Status Dalam Talian',
+    safe_zone:'Zon Selamat', geofence_alert:'Amaran Geofence', panic_button:'Butang Panik',
+    sos_emergency:'SOS - Kecemasan', left_safe_zone:'Meninggalkan Zon Selamat!',
+    member_location:'Lokasi Ahli', tracked_members:'Ahli Dipantau',
+    setup_safe_zone:'Sediakan Zon Selamat', add_caregiver:'Tambah Penjaga',
+    caregiver_name:'Nama Penjaga', caregiver_phone:'Telefon Penjaga',
+    enable_tracking:'Dayakan Penjejakan Lokasi', tracking_enabled:'Penjejakan Didayakan',
+    tracking_disabled:'Penjejakan Dilumpuhkan', location_permission:'Kebenaran Lokasi',
+    allow_location:'Benarkan Akses Lokasi', location_required:'Penjejakan lokasi memerlukan kebenaran',
     appointment_title:'Temu Janji', book_an_appt:'Tempah Temu Janji',
     select_type:'Pilih jenis perundingan yang anda perlukan:',
     home_assessment:'Penilaian Rumah', equipment_consult:'Perundingan Peralatan',
@@ -1137,7 +1283,7 @@ const LANG = {
     humidity:'Kelembapan', wind:'Angin', feels_like:'Terasa Seperti',
     singapore:'Singapura', loading:'Memuatkan...',
     tab_home:'Utama', tab_appt:'Temu Janji', tab_products:'Peralatan',
-    tab_reports:'Laporan', tab_profile:'Profil',
+    tab_reports:'Laporan', tab_profile:'Profil', tab_tracking:'Penjejakan',
     welcome:'Selamat Datang', good_morning:'Selamat Pagi',
     good_afternoon:'Selamat Tengah Hari', good_evening:'Selamat Petang',
     welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
@@ -1163,6 +1309,17 @@ const LANG = {
     mission_desc:'சிங்கப்பூரின் மக்கள்தொகை வயதாகி, அதிகமானோர் சுதந்திரமாக வாழ்கையில், அவசரநிலை ஏற்படுமுன் தரமான உதவி உபகரணங்களையும் ஆதரவையும் பெற அனைவருக்கும் உரிமை உண்டு என்று நாங்கள் நம்புகிறோம்.',
     prepare:'தயாரி', educate:'கல்வி', equip:'உபகரணப்படுத்து', support:'ஆதரவு', sustain:'நிலைத்தவ',
     latest_updates:'சமீபத்திய செய்திகள்',
+    tracking:'கண்காணிப்பு', my_location:'என் இடம்', member_tracking:'உறுப்பினர் கண்காணிப்பு',
+    live_map:'நேரடி வரைபடம்', location_history:'இடம் வரலாறு', battery_status:'பேட்டரி நிலை',
+    last_seen:'கடைசியாக பார்க்கப்பட்டது', dwell_time:'தங்குதல் நேரம்', online_status:'ஆன்லைன் நிலை',
+    safe_zone:'பாதுகாப்பான பகுதி', geofence_alert:'ஜியோ ஃபென்ஸ் எச்சரிக்கை', panic_button:'பதட்ட பொத்தான்',
+    sos_emergency:'SOS - அவசரம்', left_safe_zone:'பாதுகாப்பான பகுதியை விட்டு வெளியேறினார்!',
+    member_location:'உறுப்பினர் இடம்', tracked_members:'கண்காணிக்கப்பட்ட உறுப்பினர்கள்',
+    setup_safe_zone:'பாதுகாப்பான பகுதியை அமைக்கவும்', add_caregiver:'பராமரிப்பாளரைச் சேர்க்கவும்',
+    caregiver_name:'பராமரிப்பாளர் பெயர்', caregiver_phone:'பராமரிப்பாளர் தொலைபேசி',
+    enable_tracking:'இட கண்காணிப்பை இயக்கவும்', tracking_enabled:'கண்காணிப்பு இயக்கப்பட்டது',
+    tracking_disabled:'கண்காணிப்பு முடக்கப்பட்டது', location_permission:'இட அனுமதி',
+    allow_location:'இட அணுக அனுமதிக்கவும்', location_required:'இட கண்காணிப்புக்கு அனுமதி தேவை',
     appointment_title:'சந்திப்பு', book_an_appt:'சந்திப்பு முன்பதிவு',
     select_type:'உங்களுக்கு தேவையான ஆலோசனை வகையை தேர்வு செய்யவும்:',
     home_assessment:'வீட்டு மதிப்பீடு', equipment_consult:'உபகரண ஆலோசனை',
@@ -1207,7 +1364,7 @@ const LANG = {
     humidity:'ஈரப்பதம்', wind:'காற்று', feels_like:'உணர்வு வெப்பம்',
     singapore:'சிங்கப்பூர்', loading:'ஏற்றுகிறது...',
     tab_home:'முகப்பு', tab_appt:'சந்திப்பு', tab_products:'உபகரணங்கள்',
-    tab_reports:'அறிக்கை', tab_profile:'சுயவிவரம்',
+    tab_reports:'அறிக்கை', tab_profile:'சுயவிவரம்', tab_tracking:'கண்காணிப்பு',
     welcome:'வரவேற்கிறோம்', good_morning:'காலை வணக்கம்',
     good_afternoon:'மதிய வணக்கம்', good_evening:'மாலை வணக்கம்',
     welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
@@ -1511,6 +1668,14 @@ async function doRegister() {
 }
 
 let isGuest = false;
+let trackingEnabled = false;
+let currentLocation = null;
+let batteryPercent = 100;
+let isOnline = true;
+let caregivers = [];
+let safeZones = [];
+let locationHistory = [];
+let gpsWatchId = null;
 
 function doLogout() {
   ME = null;
@@ -1657,7 +1822,7 @@ async function enterApp() {
 /* ── Tab Navigation ───────────────────────── */
 function switchTab(tab) {
   // Block member-only tabs for guests
-  if (isGuest && (tab === 'consult' || tab === 'reports' || tab === 'profile')) {
+  if (isGuest && (tab === 'consult' || tab === 'reports' || tab === 'profile' || tab === 'tracking')) {
     // Still show the tab but with guest prompt visible
   }
   
@@ -1669,6 +1834,7 @@ function switchTab(tab) {
 
   if (tab === 'profile' && !isGuest) renderProfile();
   if (tab === 'reports' && !isGuest) renderBPChart();
+  if (tab === 'tracking' && !isGuest) renderTrackingTab();
   if (tab === 'products') setTimeout(() => addFilterSwipeListeners(), 100);
 }
 
@@ -2391,6 +2557,279 @@ async function loadOrders() {
       `;
     }).join('');
   } catch(e) {}
+}
+
+/* ── Tracking (Part 1 - Frontend UI) ──────────── */
+
+function renderTrackingTab() {
+  const t = LANG[currentLang] || LANG.en;
+  
+  // Determine if user is caregiver/admin or member
+  const isCaregiver = ME && (ME.role === 'admin');
+  
+  if (isCaregiver) {
+    // Show caregiver view (member tracking)
+    show('tracking-member-view');
+    hide('tracking-self-view');
+    renderTrackedMembersList();
+    renderLocationHistory();
+  } else {
+    // Show member view (self tracking)
+    hide('tracking-member-view');
+    show('tracking-self-view');
+    requestLocationPermission();
+    updateTrackingUI();
+  }
+}
+
+function requestLocationPermission() {
+  const t = LANG[currentLang] || LANG.en;
+  
+  if (!navigator.geolocation) {
+    toast('Geolocation not supported on this device', 'error');
+    return;
+  }
+  
+  // Request permission
+  navigator.permissions.query({ name: 'geolocation' }).then(result => {
+    if (result.state === 'granted' || result.state === 'prompt') {
+      startTracking();
+    } else if (result.state === 'denied') {
+      toast(t.location_required || 'Location permission required for tracking', 'error');
+    }
+  }).catch(() => {
+    // Fallback for browsers that don't support permissions API
+    startTracking();
+  });
+}
+
+function startTracking() {
+  const t = LANG[currentLang] || LANG.en;
+  
+  if (!navigator.geolocation) return;
+  
+  trackingEnabled = true;
+  if ($('tracking-status-badge')) {
+    $('tracking-status-badge').textContent = t.tracking_enabled || 'Tracking Enabled';
+    $('tracking-status-badge').style.background = 'var(--success)';
+  }
+  
+  // Get location every 30 seconds
+  gpsWatchId = navigator.geolocation.watchPosition(
+    position => {
+      currentLocation = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+        timestamp: new Date().toISOString(),
+        dwell_time: calculateDwellTime()
+      };
+      
+      // Add to history
+      locationHistory.unshift(currentLocation);
+      if (locationHistory.length > 200) locationHistory.pop(); // Keep only 200 recent
+      
+      updateTrackingUI();
+      checkGeofence();
+    },
+    error => {
+      console.error('Geolocation error:', error);
+      toast('Unable to get location', 'error');
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+  
+  // Get battery status
+  if (navigator.getBattery) {
+    navigator.getBattery().then(battery => {
+      batteryPercent = Math.round(battery.level * 100);
+      battery.addEventListener('levelchange', () => {
+        batteryPercent = Math.round(battery.level * 100);
+        updateBatteryDisplay();
+      });
+    });
+  }
+}
+
+function calculateDwellTime() {
+  if (locationHistory.length < 2) return 0;
+  const now = new Date(locationHistory[0].timestamp).getTime();
+  const prev = new Date(locationHistory[locationHistory.length - 1].timestamp).getTime();
+  return Math.round((now - prev) / 60000); // in minutes
+}
+
+function updateTrackingUI() {
+  const t = LANG[currentLang] || LANG.en;
+  
+  if (currentLocation) {
+    const lat = currentLocation.latitude.toFixed(4);
+    const lng = currentLocation.longitude.toFixed(4);
+    const acc = Math.round(currentLocation.accuracy);
+    const dwell = currentLocation.dwell_time || 0;
+    
+    if ($('current-location-display')) {
+      $('current-location-display').innerHTML = `
+        <div style="margin-bottom:8px"><strong>${lat}, ${lng}</strong></div>
+        <div class="text-sm text-muted">Accuracy: ${acc}m · Dwell: ${dwell}m</div>
+        <div class="text-sm text-muted">Updated: ${new Date(currentLocation.timestamp).toLocaleTimeString('en-SG')}</div>
+      `;
+    }
+  }
+  
+  updateBatteryDisplay();
+}
+
+function updateBatteryDisplay() {
+  if ($('battery-percent')) $('battery-percent').textContent = batteryPercent + '%';
+  if ($('online-status')) {
+    const status = isOnline ? '🟢 Online' : '🔴 Offline';
+    $('online-status').textContent = status;
+  }
+}
+
+function checkGeofence() {
+  const t = LANG[currentLang] || LANG.en;
+  
+  if (!currentLocation || safeZones.length === 0) return;
+  
+  safeZones.forEach(zone => {
+    const distance = calculateDistance(
+      currentLocation.latitude, 
+      currentLocation.longitude,
+      zone.latitude,
+      zone.longitude
+    );
+    
+    if (distance > zone.radius_meters) {
+      // Outside safe zone
+      toast(`⚠️ ${t.left_safe_zone || 'Left Safe Zone!'} (${zone.name})`, 'warning');
+      // Part 2: Send notification to caregivers
+    }
+  });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // Earth radius in meters
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function triggerSOS() {
+  const t = LANG[currentLang] || LANG.en;
+  
+  if (!confirm(t.sos_emergency + '?\n\n' + (t.location_required || 'Send location to caregivers?'))) return;
+  
+  if (currentLocation) {
+    toast('🚨 ' + (t.sos_emergency || 'SOS') + ' - ' + (t.location_required || 'Location sent to caregivers'), 'error');
+    // Part 2: Send SOS alert with location to caregivers
+    console.log('SOS triggered at:', currentLocation);
+  } else {
+    toast('Waiting for location...', 'error');
+  }
+}
+
+function saveSafeZone() {
+  const name = $('safe-zone-name').value.trim();
+  if (!name) {
+    toast('Please enter zone name', 'error');
+    return;
+  }
+  
+  if (!currentLocation) {
+    toast('Waiting for location...', 'error');
+    return;
+  }
+  
+  const zone = {
+    id: Date.now().toString(),
+    name: name,
+    latitude: currentLocation.latitude,
+    longitude: currentLocation.longitude,
+    radius_meters: 500 // 500m default radius
+  };
+  
+  safeZones.push(zone);
+  $('safe-zone-name').value = '';
+  toast('Safe zone added: ' + name, 'success');
+  renderSafeZones();
+}
+
+function renderSafeZones() {
+  const html = safeZones.map(z => `
+    <div class="safe-zone-card zone-active">
+      <div>
+        <strong>${esc(z.name)}</strong>
+        <p class="text-sm text-muted">${z.latitude.toFixed(4)}, ${z.longitude.toFixed(4)} · 500m</p>
+      </div>
+      <button onclick="removeSafeZone('${z.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">Remove</button>
+    </div>
+  `).join('');
+  
+  if ($('safe-zones-list')) $('safe-zones-list').innerHTML = html || '<p class="text-sm text-muted">No safe zones yet</p>';
+}
+
+function removeSafeZone(zoneId) {
+  safeZones = safeZones.filter(z => z.id !== zoneId);
+  renderSafeZones();
+}
+
+function addCaregiver() {
+  const name = $('caregiver-name').value.trim();
+  const phone = $('caregiver-phone').value.trim();
+  
+  if (!name || !phone) {
+    toast('Please fill in all fields', 'error');
+    return;
+  }
+  
+  const caregiver = {
+    id: Date.now().toString(),
+    name: name,
+    phone: phone
+  };
+  
+  caregivers.push(caregiver);
+  $('caregiver-name').value = '';
+  $('caregiver-phone').value = '';
+  toast('Caregiver added: ' + name, 'success');
+  renderCaregivers();
+}
+
+function renderCaregivers() {
+  const html = caregivers.map(c => `
+    <div class="caregiver-card">
+      <div>
+        <strong>${esc(c.name)}</strong>
+        <p class="text-sm text-muted">${esc(c.phone)}</p>
+      </div>
+      <button onclick="removeCaregiver('${c.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">Remove</button>
+    </div>
+  `).join('');
+  
+  if ($('caregivers-list')) $('caregivers-list').innerHTML = html || '<p class="text-sm text-muted">No caregivers added yet</p>';
+}
+
+function removeCaregiver(caregiverId) {
+  caregivers = caregivers.filter(c => c.id !== caregiverId);
+  renderCaregivers();
+}
+
+function renderTrackedMembersList() {
+  // Part 2: Fetch tracked members from backend
+  const html = '<p class="text-sm text-muted">Loading tracked members... (Part 2)</p>';
+  if ($('tracked-members-list')) $('tracked-members-list').innerHTML = html;
+}
+
+function renderLocationHistory() {
+  const t = LANG[currentLang] || LANG.en;
+  
+  // Part 2: Fetch location history from backend
+  const html = '<p class="text-sm text-muted">' + (t.loading || 'Loading') + ' (Part 2)</p>';
+  if ($('location-history-list')) $('location-history-list').innerHTML = html;
 }
 
 /* ── Utility ──────────────────────────────── */
