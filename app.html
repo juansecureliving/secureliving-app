@@ -863,6 +863,10 @@ let products = [];
 let selectedApptType = '';
 let selectedApptDur = '';
 let orderType = 'buy';
+let allCategories = [];
+let currentCategoryIndex = 0;
+let touchStartX = 0;
+let touchEndX = 0;
 
 /* ── Helpers ──────────────────────────────── */
 function $(id) { return document.getElementById(id); }
@@ -909,34 +913,55 @@ function updateTime() {
 
 async function fetchWeather() {
   try {
-    const res = await fetch('https://api.weatherapi.com/v1/forecast.json?key=5dd4d6e47b364e31b1c144420242107&q=Singapore&days=5&aqi=no', {
-      method: 'GET'
-    });
+    // Singapore coordinates: 1.3521°N, 103.8198°E
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=1.3521&longitude=103.8198&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,apparent_temperature&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia/Singapore');
     if (!res.ok) throw new Error('Weather fetch failed');
     const data = await res.json();
     
     const current = data.current;
-    const forecast = data.forecast.forecastday;
+    const daily = data.daily;
+    
+    // Weather code to emoji mapping
+    const getWeatherEmoji = (code) => {
+      if (code === 0 || code === 1) return '☀️'; // Clear/Mainly clear
+      if (code === 2 || code === 3) return '⛅'; // Partly cloudy/Overcast
+      if (code >= 45 && code <= 48) return '🌫️'; // Foggy
+      if (code >= 51 && code <= 67) return '🌧️'; // Drizzle/Rain
+      if (code >= 71 && code <= 77) return '🌨️'; // Snow
+      if (code >= 80 && code <= 82) return '🌧️'; // Rain showers
+      if (code === 85 || code === 86) return '🌨️'; // Snow showers
+      if (code >= 90 && code <= 99) return '⛈️'; // Thunderstorm
+      return '🌤️';
+    };
+    
+    const getWeatherDesc = (code) => {
+      if (code === 0) return 'Clear sky';
+      if (code === 1 || code === 2) return 'Partly cloudy';
+      if (code === 3) return 'Overcast';
+      if (code >= 45 && code <= 48) return 'Foggy';
+      if (code >= 51 && code <= 55) return 'Light drizzle';
+      if (code >= 61 && code <= 65) return 'Rain';
+      if (code >= 71 && code <= 75) return 'Snowfall';
+      if (code >= 80 && code <= 82) return 'Rain showers';
+      if (code >= 90 && code <= 99) return 'Thunderstorm';
+      return 'Unknown';
+    };
     
     // Update current weather
-    $('current-temp').textContent = Math.round(current.temp_c);
-    $('weather-desc').textContent = current.condition.text;
-    $('humidity').textContent = current.humidity + '%';
-    $('wind-speed').textContent = Math.round(current.wind_kph) + ' km/h';
-    $('feels-like').textContent = Math.round(current.feelslike_c) + '°C';
-    $('weather-icon').textContent = current.condition.icon.includes('rain') ? '🌧️' : 
-                                     current.condition.icon.includes('cloud') ? '☁️' :
-                                     current.condition.icon.includes('sun') ? '☀️' : '🌤️';
+    $('current-temp').textContent = Math.round(current.temperature_2m);
+    $('weather-desc').textContent = getWeatherDesc(current.weather_code);
+    $('humidity').textContent = current.relative_humidity_2m + '%';
+    $('wind-speed').textContent = Math.round(current.wind_speed_10m) + ' km/h';
+    $('feels-like').textContent = Math.round(current.apparent_temperature) + '°C';
+    $('weather-icon').textContent = getWeatherEmoji(current.weather_code);
     
     // Update forecast
-    const forecastHtml = forecast.slice(0, 4).map(day => {
-      const date = new Date(day.date);
-      const dayName = date.toLocaleDateString('en-SG', { weekday:'short' });
-      const icon = day.day.condition.icon.includes('rain') ? '🌧️' : 
-                   day.day.condition.icon.includes('cloud') ? '☁️' :
-                   day.day.condition.icon.includes('sun') ? '☀️' : '🌤️';
-      const maxTemp = Math.round(day.day.maxtemp_c);
-      const minTemp = Math.round(day.day.mintemp_c);
+    const forecastHtml = daily.time.slice(0, 4).map((date, i) => {
+      const d = new Date(date);
+      const dayName = d.toLocaleDateString('en-SG', { weekday:'short' });
+      const maxTemp = Math.round(daily.temperature_2m_max[i]);
+      const minTemp = Math.round(daily.temperature_2m_min[i]);
+      const icon = getWeatherEmoji(daily.weather_code[i]);
       return `
         <div class="forecast-card">
           <div class="forecast-time">${dayName}</div>
@@ -948,7 +973,9 @@ async function fetchWeather() {
     }).join('');
     $('weather-forecast').innerHTML = forecastHtml;
   } catch(e) {
-    console.log('Weather error:', e);
+    console.error('Weather error:', e);
+    $('current-temp').textContent = '--';
+    $('weather-desc').textContent = 'Weather unavailable';
   }
 }
 
@@ -1517,9 +1544,40 @@ async function loadProducts() {
 
 function renderProductFilters() {
   const cats = [...new Set(products.map(p => p.category))];
-  $('product-filters').innerHTML =
+  allCategories = ['all', ...cats];
+  currentCategoryIndex = 0;
+  const filterRow = $('product-filters');
+  filterRow.innerHTML =
     `<button class="filter-btn active" onclick="filterProducts('all',this)">All</button>` +
     cats.map(c => `<button class="filter-btn" onclick="filterProducts('${c}',this)">${c}</button>`).join('');
+  
+  // Add swipe listeners
+  filterRow.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+  filterRow.addEventListener('touchend', (e) => { 
+    touchEndX = e.changedTouches[0].screenX;
+    handleCategorySwipe();
+  });
+}
+
+function handleCategorySwipe() {
+  const swipeThreshold = 50;
+  const diff = touchStartX - touchEndX;
+  
+  if (Math.abs(diff) > swipeThreshold) {
+    if (diff > 0 && currentCategoryIndex < allCategories.length - 1) {
+      // Swiped left - next category
+      currentCategoryIndex++;
+      const cat = allCategories[currentCategoryIndex];
+      const btn = document.querySelector(`[onclick*="filterProducts('${cat}'"]`);
+      if (btn) filterProducts(cat, btn);
+    } else if (diff < 0 && currentCategoryIndex > 0) {
+      // Swiped right - previous category
+      currentCategoryIndex--;
+      const cat = allCategories[currentCategoryIndex];
+      const btn = document.querySelector(`[onclick*="filterProducts('${cat}'"]`);
+      if (btn) filterProducts(cat, btn);
+    }
+  }
 }
 
 function filterProducts(cat, btn) {
