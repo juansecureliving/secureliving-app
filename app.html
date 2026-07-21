@@ -857,7 +857,7 @@ button{cursor:pointer;border:none;background:none}
   </button>
   <button class="tab-btn" onclick="switchTab('history')" data-tab="history">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M3 12a9 9 0 0 0 9 9m0-18a9 9 0 0 0-9 9m18 0a9 9 0 0 1-9 9m0 0a9 9 0 0 1 9-9m0 0a9 9 0 1 1-9 9"/><polyline points="12 7 12 12 16 14"/></svg>
-    History
+    <span data-i18n="tab_history">History</span>
   </button>
   <button class="tab-btn" onclick="switchTab('reports')" data-tab="reports">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -2668,7 +2668,11 @@ function requestLocationPermission() {
 function startTracking() {
   const t = LANG[currentLang] || LANG.en;
   
-  if (!navigator.geolocation) return;
+  if (!navigator.geolocation) {
+    // Silently skip if geolocation not available
+    trackingEnabled = false;
+    return;
+  }
   
   trackingEnabled = true;
   if ($('tracking-status-badge')) {
@@ -2695,10 +2699,19 @@ function startTracking() {
       checkGeofence();
     },
     error => {
-      console.error('Geolocation error:', error);
-      toast('Unable to get location', 'error');
+      // Silently ignore TIMEOUT errors (common on desktop without GPS)
+      // Only show error for actual permission denial
+      if (error.code === error.PERMISSION_DENIED) {
+        console.warn('Location permission denied');
+        trackingEnabled = false;
+        if ($('tracking-status-badge')) {
+          $('tracking-status-badge').textContent = t.tracking_disabled || 'Tracking Disabled';
+          $('tracking-status-badge').style.background = '#ccc';
+        }
+      }
+      // Ignore TIMEOUT and other temporary errors silently
     },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 }
   );
   
   // Get battery status
@@ -2709,6 +2722,9 @@ function startTracking() {
         batteryPercent = Math.round(battery.level * 100);
         updateBatteryDisplay();
       });
+    }).catch(() => {
+      // Battery API not available, use fallback
+      batteryPercent = 100;
     });
   }
 }
