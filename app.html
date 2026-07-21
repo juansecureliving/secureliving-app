@@ -303,16 +303,16 @@ button{cursor:pointer;border:none;background:none}
     <p>Supporting Independent Living</p>
   </div>
   <div class="auth-card">
-    <h2>Welcome Back</h2>
+    <h2data-i18n="welcome_back">Welcome Back</h2>
     <div class="form-group">
-      <label>Phone Number</label>
+      <labeldata-i18n="phone_number">Phone Number</label>
       <input type="tel" id="login-phone" placeholder="e.g. 91234567">
     </div>
     <div class="form-group">
-      <label>Password</label>
+      <labeldata-i18n="password">Password</label>
       <input type="password" id="login-pw" placeholder="Enter password">
     </div>
-    <button class="btn btn-pri" onclick="doLogin()">Sign In</button>
+    <button class="btn btn-pri" onclick="doLogin()"data-i18n="sign_in">Sign In</button>
     <div class="auth-switch">
       New here? <a href="#" onclick="showRegister()">Create an account</a>
     </div>
@@ -327,7 +327,7 @@ button{cursor:pointer;border:none;background:none}
     <p>Create Your Account</p>
   </div>
   <div class="auth-card">
-    <h2>Register</h2>
+    <h2data-i18n="register">Register</h2>
     <div class="form-group">
       <label>Full Name *</label>
       <input type="text" id="reg-name" placeholder="Your full name">
@@ -343,11 +343,11 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
     <div class="form-group">
-      <label>Email</label>
+      <labeldata-i18n="email">Email</label>
       <input type="email" id="reg-email" placeholder="your@email.com">
     </div>
     <div class="form-group">
-      <label>Gender</label>
+      <labeldata-i18n="gender">Gender</label>
       <select id="reg-gender">
         <option value="">Select</option>
         <option>Male</option>
@@ -366,11 +366,11 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
     <div class="form-group">
-      <label>Address</label>
+      <labeldata-i18n="address">Address</label>
       <input type="text" id="reg-address" placeholder="Block, Street, Unit">
     </div>
     <div class="form-group">
-      <label>Postal Code</label>
+      <labeldata-i18n="postal_code">Postal Code</label>
       <input type="text" id="reg-postal" placeholder="e.g. 520123">
     </div>
     <div class="form-row">
@@ -383,9 +383,9 @@ button{cursor:pointer;border:none;background:none}
         <input type="tel" id="reg-ephone" placeholder="Phone">
       </div>
     </div>
-    <button class="btn btn-pri" onclick="doRegister()">Create Account</button>
+    <button class="btn btn-pri" onclick="doRegister()"data-i18n="create_account_btn">Create Account</button>
     <div class="auth-switch">
-      Already have an account? <a href="#" onclick="showLogin()">Sign In</a>
+      Already have an account? <a href="#" onclick="showLogin()"data-i18n="sign_in">Sign In</a>
     </div>
   </div>
 </div>
@@ -523,37 +523,37 @@ button{cursor:pointer;border:none;background:none}
 
   <div class="card">
     <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"><span data-i18n="book_an_appt">Book an Appointment</span></h3>
-    <p class="text-sm text-muted mb-16">Select the type of consultation you need:</p>
+    <p class="text-sm text-muted mb-16"><span data-i18n="select_type">Select the type of consultation you need:</span></p>
     <div class="appt-type-grid" id="appt-type-grid">
       <button class="appt-type-btn" onclick="selectApptType(this,'Home Assessment')" data-dur="60">
         <div class="type-icon">🏠</div>
-        <div class="type-label">Home Assessment</div>
+        <div class="type-label"data-i18n="home_assessment">Home Assessment</div>
         <div class="type-dur">~60 min</div>
       </button>
       <button class="appt-type-btn" onclick="selectApptType(this,'Equipment Consult')" data-dur="30">
         <div class="type-icon">🦽</div>
-        <div class="type-label">Equipment Consult</div>
+        <div class="type-label"data-i18n="equipment_consult">Equipment Consult</div>
         <div class="type-dur">~30 min</div>
       </button>
       <button class="appt-type-btn" onclick="selectApptType(this,'Health Review')" data-dur="45">
         <div class="type-icon">🩺</div>
-        <div class="type-label">Health Review</div>
+        <div class="type-label"data-i18n="health_review">Health Review</div>
         <div class="type-dur">~45 min</div>
       </button>
       <button class="appt-type-btn" onclick="selectApptType(this,'Repair / Service')" data-dur="30">
         <div class="type-icon">🔧</div>
-        <div class="type-label">Repair / Service</div>
+        <div class="type-label"data-i18n="repair_service">Repair / Service</div>
         <div class="type-dur">~30 min</div>
       </button>
     </div>
     <div id="appt-form" class="hidden">
       <div class="form-row">
         <div class="form-group">
-          <label>Date</label>
+          <labeldata-i18n="date">Date</label>
           <input type="date" id="appt-date">
         </div>
         <div class="form-group">
-          <label>Preferred Time</label>
+          <labeldata-i18n="preferred_time">Preferred Time</label>
           <select id="appt-time">
             <option value="09:00">9:00 AM</option>
             <option value="09:30">9:30 AM</option>
@@ -574,10 +574,10 @@ button{cursor:pointer;border:none;background:none}
         </div>
       </div>
       <div class="form-group">
-        <label>Notes / Special Requirements</label>
+        <labeldata-i18n="notes_requirements">Notes / Special Requirements</label>
         <textarea id="appt-notes" placeholder="Describe your needs or concerns..."></textarea>
       </div>
-      <button class="btn btn-pri" onclick="bookAppt()">Confirm Booking</button>
+      <button class="btn btn-pri" onclick="bookAppt()"data-i18n="confirm_booking">Confirm Booking</button>
     </div>
   </div>
 
@@ -585,7 +585,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card mt-16">
     <div class="card-header">
       <h3 data-i18n="my_appointments">My Appointments</h3>
-      <button class="btn btn-sm btn-outline" onclick="loadAppointments()">Refresh</button>
+      <button class="btn btn-sm btn-outline" onclick="loadAppointments()"data-i18n="refresh">Refresh</button>
     </div>
     <div id="appt-list"></div>
   </div>
@@ -600,29 +600,29 @@ button{cursor:pointer;border:none;background:none}
     <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"><span data-i18n="log_bp">Log Blood Pressure</span></h3>
     <div class="form-row">
       <div class="form-group">
-        <label>Systolic (top)</label>
+        <labeldata-i18n="systolic">Systolic (top)</label>
         <input type="number" id="bp-sys" placeholder="e.g. 120" min="60" max="250">
       </div>
       <div class="form-group">
-        <label>Diastolic (btm)</label>
+        <labeldata-i18n="diastolic">Diastolic (btm)</label>
         <input type="number" id="bp-dia" placeholder="e.g. 80" min="30" max="150">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Heart Rate (bpm)</label>
+        <labeldata-i18n="heart_rate">Heart Rate (bpm)</label>
         <input type="number" id="bp-hr" placeholder="e.g. 72" min="30" max="220">
       </div>
       <div class="form-group">
-        <label>Date</label>
+        <labeldata-i18n="date">Date</label>
         <input type="date" id="bp-date">
       </div>
     </div>
     <div class="form-group">
-      <label>Notes</label>
+      <labeldata-i18n="notes">Notes</label>
       <input type="text" id="bp-notes" placeholder="e.g. After exercise, morning reading">
     </div>
-    <button class="btn btn-pri" onclick="addBP()">Save Reading</button>
+    <button class="btn btn-pri" onclick="addBP()"data-i18n="save_reading">Save Reading</button>
   </div>
 
   <!-- Latest BP -->
@@ -630,7 +630,7 @@ button{cursor:pointer;border:none;background:none}
 
   <!-- BP Chart -->
   <div class="bp-chart">
-    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px">Trend (Last 14 readings)</h3>
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"data-i18n="trend_title">Trend (Last 14 readings)</h3>
     <canvas id="bp-canvas"></canvas>
   </div>
 
@@ -638,7 +638,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card">
     <div class="card-header">
       <h3 data-i18n="reading_history">Reading History</h3>
-      <button class="btn btn-sm btn-outline" onclick="loadBP()">Refresh</button>
+      <button class="btn btn-sm btn-outline" onclick="loadBP()"data-i18n="refresh">Refresh</button>
     </div>
     <div id="bp-history"></div>
   </div>
@@ -662,7 +662,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card">
     <div class="card-header">
       <h3 data-i18n="health_profile">Health Profile</h3>
-      <button class="btn btn-sm btn-outline" onclick="openHealthModal()">Edit</button>
+      <button class="btn btn-sm btn-outline" onclick="openHealthModal()"data-i18n="edit">Edit</button>
     </div>
     <div class="info-grid" id="health-info-grid"></div>
   </div>
@@ -671,7 +671,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card mt-16">
     <div class="card-header">
       <h3 data-i18n="account_details">Account Details</h3>
-      <button class="btn btn-sm btn-outline" onclick="openAccountModal()">Edit</button>
+      <button class="btn btn-sm btn-outline" onclick="openAccountModal()"data-i18n="edit">Edit</button>
     </div>
     <div class="info-grid" id="account-info-grid"></div>
   </div>
@@ -680,7 +680,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="card mt-16">
     <div class="card-header">
       <h3 data-i18n="my_orders">My Orders</h3>
-      <button class="btn btn-sm btn-outline" onclick="loadOrders()">Refresh</button>
+      <button class="btn btn-sm btn-outline" onclick="loadOrders()"data-i18n="refresh">Refresh</button>
     </div>
     <div id="orders-list"></div>
   </div>
@@ -693,7 +693,7 @@ button{cursor:pointer;border:none;background:none}
 <!-- ── TAB: Products ──────────────────────── -->
 <div id="tab-products" class="tab-content">
   <h2 class="section-title"data-i18n="equipment_title">Equipment</h2>
-  <p class="text-sm text-muted mb-16">Rent or purchase quality assistive equipment. We also offer repair and servicing for all items.</p>
+  <p class="text-sm text-muted mb-16"data-i18n="products_desc">Rent or purchase quality assistive equipment. We also offer repair and servicing for all items.</p>
   <div class="filter-row" id="product-filters"></div>
   <div id="product-list"></div>
 </div>
@@ -729,19 +729,19 @@ button{cursor:pointer;border:none;background:none}
 <div id="health-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('health-modal')">
 <div class="modal" style="position:relative">
   <button class="modal-close" onclick="closeModal('health-modal')">✕</button>
-  <h3>Edit Health Profile</h3>
+  <h3data-i18n="edit_health">Edit Health Profile</h3>
   <div class="form-row">
     <div class="form-group">
-      <label>Height (cm)</label>
+      <labeldata-i18n="height_cm">Height (cm)</label>
       <input type="number" id="hp-height" placeholder="e.g. 170">
     </div>
     <div class="form-group">
-      <label>Weight (kg)</label>
+      <labeldata-i18n="weight_kg">Weight (kg)</label>
       <input type="number" id="hp-weight" placeholder="e.g. 65">
     </div>
   </div>
   <div class="form-group">
-    <label>Blood Type</label>
+    <labeldata-i18n="blood_type">Blood Type</label>
     <select id="hp-blood">
       <option value="">Select</option>
       <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
@@ -749,22 +749,22 @@ button{cursor:pointer;border:none;background:none}
     </select>
   </div>
   <div class="form-group">
-    <label>Allergies</label>
+    <labeldata-i18n="allergies">Allergies</label>
     <textarea id="hp-allergies" placeholder="List known allergies"></textarea>
   </div>
   <div class="form-group">
-    <label>Medical Conditions</label>
+    <labeldata-i18n="conditions">Medical Conditions</label>
     <textarea id="hp-conditions" placeholder="e.g. Diabetes, Hypertension"></textarea>
   </div>
   <div class="form-group">
-    <label>Current Medications</label>
+    <labeldata-i18n="medications">Current Medications</label>
     <textarea id="hp-medications" placeholder="List medications and dosages"></textarea>
   </div>
   <div class="form-group">
-    <label>Additional Notes</label>
+    <labeldata-i18n="additional_notes">Additional Notes</label>
     <textarea id="hp-notes" placeholder="Any other health information"></textarea>
   </div>
-  <button class="btn btn-pri" onclick="saveHealth()">Save Health Profile</button>
+  <button class="btn btn-pri" onclick="saveHealth()"data-i18n="save_health">Save Health Profile</button>
 </div>
 </div>
 
@@ -772,13 +772,13 @@ button{cursor:pointer;border:none;background:none}
 <div id="account-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('account-modal')">
 <div class="modal" style="position:relative">
   <button class="modal-close" onclick="closeModal('account-modal')">✕</button>
-  <h3>Edit Account</h3>
+  <h3data-i18n="edit_account">Edit Account</h3>
   <div class="form-group">
-    <label>Full Name</label>
+    <labeldata-i18n="full_name">Full Name</label>
     <input type="text" id="acct-name">
   </div>
   <div class="form-group">
-    <label>Email</label>
+    <labeldata-i18n="email">Email</label>
     <input type="email" id="acct-email">
   </div>
   <div class="form-row">
@@ -787,7 +787,7 @@ button{cursor:pointer;border:none;background:none}
       <input type="date" id="acct-dob">
     </div>
     <div class="form-group">
-      <label>Gender</label>
+      <labeldata-i18n="gender">Gender</label>
       <select id="acct-gender">
         <option value="">Select</option>
         <option>Male</option><option>Female</option><option>Other</option>
@@ -795,11 +795,11 @@ button{cursor:pointer;border:none;background:none}
     </div>
   </div>
   <div class="form-group">
-    <label>Address</label>
+    <labeldata-i18n="address">Address</label>
     <input type="text" id="acct-address">
   </div>
   <div class="form-group">
-    <label>Postal Code</label>
+    <labeldata-i18n="postal_code">Postal Code</label>
     <input type="text" id="acct-postal">
   </div>
   <div class="form-row">
@@ -816,7 +816,7 @@ button{cursor:pointer;border:none;background:none}
     <label>New Password (leave blank to keep)</label>
     <input type="password" id="acct-newpw" placeholder="New password">
   </div>
-  <button class="btn btn-pri" onclick="saveAccount()">Save Changes</button>
+  <button class="btn btn-pri" onclick="saveAccount()"data-i18n="save_changes">Save Changes</button>
 </div>
 </div>
 
@@ -832,7 +832,7 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div id="order-buy-fields">
     <div class="form-group">
-      <label>Quantity</label>
+      <labeldata-i18n="quantity">Quantity</label>
       <input type="number" id="order-qty" value="1" min="1">
     </div>
     <div class="form-group">
@@ -857,12 +857,12 @@ button{cursor:pointer;border:none;background:none}
     </div>
   </div>
   <div class="form-group">
-    <label>Notes</label>
+    <labeldata-i18n="notes">Notes</label>
     <textarea id="order-notes" placeholder="Delivery address, special requests..."></textarea>
   </div>
   <input type="hidden" id="order-product-id">
   <input type="hidden" id="order-sale-price">
-  <button class="btn btn-accent" onclick="submitOrder()">Place Order</button>
+  <button class="btn btn-accent" onclick="submitOrder()"data-i18n="place_order">Place Order</button>
 </div>
 </div>
 
@@ -922,100 +922,272 @@ let currentLang = 'en';
 
 const LANG = {
   en: {
-    hero_desc: 'Your partner in independent living. We provide equipment, consultation, and ongoing support so you\'re prepared for whatever comes.',
-    book_appt: 'Book Appointment', free_assessment: 'Free assessment',
-    equipment: 'Equipment', rent_or_buy: 'Rent or buy',
-    health_log: 'Health Log', track_bp: 'Track BP & more',
-    my_profile: 'My Profile', health_data: 'Health data',
-    our_mission: 'Our Mission',
-    mission_desc: 'As Singapore\'s population ages and more people live independently, we believe everyone deserves access to quality assistive equipment and support — before an emergency happens. We help you prepare, educate, and equip so that sudden disability or medical needs never catch you off guard.',
-    rental: 'Rental', sales: 'Sales', repair: 'Repair', consult: 'Consult',
-    latest_updates: 'Latest Updates',
-    appointment_title: 'Appointment', book_an_appt: 'Book an Appointment',
-    my_appointments: 'My Appointments',
-    health_reports: 'Health Reports', log_bp: 'Log Blood Pressure',
-    reading_history: 'Reading History', health_summary: 'Health Summary',
-    health_profile: 'Health Profile', account_details: 'Account Details',
-    my_orders: 'My Orders', sign_out: 'Sign Out',
-    equipment_title: 'Equipment',
-    humidity: 'Humidity', wind: 'Wind', feels_like: 'Feels Like',
-    singapore: 'Singapore', loading: 'Loading...',
-    tab_home: 'Home', tab_appt: 'Appointment', tab_products: 'Products',
-    tab_reports: 'Reports', tab_profile: 'Profile',
-    welcome: 'Welcome', good_morning: 'Good Morning',
-    good_afternoon: 'Good Afternoon', good_evening: 'Good Evening'
+    // Home
+    hero_desc:'Your partner in independent living. We provide equipment, consultation, and ongoing support so you\'re prepared for whatever comes.',
+    book_appt:'Book Appointment', free_assessment:'Free assessment',
+    equipment:'Equipment', rent_or_buy:'Rent or buy',
+    health_log:'Health Log', track_bp:'Track BP & more',
+    my_profile:'My Profile', health_data:'Health data',
+    our_mission:'Our Mission',
+    mission_desc:'As Singapore\'s population ages and more people live independently, we believe everyone deserves access to quality assistive equipment and support — before an emergency happens. We help you prepare, educate, and equip so that sudden disability or medical needs never catch you off guard.',
+    rental:'Rental', sales:'Sales', repair:'Repair', consult:'Consult',
+    latest_updates:'Latest Updates',
+    // Appointment
+    appointment_title:'Appointment', book_an_appt:'Book an Appointment',
+    select_type:'<span data-i18n="select_type">Select the type of consultation you need:</span>',
+    home_assessment:'Home Assessment', equipment_consult:'Equipment Consult',
+    health_review:'Health Review', repair_service:'Repair / Service',
+    my_appointments:'My Appointments', date:'Date', preferred_time:'Preferred Time',
+    notes_requirements:'Notes / Special Requirements', notes_placeholder:'Describe your needs or concerns...',
+    confirm_booking:'Confirm Booking', refresh:'Refresh', cancel:'Cancel',
+    no_appointments:'No appointments yet', min:'min',
+    pending:'pending', confirmed:'confirmed', cancelled:'cancelled', completed:'completed',
+    // Products
+    equipment_title:'Equipment',
+    products_desc:'Rent or purchase quality assistive equipment. We also offer repair and servicing for all items.',
+    // Reports
+    health_reports:'Health Reports', log_bp:'Log Blood Pressure',
+    systolic:'Systolic (top)', diastolic:'Diastolic (btm)',
+    heart_rate:'Heart Rate (bpm)', notes:'Notes',
+    save_reading:'Save Reading', reading_history:'Reading History',
+    health_summary:'Health Summary', trend_title:'Trend (Last 14 readings)',
+    no_readings:'No readings yet. Add your first above.',
+    need_2_readings:'Need at least 2 readings to show trend',
+    latest_bp:'Latest BP', seven_avg:'7-reading avg',
+    normal:'Normal', elevated:'Elevated', high:'High (Stage 1+)',
+    underweight:'Underweight', overweight:'Overweight', obese:'Obese',
+    complete_profile:'Complete your health profile and add BP readings to see a summary here.',
+    // Profile
+    health_profile:'Health Profile', account_details:'Account Details',
+    my_orders:'My Orders', sign_out:'Sign Out', edit:'Edit',
+    height:'Height', weight:'Weight', bmi:'BMI', blood_type:'Blood Type',
+    allergies:'Allergies', conditions:'Medical Conditions', medications:'Medications',
+    name:'Name', phone:'Phone', email:'Email', dob:'Date of Birth',
+    gender:'Gender', address:'Address', postal_code:'Postal Code',
+    emergency_contact:'Emergency Contact', role:'Role', member_since:'Member Since',
+    admin:'Admin', member:'Member',
+    // Profile modals
+    edit_health:'Edit Health Profile', edit_account:'Edit Account',
+    height_cm:'Height (cm)', weight_kg:'Weight (kg)',
+    additional_notes:'Additional Notes', save_health:'Save Health Profile',
+    full_name:'Full Name', new_password:'New Password (leave blank to keep)',
+    save_changes:'Save Changes',
+    // Order modal
+    purchase_equipment:'Purchase Equipment', rent_equipment:'Rent Equipment',
+    purchase:'Purchase', rent:'Rent', quantity:'Quantity', price:'Price',
+    start_date:'Start Date', end_date:'End Date', rental_rates:'Rental Rates',
+    delivery_notes:'Delivery address, special requests...', place_order:'Place Order',
+    day:'Day', week:'Week', month:'Month',
+    // Orders
+    no_orders:'No orders yet', qty:'Qty',
+    // Weather
+    humidity:'Humidity', wind:'Wind', feels_like:'Feels Like',
+    singapore:'Singapore', loading:'Loading...',
+    // Tabs
+    tab_home:'Home', tab_appt:'Appointment', tab_products:'Products',
+    tab_reports:'Reports', tab_profile:'Profile',
+    // Greetings
+    welcome:'Welcome', good_morning:'Good Morning',
+    good_afternoon:'Good Afternoon', good_evening:'Good Evening',
+    // Auth
+    welcome_back:'Welcome Back', phone_number:'Phone Number',
+    password:'Password', sign_in:'Sign In',
+    new_here:'New here?', create_account:'Create an account',
+    register:'Register', confirm_pw:'Confirm',
+    already_account:'Already have an account?',
+    create_account_btn:'Create Account'
   },
   zh: {
-    hero_desc: '您的独立生活伙伴。我们提供设备、咨询和持续支持，让您随时做好准备。',
-    book_appt: '预约咨询', free_assessment: '免费评估',
-    equipment: '设备', rent_or_buy: '租赁或购买',
-    health_log: '健康日志', track_bp: '追踪血压等',
-    my_profile: '我的档案', health_data: '健康数据',
-    our_mission: '我们的使命',
-    mission_desc: '随着新加坡人口老龄化，越来越多人独立生活。我们相信每个人都应在紧急情况发生前获得优质辅助设备和支持。我们帮助您做好准备、教育和装备，让突发残疾或医疗需求不会让您措手不及。',
-    rental: '租赁', sales: '销售', repair: '维修', consult: '咨询',
-    latest_updates: '最新动态',
-    appointment_title: '预约', book_an_appt: '预约服务',
-    my_appointments: '我的预约',
-    health_reports: '健康报告', log_bp: '记录血压',
-    reading_history: '历史记录', health_summary: '健康摘要',
-    health_profile: '健康档案', account_details: '账户信息',
-    my_orders: '我的订单', sign_out: '退出登录',
-    equipment_title: '设备',
-    humidity: '湿度', wind: '风速', feels_like: '体感温度',
-    singapore: '新加坡', loading: '加载中...',
-    tab_home: '首页', tab_appt: '预约', tab_products: '设备',
-    tab_reports: '报告', tab_profile: '档案',
-    welcome: '欢迎', good_morning: '早上好',
-    good_afternoon: '下午好', good_evening: '晚上好'
+    hero_desc:'您的独立生活伙伴。我们提供设备、咨询和持续支持，让您随时做好准备。',
+    book_appt:'预约咨询', free_assessment:'免费评估',
+    equipment:'设备', rent_or_buy:'租赁或购买',
+    health_log:'健康日志', track_bp:'追踪血压等',
+    my_profile:'我的档案', health_data:'健康数据',
+    our_mission:'我们的使命',
+    mission_desc:'随着新加坡人口老龄化，越来越多人独立生活。我们相信每个人都应在紧急情况发生前获得优质辅助设备和支持。我们帮助您做好准备、教育和装备，让突发残疾或医疗需求不会让您措手不及。',
+    rental:'租赁', sales:'销售', repair:'维修', consult:'咨询',
+    latest_updates:'最新动态',
+    appointment_title:'预约', book_an_appt:'预约服务',
+    select_type:'请选择您需要的咨询类型：',
+    home_assessment:'家居评估', equipment_consult:'设备咨询',
+    health_review:'健康评估', repair_service:'维修 / 保养',
+    my_appointments:'我的预约', date:'日期', preferred_time:'首选时间',
+    notes_requirements:'备注 / 特殊需求', notes_placeholder:'描述您的需求或关注事项...',
+    confirm_booking:'确认预约', refresh:'刷新', cancel:'取消',
+    no_appointments:'暂无预约', min:'分钟',
+    pending:'待处理', confirmed:'已确认', cancelled:'已取消', completed:'已完成',
+    equipment_title:'设备',
+    products_desc:'租赁或购买优质辅助设备。我们也提供维修和保养服务。',
+    health_reports:'健康报告', log_bp:'记录血压',
+    systolic:'收缩压（高压）', diastolic:'舒张压（低压）',
+    heart_rate:'心率（次/分）', notes:'备注',
+    save_reading:'保存读数', reading_history:'历史记录',
+    health_summary:'健康摘要', trend_title:'趋势（最近14次读数）',
+    no_readings:'暂无读数。请在上方添加第一次记录。',
+    need_2_readings:'需要至少2次读数才能显示趋势',
+    latest_bp:'最新血压', seven_avg:'最近7次平均',
+    normal:'正常', elevated:'偏高', high:'高血压（一期+）',
+    underweight:'体重偏轻', overweight:'超重', obese:'肥胖',
+    complete_profile:'请完善您的健康档案并添加血压读数以查看摘要。',
+    health_profile:'健康档案', account_details:'账户信息',
+    my_orders:'我的订单', sign_out:'退出登录', edit:'编辑',
+    height:'身高', weight:'体重', bmi:'身体质量指数', blood_type:'血型',
+    allergies:'过敏', conditions:'医疗状况', medications:'用药情况',
+    name:'姓名', phone:'电话', email:'邮箱', dob:'出生日期',
+    gender:'性别', address:'地址', postal_code:'邮编',
+    emergency_contact:'紧急联系人', role:'角色', member_since:'注册时间',
+    admin:'管理员', member:'会员',
+    edit_health:'编辑健康档案', edit_account:'编辑账户',
+    height_cm:'身高（厘米）', weight_kg:'体重（公斤）',
+    additional_notes:'其他备注', save_health:'保存健康档案',
+    full_name:'全名', new_password:'新密码（留空则不修改）',
+    save_changes:'保存更改',
+    purchase_equipment:'购买设备', rent_equipment:'租赁设备',
+    purchase:'购买', rent:'租赁', quantity:'数量', price:'价格',
+    start_date:'开始日期', end_date:'结束日期', rental_rates:'租赁价格',
+    delivery_notes:'送货地址、特殊要求...', place_order:'下单',
+    day:'日', week:'周', month:'月',
+    no_orders:'暂无订单', qty:'数量',
+    humidity:'湿度', wind:'风速', feels_like:'体感温度',
+    singapore:'新加坡', loading:'加载中...',
+    tab_home:'首页', tab_appt:'预约', tab_products:'设备',
+    tab_reports:'报告', tab_profile:'档案',
+    welcome:'欢迎', good_morning:'早上好',
+    good_afternoon:'下午好', good_evening:'晚上好',
+    welcome_back:'欢迎回来', phone_number:'手机号码',
+    password:'密码', sign_in:'登录',
+    new_here:'新用户？', create_account:'创建账户',
+    register:'注册', confirm_pw:'确认',
+    already_account:'已有账户？',
+    create_account_btn:'创建账户'
   },
   ms: {
-    hero_desc: 'Rakan anda untuk kehidupan berdikari. Kami menyediakan peralatan, perundingan, dan sokongan berterusan supaya anda sentiasa bersedia.',
-    book_appt: 'Tempah Temu Janji', free_assessment: 'Penilaian percuma',
-    equipment: 'Peralatan', rent_or_buy: 'Sewa atau beli',
-    health_log: 'Log Kesihatan', track_bp: 'Jejak tekanan darah',
-    my_profile: 'Profil Saya', health_data: 'Data kesihatan',
-    our_mission: 'Misi Kami',
-    mission_desc: 'Apabila populasi Singapura semakin menua dan lebih ramai hidup berdikari, kami percaya semua orang berhak mendapat akses kepada peralatan bantuan dan sokongan berkualiti — sebelum kecemasan berlaku. Kami membantu anda bersedia, mendidik, dan melengkapkan supaya kecacatan mendadak atau keperluan perubatan tidak mengejutkan anda.',
-    rental: 'Sewaan', sales: 'Jualan', repair: 'Pembaikan', consult: 'Perundingan',
-    latest_updates: 'Berita Terkini',
-    appointment_title: 'Temu Janji', book_an_appt: 'Tempah Temu Janji',
-    my_appointments: 'Temu Janji Saya',
-    health_reports: 'Laporan Kesihatan', log_bp: 'Rekod Tekanan Darah',
-    reading_history: 'Sejarah Bacaan', health_summary: 'Ringkasan Kesihatan',
-    health_profile: 'Profil Kesihatan', account_details: 'Butiran Akaun',
-    my_orders: 'Pesanan Saya', sign_out: 'Log Keluar',
-    equipment_title: 'Peralatan',
-    humidity: 'Kelembapan', wind: 'Angin', feels_like: 'Terasa Seperti',
-    singapore: 'Singapura', loading: 'Memuatkan...',
-    tab_home: 'Utama', tab_appt: 'Temu Janji', tab_products: 'Peralatan',
-    tab_reports: 'Laporan', tab_profile: 'Profil',
-    welcome: 'Selamat Datang', good_morning: 'Selamat Pagi',
-    good_afternoon: 'Selamat Tengah Hari', good_evening: 'Selamat Petang'
+    hero_desc:'Rakan anda untuk kehidupan berdikari. Kami menyediakan peralatan, perundingan, dan sokongan berterusan supaya anda sentiasa bersedia.',
+    book_appt:'Tempah Temu Janji', free_assessment:'Penilaian percuma',
+    equipment:'Peralatan', rent_or_buy:'Sewa atau beli',
+    health_log:'Log Kesihatan', track_bp:'Jejak tekanan darah',
+    my_profile:'Profil Saya', health_data:'Data kesihatan',
+    our_mission:'Misi Kami',
+    mission_desc:'Apabila populasi Singapura semakin menua dan lebih ramai hidup berdikari, kami percaya semua orang berhak mendapat akses kepada peralatan bantuan dan sokongan berkualiti — sebelum kecemasan berlaku. Kami membantu anda bersedia, mendidik, dan melengkapkan supaya kecacatan mendadak atau keperluan perubatan tidak mengejutkan anda.',
+    rental:'Sewaan', sales:'Jualan', repair:'Pembaikan', consult:'Perundingan',
+    latest_updates:'Berita Terkini',
+    appointment_title:'Temu Janji', book_an_appt:'Tempah Temu Janji',
+    select_type:'Pilih jenis perundingan yang anda perlukan:',
+    home_assessment:'Penilaian Rumah', equipment_consult:'Perundingan Peralatan',
+    health_review:'Semakan Kesihatan', repair_service:'Pembaikan / Servis',
+    my_appointments:'Temu Janji Saya', date:'Tarikh', preferred_time:'Masa Pilihan',
+    notes_requirements:'Nota / Keperluan Khas', notes_placeholder:'Nyatakan keperluan atau kebimbangan anda...',
+    confirm_booking:'Sahkan Tempahan', refresh:'Muat Semula', cancel:'Batal',
+    no_appointments:'Tiada temu janji', min:'min',
+    pending:'menunggu', confirmed:'disahkan', cancelled:'dibatalkan', completed:'selesai',
+    equipment_title:'Peralatan',
+    products_desc:'Sewa atau beli peralatan bantuan berkualiti. Kami juga menawarkan pembaikan dan servis.',
+    health_reports:'Laporan Kesihatan', log_bp:'Rekod Tekanan Darah',
+    systolic:'Sistolik (atas)', diastolic:'Diastolik (bawah)',
+    heart_rate:'Kadar Jantung (bpm)', notes:'Nota',
+    save_reading:'Simpan Bacaan', reading_history:'Sejarah Bacaan',
+    health_summary:'Ringkasan Kesihatan', trend_title:'Trend (14 bacaan terakhir)',
+    no_readings:'Tiada bacaan lagi. Tambah yang pertama di atas.',
+    need_2_readings:'Perlu sekurang-kurangnya 2 bacaan untuk paparan trend',
+    latest_bp:'Tekanan Darah Terkini', seven_avg:'Purata 7 bacaan',
+    normal:'Normal', elevated:'Meningkat', high:'Tinggi (Tahap 1+)',
+    underweight:'Kurang berat', overweight:'Berlebihan berat', obese:'Obes',
+    complete_profile:'Lengkapkan profil kesihatan dan tambah bacaan tekanan darah untuk melihat ringkasan.',
+    health_profile:'Profil Kesihatan', account_details:'Butiran Akaun',
+    my_orders:'Pesanan Saya', sign_out:'Log Keluar', edit:'Ubah',
+    height:'Ketinggian', weight:'Berat', bmi:'BMI', blood_type:'Jenis Darah',
+    allergies:'Alahan', conditions:'Keadaan Perubatan', medications:'Ubat-ubatan',
+    name:'Nama', phone:'Telefon', email:'E-mel', dob:'Tarikh Lahir',
+    gender:'Jantina', address:'Alamat', postal_code:'Poskod',
+    emergency_contact:'Hubungan Kecemasan', role:'Peranan', member_since:'Ahli Sejak',
+    admin:'Pentadbir', member:'Ahli',
+    edit_health:'Ubah Profil Kesihatan', edit_account:'Ubah Akaun',
+    height_cm:'Ketinggian (cm)', weight_kg:'Berat (kg)',
+    additional_notes:'Nota Tambahan', save_health:'Simpan Profil Kesihatan',
+    full_name:'Nama Penuh', new_password:'Kata Laluan Baru (kosongkan jika kekal)',
+    save_changes:'Simpan Perubahan',
+    purchase_equipment:'Beli Peralatan', rent_equipment:'Sewa Peralatan',
+    purchase:'Beli', rent:'Sewa', quantity:'Kuantiti', price:'Harga',
+    start_date:'Tarikh Mula', end_date:'Tarikh Tamat', rental_rates:'Kadar Sewaan',
+    delivery_notes:'Alamat penghantaran, permintaan khas...', place_order:'Buat Pesanan',
+    day:'Hari', week:'Minggu', month:'Bulan',
+    no_orders:'Tiada pesanan', qty:'Kuan',
+    humidity:'Kelembapan', wind:'Angin', feels_like:'Terasa Seperti',
+    singapore:'Singapura', loading:'Memuatkan...',
+    tab_home:'Utama', tab_appt:'Temu Janji', tab_products:'Peralatan',
+    tab_reports:'Laporan', tab_profile:'Profil',
+    welcome:'Selamat Datang', good_morning:'Selamat Pagi',
+    good_afternoon:'Selamat Tengah Hari', good_evening:'Selamat Petang',
+    welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
+    password:'Kata Laluan', sign_in:'Log Masuk',
+    new_here:'Baru di sini?', create_account:'Daftar akaun',
+    register:'Daftar', confirm_pw:'Sahkan',
+    already_account:'Sudah ada akaun?',
+    create_account_btn:'Daftar Akaun'
   },
   ta: {
-    hero_desc: 'சுதந்திரமான வாழ்க்கையில் உங்கள் துணை. உபகரணங்கள், ஆலோசனை, தொடர்ச்சியான ஆதரவை நாங்கள் வழங்குகிறோம்.',
-    book_appt: 'சந்திப்பு முன்பதிவு', free_assessment: 'இலவச மதிப்பீடு',
-    equipment: 'உபகரணங்கள்', rent_or_buy: 'வாடகை அல்லது வாங்கு',
-    health_log: 'சுகாதார பதிவு', track_bp: 'இரத்த அழுத்தம் கண்காணி',
-    my_profile: 'என் சுயவிவரம்', health_data: 'சுகாதார தரவு',
-    our_mission: 'எங்கள் நோக்கம்',
-    mission_desc: 'சிங்கப்பூரின் மக்கள்தொகை வயதாகி, அதிகமானோர் சுதந்திரமாக வாழ்கையில், அவசரநிலை ஏற்படுமுன் தரமான உதவி உபகரணங்களையும் ஆதரவையும் பெற அனைவருக்கும் உரிமை உண்டு என்று நாங்கள் நம்புகிறோம்.',
-    rental: 'வாடகை', sales: 'விற்பனை', repair: 'பழுதுபார்ப்பு', consult: 'ஆலோசனை',
-    latest_updates: 'சமீபத்திய செய்திகள்',
-    appointment_title: 'சந்திப்பு', book_an_appt: 'சந்திப்பு முன்பதிவு',
-    my_appointments: 'எனது சந்திப்புகள்',
-    health_reports: 'சுகாதார அறிக்கைகள்', log_bp: 'இரத்த அழுத்தம் பதிவு',
-    reading_history: 'பதிவு வரலாறு', health_summary: 'சுகாதார சுருக்கம்',
-    health_profile: 'சுகாதார விவரம்', account_details: 'கணக்கு விவரங்கள்',
-    my_orders: 'எனது ஆர்டர்கள்', sign_out: 'வெளியேறு',
-    equipment_title: 'உபகரணங்கள்',
-    humidity: 'ஈரப்பதம்', wind: 'காற்று', feels_like: 'உணர்வு வெப்பம்',
-    singapore: 'சிங்கப்பூர்', loading: 'ஏற்றுகிறது...',
-    tab_home: 'முகப்பு', tab_appt: 'சந்திப்பு', tab_products: 'உபகரணங்கள்',
-    tab_reports: 'அறிக்கை', tab_profile: 'சுயவிவரம்',
-    welcome: 'வரவேற்கிறோம்', good_morning: 'காலை வணக்கம்',
-    good_afternoon: 'மதிய வணக்கம்', good_evening: 'மாலை வணக்கம்'
+    hero_desc:'சுதந்திரமான வாழ்க்கையில் உங்கள் துணை. உபகரணங்கள், ஆலோசனை, தொடர்ச்சியான ஆதரவை நாங்கள் வழங்குகிறோம்.',
+    book_appt:'சந்திப்பு முன்பதிவு', free_assessment:'இலவச மதிப்பீடு',
+    equipment:'உபகரணங்கள்', rent_or_buy:'வாடகை அல்லது வாங்கு',
+    health_log:'சுகாதார பதிவு', track_bp:'இரத்த அழுத்தம் கண்காணி',
+    my_profile:'என் சுயவிவரம்', health_data:'சுகாதார தரவு',
+    our_mission:'எங்கள் நோக்கம்',
+    mission_desc:'சிங்கப்பூரின் மக்கள்தொகை வயதாகி, அதிகமானோர் சுதந்திரமாக வாழ்கையில், அவசரநிலை ஏற்படுமுன் தரமான உதவி உபகரணங்களையும் ஆதரவையும் பெற அனைவருக்கும் உரிமை உண்டு என்று நாங்கள் நம்புகிறோம்.',
+    rental:'வாடகை', sales:'விற்பனை', repair:'பழுதுபார்ப்பு', consult:'ஆலோசனை',
+    latest_updates:'சமீபத்திய செய்திகள்',
+    appointment_title:'சந்திப்பு', book_an_appt:'சந்திப்பு முன்பதிவு',
+    select_type:'உங்களுக்கு தேவையான ஆலோசனை வகையை தேர்வு செய்யவும்:',
+    home_assessment:'வீட்டு மதிப்பீடு', equipment_consult:'உபகரண ஆலோசனை',
+    health_review:'சுகாதார மதிப்பாய்வு', repair_service:'பழுது / சேவை',
+    my_appointments:'எனது சந்திப்புகள்', date:'தேதி', preferred_time:'விரும்பிய நேரம்',
+    notes_requirements:'குறிப்புகள் / சிறப்பு தேவைகள்', notes_placeholder:'உங்கள் தேவைகள் அல்லது கவலைகளை விவரிக்கவும்...',
+    confirm_booking:'முன்பதிவை உறுதிப்படுத்து', refresh:'புதுப்பி', cancel:'ரத்துசெய்',
+    no_appointments:'சந்திப்புகள் இல்லை', min:'நிமிடம்',
+    pending:'நிலுவையில்', confirmed:'உறுதிசெய்யப்பட்டது', cancelled:'ரத்துசெய்யப்பட்டது', completed:'நிறைவடைந்தது',
+    equipment_title:'உபகரணங்கள்',
+    products_desc:'தரமான உதவி உபகரணங்களை வாடகை அல்லது வாங்கவும். பழுதுபார்ப்பு மற்றும் சேவையும் வழங்குகிறோம்.',
+    health_reports:'சுகாதார அறிக்கைகள்', log_bp:'இரத்த அழுத்தம் பதிவு',
+    systolic:'சிஸ்டோலிக் (மேல்)', diastolic:'டயஸ்டோலிக் (கீழ்)',
+    heart_rate:'இதயத் துடிப்பு (bpm)', notes:'குறிப்புகள்',
+    save_reading:'பதிவை சேமி', reading_history:'பதிவு வரலாறு',
+    health_summary:'சுகாதார சுருக்கம்', trend_title:'போக்கு (கடைசி 14 வாசிப்புகள்)',
+    no_readings:'வாசிப்புகள் இல்லை. மேலே உங்கள் முதல் பதிவை சேர்க்கவும்.',
+    need_2_readings:'போக்கு காட்ட குறைந்தது 2 வாசிப்புகள் தேவை',
+    latest_bp:'சமீபத்திய இரத்த அழுத்தம்', seven_avg:'7 வாசிப்பு சராசரி',
+    normal:'இயல்பு', elevated:'உயர்ந்தது', high:'அதிகம் (நிலை 1+)',
+    underweight:'குறைந்த எடை', overweight:'அதிக எடை', obese:'பருமன்',
+    complete_profile:'சுகாதார சுயவிவரத்தை நிரப்பி இரத்த அழுத்த வாசிப்புகளை சேர்க்கவும்.',
+    health_profile:'சுகாதார விவரம்', account_details:'கணக்கு விவரங்கள்',
+    my_orders:'எனது ஆர்டர்கள்', sign_out:'வெளியேறு', edit:'திருத்து',
+    height:'உயரம்', weight:'எடை', bmi:'BMI', blood_type:'இரத்த வகை',
+    allergies:'ஒவ்வாமை', conditions:'மருத்துவ நிலைமைகள்', medications:'மருந்துகள்',
+    name:'பெயர்', phone:'தொலைபேசி', email:'மின்னஞ்சல்', dob:'பிறந்த தேதி',
+    gender:'பாலினம்', address:'முகவரி', postal_code:'அஞ்சல் குறியீடு',
+    emergency_contact:'அவசர தொடர்பு', role:'பங்கு', member_since:'உறுப்பினர் ஆனது',
+    admin:'நிர்வாகி', member:'உறுப்பினர்',
+    edit_health:'சுகாதார விவரம் திருத்து', edit_account:'கணக்கு திருத்து',
+    height_cm:'உயரம் (செ.மீ)', weight_kg:'எடை (கி.கி)',
+    additional_notes:'கூடுதல் குறிப்புகள்', save_health:'சுகாதார விவரம் சேமி',
+    full_name:'முழு பெயர்', new_password:'புதிய கடவுச்சொல் (மாற்ற வேண்டாமென்றால் காலியாக விடவும்)',
+    save_changes:'மாற்றங்களை சேமி',
+    purchase_equipment:'உபகரணம் வாங்கு', rent_equipment:'உபகரணம் வாடகை',
+    purchase:'வாங்கு', rent:'வாடகை', quantity:'எண்ணிக்கை', price:'விலை',
+    start_date:'தொடக்க தேதி', end_date:'முடிவு தேதி', rental_rates:'வாடகை கட்டணம்',
+    delivery_notes:'விநியோக முகவரி, சிறப்பு கோரிக்கைகள்...', place_order:'ஆர்டர் செய்',
+    day:'நாள்', week:'வாரம்', month:'மாதம்',
+    no_orders:'ஆர்டர்கள் இல்லை', qty:'எண்',
+    humidity:'ஈரப்பதம்', wind:'காற்று', feels_like:'உணர்வு வெப்பம்',
+    singapore:'சிங்கப்பூர்', loading:'ஏற்றுகிறது...',
+    tab_home:'முகப்பு', tab_appt:'சந்திப்பு', tab_products:'உபகரணங்கள்',
+    tab_reports:'அறிக்கை', tab_profile:'சுயவிவரம்',
+    welcome:'வரவேற்கிறோம்', good_morning:'காலை வணக்கம்',
+    good_afternoon:'மதிய வணக்கம்', good_evening:'மாலை வணக்கம்',
+    welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
+    password:'கடவுச்சொல்', sign_in:'உள்நுழை',
+    new_here:'புதியவரா?', create_account:'கணக்கு உருவாக்கு',
+    register:'பதிவு', confirm_pw:'உறுதிசெய்',
+    already_account:'ஏற்கனவே கணக்கு உள்ளதா?',
+    create_account_btn:'கணக்கு உருவாக்கு'
   }
 };
 
@@ -1061,7 +1233,6 @@ function applyLanguage() {
   // Re-render products if loaded
   if (products.length) {
     renderProductFilters();
-    // Restore active category
     const buttons = document.querySelectorAll('.filter-btn');
     if (buttons[currentCategoryIndex]) {
       buttons.forEach(b => b.classList.remove('active'));
@@ -1069,6 +1240,13 @@ function applyLanguage() {
     }
     const activeCat = allCategories[currentCategoryIndex] || 'all';
     renderProducts(activeCat);
+  }
+  
+  // Re-render profile and health data
+  if (ME) {
+    renderProfile();
+    renderHealthSummary();
+    renderBP();
   }
 }
 
@@ -1395,31 +1573,32 @@ function renderProfile() {
   $('profile-avatar').textContent = initials;
   $('profile-name').textContent = ME.name;
   $('profile-phone').textContent = ME.phone;
+  const t = LANG[currentLang] || LANG.en;
 
   // Health info
   const hp = healthProfile || {};
   $('health-info-grid').innerHTML = [
-    row('Height', hp.height ? hp.height + ' cm' : '-'),
-    row('Weight', hp.weight ? hp.weight + ' kg' : '-'),
-    row('BMI', hp.bmi || '-'),
-    row('Blood Type', hp.bloodType || '-'),
-    row('Allergies', hp.allergies || '-'),
-    row('Conditions', hp.conditions || '-'),
-    row('Medications', hp.medications || '-'),
+    row(t.height, hp.height ? hp.height + ' cm' : '-'),
+    row(t.weight, hp.weight ? hp.weight + ' kg' : '-'),
+    row(t.bmi, hp.bmi || '-'),
+    row(t.blood_type, hp.bloodType || '-'),
+    row(t.allergies, hp.allergies || '-'),
+    row(t.conditions, hp.conditions || '-'),
+    row(t.medications, hp.medications || '-'),
   ].join('');
 
   // Account info
   $('account-info-grid').innerHTML = [
-    row('Name', ME.name),
-    row('Phone', ME.phone),
-    row('Email', ME.email || '-'),
-    row('Date of Birth', formatDate(ME.dob) || '-'),
-    row('Gender', ME.gender || '-'),
-    row('Address', ME.address || '-'),
-    row('Postal Code', ME.postalCode || '-'),
-    row('Emergency Contact', ME.emergencyName ? `${ME.emergencyName} (${ME.emergencyPhone})` : '-'),
-    row('Role', ME.role === 'admin' ? '⭐ Admin' : 'Member'),
-    row('Member Since', formatDate(ME.createdAt)),
+    row(t.name, ME.name),
+    row(t.phone, ME.phone),
+    row(t.email, ME.email || '-'),
+    row(t.dob, formatDate(ME.dob) || '-'),
+    row(t.gender, ME.gender || '-'),
+    row(t.address, ME.address || '-'),
+    row(t.postal_code, ME.postalCode || '-'),
+    row(t.emergency_contact, ME.emergencyName ? `${ME.emergencyName} (${ME.emergencyPhone})` : '-'),
+    row(t.role, ME.role === 'admin' ? '⭐ ' + t.admin : t.member),
+    row(t.member_since, formatDate(ME.createdAt)),
   ].join('');
 }
 
@@ -1513,10 +1692,10 @@ async function loadBP() {
 }
 
 function renderBP() {
-  // Summary (latest reading)
   const sum = $('bp-summary');
+  const t = LANG[currentLang] || LANG.en;
   if (!bpReadings.length) {
-    sum.innerHTML = '<div class="empty-state" style="width:100%"><div class="empty-icon">💓</div><p>No readings yet. Add your first above.</p></div>';
+    sum.innerHTML = `<div class="empty-state" style="width:100%"><div class="empty-icon">💓</div><p>${t.no_readings}</p></div>`;
     $('bp-history').innerHTML = '';
     renderHealthSummary();
     return;
@@ -1527,18 +1706,17 @@ function renderBP() {
   const hrClass = (latest.heartRate >= 60 && latest.heartRate <= 100) ? 'normal' : 'elevated';
 
   sum.innerHTML = `
-    <div class="bp-stat ${sysClass}"><div class="bp-val">${latest.systolic}</div><div class="bp-label">Systolic</div></div>
-    <div class="bp-stat ${diaClass}"><div class="bp-val">${latest.diastolic}</div><div class="bp-label">Diastolic</div></div>
-    <div class="bp-stat ${hrClass}"><div class="bp-val">${latest.heartRate || '-'}</div><div class="bp-label">Heart Rate</div></div>
+    <div class="bp-stat ${sysClass}"><div class="bp-val">${latest.systolic}</div><div class="bp-label">${t.systolic}</div></div>
+    <div class="bp-stat ${diaClass}"><div class="bp-val">${latest.diastolic}</div><div class="bp-label">${t.diastolic}</div></div>
+    <div class="bp-stat ${hrClass}"><div class="bp-val">${latest.heartRate || '-'}</div><div class="bp-label">${t.heart_rate}</div></div>
   `;
 
-  // History list
   $('bp-history').innerHTML = bpReadings.slice(0, 20).map(r => `
     <div class="bp-history-item">
       <span class="bp-reading-vals">${r.systolic}/${r.diastolic}</span>
       <span class="bp-reading-hr">${r.heartRate ? r.heartRate + ' bpm' : ''}</span>
       <span class="bp-reading-date">${formatDate(r.date)} ${r.time || ''}</span>
-      <button class="bp-reading-del" onclick="deleteBP('${r.id}')" title="Delete">×</button>
+      <button class="bp-reading-del" onclick="deleteBP('${r.id}')" title="${t.cancel}">×</button>
     </div>
   `).join('');
 
@@ -1662,41 +1840,41 @@ function renderHealthSummary() {
   const el = $('health-summary-report');
   if (!el) return;
   const hp = healthProfile || {};
+  const t = LANG[currentLang] || LANG.en;
   const lines = [];
 
   if (hp.bmi) {
     const bmi = parseFloat(hp.bmi);
-    let cat = 'Normal';
-    if (bmi < 18.5) cat = 'Underweight';
-    else if (bmi >= 23) cat = 'Overweight';  // Asian BMI thresholds
-    else if (bmi >= 27.5) cat = 'Obese';
-    lines.push(`<strong>BMI:</strong> ${hp.bmi} (${cat})`);
+    let cat = t.normal;
+    if (bmi < 18.5) cat = t.underweight;
+    else if (bmi >= 27.5) cat = t.obese;
+    else if (bmi >= 23) cat = t.overweight;
+    lines.push(`<strong>${t.bmi}:</strong> ${hp.bmi} (${cat})`);
   }
   if (hp.height && hp.weight) {
-    lines.push(`<strong>Height/Weight:</strong> ${hp.height} cm / ${hp.weight} kg`);
+    lines.push(`<strong>${t.height}/${t.weight}:</strong> ${hp.height} cm / ${hp.weight} kg`);
   }
-  if (hp.bloodType) lines.push(`<strong>Blood Type:</strong> ${hp.bloodType}`);
-  if (hp.conditions) lines.push(`<strong>Conditions:</strong> ${esc(hp.conditions)}`);
-  if (hp.medications) lines.push(`<strong>Medications:</strong> ${esc(hp.medications)}`);
-  if (hp.allergies) lines.push(`<strong>Allergies:</strong> ${esc(hp.allergies)}`);
+  if (hp.bloodType) lines.push(`<strong>${t.blood_type}:</strong> ${hp.bloodType}`);
+  if (hp.conditions) lines.push(`<strong>${t.conditions}:</strong> ${esc(hp.conditions)}`);
+  if (hp.medications) lines.push(`<strong>${t.medications}:</strong> ${esc(hp.medications)}`);
+  if (hp.allergies) lines.push(`<strong>${t.allergies}:</strong> ${esc(hp.allergies)}`);
 
   if (bpReadings.length) {
     const latest = bpReadings[0];
-    let bpCat = 'Normal';
-    if (latest.systolic >= 140 || latest.diastolic >= 90) bpCat = 'High (Stage 1+)';
-    else if (latest.systolic >= 130 || latest.diastolic >= 80) bpCat = 'Elevated';
-    lines.push(`<strong>Latest BP:</strong> ${latest.systolic}/${latest.diastolic} mmHg — ${bpCat}`);
-    if (latest.heartRate) lines.push(`<strong>Heart Rate:</strong> ${latest.heartRate} bpm`);
+    let bpCat = t.normal;
+    if (latest.systolic >= 140 || latest.diastolic >= 90) bpCat = t.high;
+    else if (latest.systolic >= 130 || latest.diastolic >= 80) bpCat = t.elevated;
+    lines.push(`<strong>${t.latest_bp}:</strong> ${latest.systolic}/${latest.diastolic} mmHg — ${bpCat}`);
+    if (latest.heartRate) lines.push(`<strong>${t.heart_rate}:</strong> ${latest.heartRate} bpm`);
 
-    // Average of last 7
     const recent = bpReadings.slice(0, 7);
     const avgSys = Math.round(recent.reduce((s,r)=>s+Number(r.systolic),0)/recent.length);
     const avgDia = Math.round(recent.reduce((s,r)=>s+Number(r.diastolic),0)/recent.length);
-    lines.push(`<strong>7-reading avg:</strong> ${avgSys}/${avgDia} mmHg`);
+    lines.push(`<strong>${t.seven_avg}:</strong> ${avgSys}/${avgDia} mmHg`);
   }
 
   if (!lines.length) {
-    el.innerHTML = '<p class="text-sm text-muted">Complete your health profile and add BP readings to see a summary here.</p>';
+    el.innerHTML = `<p class="text-sm text-muted">${t.complete_profile}</p>`;
   } else {
     el.innerHTML = lines.map(l => `<p class="text-sm" style="margin-bottom:6px;line-height:1.5">${l}</p>`).join('');
   }
