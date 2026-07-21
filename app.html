@@ -604,8 +604,8 @@ button{cursor:pointer;border:none;background:none}
 </div>
 
 <!-- ── TAB: Tracking ──────────────────────── -->
-<div id="tab-tracking" class="tab-content">
-  <div id="guest-prompt-tracking" class="guest-prompt hidden">
+<div id="tab-history" class="tab-content">
+  <div id="guest-prompt-history" class="guest-prompt hidden">
     <div class="guest-icon">🔒</div>
     <h3 data-i18n="sign_in_required">Sign In Required</h3>
     <p data-i18n="guest_tracking_msg">Create an account or sign in to access tracking features.</p>
@@ -615,7 +615,7 @@ button{cursor:pointer;border:none;background:none}
   <h2 class="section-title" data-i18n="tracking">Tracking</h2>
 
   <!-- Member View (for caregivers/admin viewing tracked members) -->
-  <div id="tracking-member-view">
+  <div id="history-member-view">
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="tracked_members">Tracked Members</h3>
       <div id="tracked-members-list" style="display:grid;gap:10px"></div>
@@ -637,7 +637,7 @@ button{cursor:pointer;border:none;background:none}
   </div>
 
   <!-- Member View (for members tracking themselves) -->
-  <div id="tracking-self-view" class="hidden">
+  <div id="history-self-view" class="hidden">
     <!-- Tracking Status -->
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -829,9 +829,9 @@ button{cursor:pointer;border:none;background:none}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     Products
   </button>
-  <button class="tab-btn" onclick="switchTab('tracking')" data-tab="tracking">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M12 11v.01M15.51 11.83l.71-.71M18.364 9.879l.707-.707M20 9.172l-1 1M11 15.51l-.71.71M9.879 18.364l-.707.707M9.172 20l-1-1M11 8.49l-.71-.71M9.879 5.636l-.707-.707M9.172 4l-1 1M15.51 12.17l.71.71M18.364 14.121l.707.707M20 14.828l-1-1"/></svg>
-    Tracking
+  <button class="tab-btn" onclick="switchTab('history')" data-tab="history">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M3 12a9 9 0 0 0 9 9m0-18a9 9 0 0 0-9 9m18 0a9 9 0 0 1-9 9m0 0a9 9 0 0 1 9-9m0 0a9 9 0 1 1-9 9"/><polyline points="12 7 12 12 16 14"/></svg>
+    History
   </button>
   <button class="tab-btn" onclick="switchTab('reports')" data-tab="reports">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -1118,7 +1118,7 @@ const LANG = {
     singapore:'Singapore', loading:'Loading...',
     // Tabs
     tab_home:'Home', tab_appt:'Appointment', tab_products:'Products',
-    tab_reports:'Reports', tab_profile:'Profile', tab_tracking:'Tracking',
+    tab_reports:'Reports', tab_profile:'Profile', tab_history:'History',
     // Greetings
     welcome:'Welcome', good_morning:'Good Morning',
     good_afternoon:'Good Afternoon', good_evening:'Good Evening',
@@ -1201,7 +1201,7 @@ const LANG = {
     humidity:'湿度', wind:'风速', feels_like:'体感温度',
     singapore:'新加坡', loading:'加载中...',
     tab_home:'首页', tab_appt:'预约', tab_products:'设备',
-    tab_reports:'报告', tab_profile:'档案', tab_tracking:'追踪',
+    tab_reports:'报告', tab_profile:'档案', tab_history:'历史',
     welcome:'欢迎', good_morning:'早上好',
     good_afternoon:'下午好', good_evening:'晚上好',
     welcome_back:'欢迎回来', phone_number:'手机号码',
@@ -1283,7 +1283,7 @@ const LANG = {
     humidity:'Kelembapan', wind:'Angin', feels_like:'Terasa Seperti',
     singapore:'Singapura', loading:'Memuatkan...',
     tab_home:'Utama', tab_appt:'Temu Janji', tab_products:'Peralatan',
-    tab_reports:'Laporan', tab_profile:'Profil', tab_tracking:'Penjejakan',
+    tab_reports:'Laporan', tab_profile:'Profil', tab_history:'Sejarah',
     welcome:'Selamat Datang', good_morning:'Selamat Pagi',
     good_afternoon:'Selamat Tengah Hari', good_evening:'Selamat Petang',
     welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
@@ -1364,7 +1364,7 @@ const LANG = {
     humidity:'ஈரப்பதம்', wind:'காற்று', feels_like:'உணர்வு வெப்பம்',
     singapore:'சிங்கப்பூர்', loading:'ஏற்றுகிறது...',
     tab_home:'முகப்பு', tab_appt:'சந்திப்பு', tab_products:'உபகரணங்கள்',
-    tab_reports:'அறிக்கை', tab_profile:'சுயவிவரம்', tab_tracking:'கண்காணிப்பு',
+    tab_reports:'அறிக்கை', tab_profile:'சுயவிவரம்', tab_history:'வரலாறு',
     welcome:'வரவேற்கிறோம்', good_morning:'காலை வணக்கம்',
     good_afternoon:'மதிய வணக்கம்', good_evening:'மாலை வணக்கம்',
     welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
@@ -1822,7 +1822,7 @@ async function enterApp() {
 /* ── Tab Navigation ───────────────────────── */
 function switchTab(tab) {
   // Block member-only tabs for guests
-  if (isGuest && (tab === 'consult' || tab === 'reports' || tab === 'profile' || tab === 'tracking')) {
+  if (isGuest && (tab === 'consult' || tab === 'reports' || tab === 'profile' || tab === 'history')) {
     // Still show the tab but with guest prompt visible
   }
   
@@ -1834,7 +1834,7 @@ function switchTab(tab) {
 
   if (tab === 'profile' && !isGuest) renderProfile();
   if (tab === 'reports' && !isGuest) renderBPChart();
-  if (tab === 'tracking' && !isGuest) renderTrackingTab();
+  if (tab === 'history' if (tab === 'history' && !isGuest) renderTrackingTab();if (tab === 'history' && !isGuest) renderTrackingTab(); !isGuest) renderHistoryTab();
   if (tab === 'products') setTimeout(() => addFilterSwipeListeners(), 100);
 }
 
@@ -2561,7 +2561,7 @@ async function loadOrders() {
 
 /* ── Tracking (Part 1 - Frontend UI) ──────────── */
 
-function renderTrackingTab() {
+function renderHistoryTab() {
   const t = LANG[currentLang] || LANG.en;
   
   // Determine if user is caregiver/admin or member
@@ -2569,14 +2569,14 @@ function renderTrackingTab() {
   
   if (isCaregiver) {
     // Show caregiver view (member tracking)
-    show('tracking-member-view');
-    hide('tracking-self-view');
+    show('history-member-view');
+    hide('history-self-view');
     renderTrackedMembersList();
     renderLocationHistory();
   } else {
     // Show member view (self tracking)
-    hide('tracking-member-view');
-    show('tracking-self-view');
+    hide('history-member-view');
+    show('history-self-view');
     requestLocationPermission();
     updateTrackingUI();
   }
