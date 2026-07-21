@@ -912,17 +912,32 @@ async function enterApp() {
 
     switchTab('home');
     
-    // Load all data with error handling
-    await Promise.all([
-      loadUpdates().catch(e => console.error('loadUpdates error:', e)),
-      loadHealthProfile().catch(e => console.error('loadHealthProfile error:', e)),
-      loadBP().catch(e => console.error('loadBP error:', e)),
-      loadAppointments().catch(e => console.error('loadAppointments error:', e)),
-      loadProducts().catch(e => console.error('loadProducts error:', e)),
-      loadOrders().catch(e => console.error('loadOrders error:', e))
-    ]);
+    // Load data one by one with explicit logging
+    console.log('Loading updates...');
+    await loadUpdates();
+    console.log('Updates loaded');
     
-    // Only show app after all data loaded
+    console.log('Loading health profile...');
+    await loadHealthProfile();
+    console.log('Health profile loaded');
+    
+    console.log('Loading BP...');
+    await loadBP();
+    console.log('BP loaded');
+    
+    console.log('Loading appointments...');
+    await loadAppointments();
+    console.log('Appointments loaded');
+    
+    console.log('Loading products...');
+    await loadProducts();
+    console.log('Products loaded');
+    
+    console.log('Loading orders...');
+    await loadOrders();
+    console.log('Orders loaded');
+    
+    console.log('All data loaded, showing app');
     show('app');
   } catch(e) {
     console.error('enterApp error:', e);
