@@ -27,11 +27,17 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 button{cursor:pointer;border:none;background:none}
 
 /* ── Loading & Toast ──────────────────────────── */
-#loading-overlay{position:fixed;inset:0;background:rgba(247,244,239,0.85);
-  display:flex;align-items:center;justify-content:center;z-index:9999}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--pri);
-  border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+#loading-overlay{position:fixed;inset:0;background:rgba(247,244,239,0.92);
+  display:flex;align-items:center;justify-content:center;z-index:9999;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.spinner{position:relative;width:50px;height:50px}
+.spinner::before{content:'';position:absolute;inset:0;
+  border:2.5px solid rgba(26,122,109,0.15);border-top-color:var(--pri);
+  border-radius:50%;animation:spin .9s linear infinite}
+.spinner::after{content:'';position:absolute;inset:5px;
+  border:1.5px dashed rgba(26,122,109,0.1);border-radius:50%;
+  animation:spin 1.8s linear infinite reverse}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 #toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);
   padding:12px 24px;border-radius:8px;color:#fff;font-weight:500;
   z-index:10000;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90%}
@@ -1105,6 +1111,7 @@ function switchTab(tab) {
 
   if (tab === 'profile') renderProfile();
   if (tab === 'reports') renderBPChart();
+  if (tab === 'products') setTimeout(() => addFilterSwipeListeners(), 100);
 }
 
 /* ── Updates (Home) ───────────────────────── */
@@ -1550,45 +1557,53 @@ function renderProductFilters() {
   filterRow.innerHTML =
     `<button class="filter-btn active" onclick="filterProducts('all',this)">All</button>` +
     cats.map(c => `<button class="filter-btn" onclick="filterProducts('${c}',this)">${c}</button>`).join('');
+}
+
+let filterRowTouchStart = 0;
+let filterRowTouchEnd = 0;
+
+// Add swipe to filter row when products tab is switched
+function addFilterSwipeListeners() {
+  const filterRow = $('product-filters');
+  if (!filterRow) return;
   
-  // Add swipe listeners
-  filterRow.removeEventListener('touchstart', handleFilterTouchStart);
-  filterRow.removeEventListener('touchend', handleFilterTouchEnd);
-  filterRow.addEventListener('touchstart', handleFilterTouchStart, false);
-  filterRow.addEventListener('touchend', handleFilterTouchEnd, false);
-}
-
-function handleFilterTouchStart(e) {
-  touchStartX = e.changedTouches[0].screenX;
-}
-
-function handleFilterTouchEnd(e) {
-  touchEndX = e.changedTouches[0].screenX;
-  handleCategorySwipe();
-}
-
-function handleCategorySwipe() {
-  const swipeThreshold = 50;
-  const diff = touchStartX - touchEndX;
+  filterRow.addEventListener('touchstart', (e) => {
+    filterRowTouchStart = e.touches[0].clientX;
+  }, { passive: true });
   
-  if (Math.abs(diff) > swipeThreshold && allCategories.length > 1) {
-    if (diff > 0) {
-      // Swiped left - next category
-      currentCategoryIndex = (currentCategoryIndex + 1) % allCategories.length;
-    } else {
-      // Swiped right - previous category
-      currentCategoryIndex = (currentCategoryIndex - 1 + allCategories.length) % allCategories.length;
-    }
+  filterRow.addEventListener('touchend', (e) => {
+    filterRowTouchEnd = e.changedTouches[0].clientX;
+    const diff = filterRowTouchStart - filterRowTouchEnd;
+    const swipeThreshold = 50;
     
-    const cat = allCategories[currentCategoryIndex];
-    // Find and click the button
-    const buttons = document.querySelectorAll('.filter-btn');
-    if (buttons[currentCategoryIndex]) {
-      filterProducts(cat, buttons[currentCategoryIndex]);
-      // Scroll the button into view
-      buttons[currentCategoryIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    if (Math.abs(diff) > swipeThreshold) {
+      const buttons = document.querySelectorAll('.filter-btn');
+      
+      if (diff > 0) {
+        // Swiped left - move to next category
+        if (currentCategoryIndex < allCategories.length - 1) {
+          currentCategoryIndex++;
+        } else {
+          currentCategoryIndex = 0;
+        }
+      } else {
+        // Swiped right - move to previous category
+        if (currentCategoryIndex > 0) {
+          currentCategoryIndex--;
+        } else {
+          currentCategoryIndex = allCategories.length - 1;
+        }
+      }
+      
+      const cat = allCategories[currentCategoryIndex];
+      if (buttons[currentCategoryIndex]) {
+        buttons[currentCategoryIndex].click();
+        setTimeout(() => {
+          buttons[currentCategoryIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }, 100);
+      }
     }
-  }
+  }, { passive: true });
 }
 
 function filterProducts(cat, btn) {
