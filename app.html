@@ -1834,7 +1834,7 @@ function switchTab(tab) {
 
   if (tab === 'profile' && !isGuest) renderProfile();
   if (tab === 'reports' && !isGuest) renderBPChart();
-  if (tab === 'history' if (tab === 'history' && !isGuest) renderTrackingTab();if (tab === 'history' && !isGuest) renderTrackingTab(); !isGuest) renderHistoryTab();
+  if (tab === 'history' && !isGuest) renderHistoryTab();
   if (tab === 'products') setTimeout(() => addFilterSwipeListeners(), 100);
 }
 
