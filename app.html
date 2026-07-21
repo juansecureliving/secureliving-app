@@ -1251,37 +1251,42 @@ function setLanguage(lang) {
 function applyLanguage() {
   const dict = LANG[currentLang] || LANG.en;
   
-  // Update all data-i18n elements
+  // 1. Update ALL data-i18n elements throughout the entire document
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (dict[key]) el.textContent = dict[key];
+    if (dict[key] !== undefined) {
+      el.textContent = dict[key];
+    }
   });
   
-  // Update tab bar labels
+  // 2. Update tab bar labels (special handling for SVG icons)
   const tabLabels = ['tab_home','tab_appt','tab_products','tab_reports','tab_profile'];
   const tabBtns = document.querySelectorAll('.tab-btn');
   tabBtns.forEach((btn, i) => {
     if (tabLabels[i] && dict[tabLabels[i]]) {
-      // Keep the SVG, replace text node
       const svg = btn.querySelector('svg');
+      const wasLocked = btn.classList.contains('locked');
       btn.textContent = '';
       if (svg) btn.appendChild(svg);
       btn.appendChild(document.createTextNode('\n    ' + dict[tabLabels[i]] + '\n  '));
+      if (wasLocked) btn.classList.add('locked');
     }
   });
   
-  // Update greeting
+  // 3. Update greeting
+  const hour = new Date().getHours();
+  const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
+  const greet = dict[greetKey] || 'Welcome';
   if (ME) {
-    const hour = new Date().getHours();
-    const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
-    const greet = dict[greetKey] || 'Welcome';
     $('greeting').textContent = `${greet}, ${ME.name.split(' ')[0]}`;
+  } else if (isGuest) {
+    $('greeting').textContent = greet;
   }
   
-  // Update lang selector
+  // 4. Update lang selector
   if ($('lang-select')) $('lang-select').value = currentLang;
   
-  // Re-render products if loaded
+  // 5. Re-render products (names, descriptions, categories, buttons)
   if (products.length) {
     renderProductFilters();
     const buttons = document.querySelectorAll('.filter-btn');
@@ -1293,13 +1298,27 @@ function applyLanguage() {
     renderProducts(activeCat);
   }
   
-  // Re-render profile, health data, and updates
+  // 6. Re-render all dynamic content
+  loadUpdates();
   if (ME) {
     renderProfile();
     renderHealthSummary();
     renderBP();
-    loadUpdates();
+    loadAppointments();
+    loadOrders();
   }
+  
+  // 7. Re-apply data-i18n after async re-renders
+  const resweep = () => {
+    const d = LANG[currentLang] || LANG.en;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (d[key] !== undefined) el.textContent = d[key];
+    });
+  };
+  setTimeout(resweep, 300);
+  setTimeout(resweep, 800);
+  setTimeout(resweep, 1500);
 }
 
 const PROD_LANG = {
@@ -2065,8 +2084,22 @@ async function loadAppointments() {
     const r = await api({ action:'getAppointments', memberId:ME.id });
     if (!r.ok) return;
     const el = $('appt-list');
+    const t = LANG[currentLang] || LANG.en;
+    
+    // Appointment type translation map
+    const typeMap = {
+      'Home Assessment': t.home_assessment || 'Home Assessment',
+      'Equipment Consult': t.equipment_consult || 'Equipment Consult',
+      'Health Review': t.health_review || 'Health Review',
+      'Repair / Service': t.repair_service || 'Repair / Service'
+    };
+    const statusMap = {
+      'pending': t.pending, 'confirmed': t.confirmed,
+      'cancelled': t.cancelled, 'completed': t.completed
+    };
+    
     if (!r.appointments.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No appointments yet</p></div>';
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>${t.no_appointments}</p></div>`;
       return;
     }
     el.innerHTML = r.appointments.map(a => {
@@ -2077,15 +2110,17 @@ async function loadAppointments() {
                           a.status === 'cancelled' ? 'badge-cancelled' :
                           a.status === 'completed' ? 'badge-completed' : 'badge-pending';
       const cancelBtn = (a.status === 'pending' || a.status === 'confirmed')
-        ? `<button class="btn btn-sm btn-outline" style="margin-top:6px;width:auto;padding:4px 12px;font-size:11px;color:var(--danger);border-color:var(--danger)" onclick="cancelAppt('${a.id}')">Cancel</button>` : '';
+        ? `<button class="btn btn-sm btn-outline" style="margin-top:6px;width:auto;padding:4px 12px;font-size:11px;color:var(--danger);border-color:var(--danger)" onclick="cancelAppt('${a.id}')">${t.cancel}</button>` : '';
+      const typeName = typeMap[a.type] || a.type;
+      const statusName = statusMap[a.status] || a.status;
       return `
         <div class="appt-list-item">
           <div class="appt-date-box"><div class="appt-day">${day}</div><div class="appt-mon">${mon}</div></div>
           <div class="appt-info">
-            <h4>${esc(a.type)}</h4>
-            <p>${a.time} · ${a.duration || 30} min ${a.consultant ? '· ' + esc(a.consultant) : ''}</p>
+            <h4>${esc(typeName)}</h4>
+            <p>${a.time} · ${a.duration || 30} ${t.min} ${a.consultant ? '· ' + esc(a.consultant) : ''}</p>
             ${a.notes ? `<p style="margin-top:2px">${esc(a.notes)}</p>` : ''}
-            <span class="badge ${statusClass}" style="margin-top:4px">${a.status}</span>
+            <span class="badge ${statusClass}" style="margin-top:4px">${statusName}</span>
             ${cancelBtn}
           </div>
         </div>
@@ -2331,23 +2366,29 @@ async function loadOrders() {
     const r = await api({ action:'getOrders', memberId:ME.id });
     if (!r.ok) return;
     const el = $('orders-list');
+    const t = LANG[currentLang] || LANG.en;
+    const langData = PROD_LANG[currentLang];
+    const statusMap = { pending:t.pending, confirmed:t.confirmed, cancelled:t.cancelled, completed:t.completed };
+    
     if (!r.orders.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>No orders yet</p></div>';
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>${t.no_orders}</p></div>`;
       return;
     }
     el.innerHTML = r.orders.map(o => {
       const statusClass = o.status === 'completed' ? 'badge-completed' :
                           o.status === 'cancelled' ? 'badge-cancelled' :
                           o.status === 'confirmed' ? 'badge-confirmed' : 'badge-pending';
-      const rental = o.type === 'rent' ? `<br>Rental: ${formatDate(o.rentalStart)} — ${formatDate(o.rentalEnd)}` : '';
+      const typeLabel = o.type === 'rent' ? t.rent : t.purchase;
+      const pName = (langData && langData[o.productId] && langData[o.productId].name) || o.productName;
+      const rental = o.type === 'rent' ? `<br>${t.rent}: ${formatDate(o.rentalStart)} — ${formatDate(o.rentalEnd)}` : '';
       return `
         <div style="padding:12px 0;border-bottom:1px solid var(--border)">
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
-              <strong style="font-size:14px">${esc(o.productName)}</strong>
-              <p class="text-sm text-muted">${o.type === 'rent' ? 'Rental' : 'Purchase'} · Qty ${o.qty} · $${Number(o.totalPrice).toFixed(2)}${rental}</p>
+              <strong style="font-size:14px">${esc(pName)}</strong>
+              <p class="text-sm text-muted">${typeLabel} · ${t.qty} ${o.qty} · $${Number(o.totalPrice).toFixed(2)}${rental}</p>
             </div>
-            <span class="badge ${statusClass}">${o.status}</span>
+            <span class="badge ${statusClass}">${statusMap[o.status] || o.status}</span>
           </div>
           <p class="text-sm text-muted" style="margin-top:4px">${formatDate(o.date)}</p>
         </div>
