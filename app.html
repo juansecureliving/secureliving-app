@@ -892,10 +892,9 @@ function doLogout() {
 }
 
 /* ── Enter App ────────────────────────────── */
-function enterApp() {
+async function enterApp() {
   try {
     hide('auth-screen');
-    show('app');
     const name = ME.name || 'User';
     const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     $('top-avatar').textContent = initials;
@@ -912,12 +911,19 @@ function enterApp() {
     if ($('order-rent-start')) $('order-rent-start').value = today;
 
     switchTab('home');
-    loadUpdates();
-    loadHealthProfile();
-    loadBP();
-    loadAppointments();
-    loadProducts();
-    loadOrders();
+    
+    // Load all data with error handling
+    await Promise.all([
+      loadUpdates().catch(e => console.error('loadUpdates error:', e)),
+      loadHealthProfile().catch(e => console.error('loadHealthProfile error:', e)),
+      loadBP().catch(e => console.error('loadBP error:', e)),
+      loadAppointments().catch(e => console.error('loadAppointments error:', e)),
+      loadProducts().catch(e => console.error('loadProducts error:', e)),
+      loadOrders().catch(e => console.error('loadOrders error:', e))
+    ]);
+    
+    // Only show app after all data loaded
+    show('app');
   } catch(e) {
     console.error('enterApp error:', e);
     toast('Error loading app, please login again', 'error');
