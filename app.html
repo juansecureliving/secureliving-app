@@ -81,7 +81,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* ── App Shell ────────────────────────────────── */
 #app{min-height:100vh;padding-bottom:80px}
-.top-bar{background:var(--pri);color:#fff;padding:14px 20px;
+.top-bar{background:#1A7A6D;color:#fff;padding:14px 20px;
   display:flex;align-items:center;justify-content:space-between;
   position:sticky;top:0;z-index:100}
 .top-bar h1{font-family:var(--font-display);font-size:20px;font-weight:400}
@@ -91,8 +91,8 @@ button{cursor:pointer;border:none;background:none}
   border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
 
 /* Tabs */
-.tab-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);
-  border-top:1px solid var(--border);display:flex;z-index:100;
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:#FFFFFF;
+  border-top:1px solid #E2DFD8;display:flex;z-index:100;
   padding-bottom:env(safe-area-inset-bottom)}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;
   padding:8px 4px 6px;gap:2px;font-size:10px;color:var(--muted);
@@ -121,8 +121,9 @@ button{cursor:pointer;border:none;background:none}
 .badge-category{background:var(--pri-light);color:var(--pri)}
 
 /* ── Home Tab ─────────────────────────────────── */
-.hero-card{background:linear-gradient(135deg,var(--pri),var(--pri-dark));
-  color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:16px}
+.hero-card{background:linear-gradient(135deg,rgba(26,122,109,0.75),rgba(20,95,85,0.75));
+  color:#fff;border-radius:var(--radius);padding:28px 24px;margin-bottom:16px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
 .hero-card p{opacity:.85;font-size:14px;line-height:1.5}
 .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
@@ -240,9 +241,9 @@ button{cursor:pointer;border:none;background:none}
   background:var(--accent);border-radius:50%}
 
 /* ── Weather Widget (Apple-style) ──────────────────── */
-.weather-widget{background:linear-gradient(135deg,var(--pri),var(--pri-dark));
+.weather-widget{background:linear-gradient(135deg,rgba(26,122,109,0.75),rgba(20,95,85,0.75));
   color:#fff;border-radius:20px;padding:32px 24px;margin-bottom:16px;
-  box-shadow:0 8px 32px rgba(26,122,109,0.15)}
+  box-shadow:0 8px 32px rgba(26,122,109,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .weather-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
 .time-display{flex:1}
 .time-display .time-main{font-size:48px;font-weight:700;line-height:1;letter-spacing:-1px}
@@ -1056,6 +1057,97 @@ function applyLanguage() {
   
   // Update lang selector
   if ($('lang-select')) $('lang-select').value = currentLang;
+  
+  // Re-render products if loaded
+  if (products.length) {
+    renderProductFilters();
+    // Restore active category
+    const buttons = document.querySelectorAll('.filter-btn');
+    if (buttons[currentCategoryIndex]) {
+      buttons.forEach(b => b.classList.remove('active'));
+      buttons[currentCategoryIndex].classList.add('active');
+    }
+    const activeCat = allCategories[currentCategoryIndex] || 'all';
+    renderProducts(activeCat);
+  }
+}
+
+const PROD_LANG = {
+  zh: {
+    p001:{name:'标准轮椅',desc:'轻便折叠轮椅，可调节脚踏板。适合日常使用。'},
+    p002:{name:'电动轮椅',desc:'电池驱动电动轮椅，操纵杆控制。每次充电续航可达20公里。'},
+    p003:{name:'手动病床',desc:'单摇杆病床，配有侧栏和输液杆架。床头部分可调节。'},
+    p004:{name:'电动病床',desc:'三功能电动病床，遥控操作。可调节床头、膝部和高度。'},
+    p005:{name:'可调节拐杖',desc:'铝制可调高度拐杖，人体工程学橡胶握把。防滑杖尖。'},
+    p006:{name:'四脚拐杖',desc:'四点底座行走拐杖，稳定性更强。可调高度，泡沫握把。'},
+    p007:{name:'助行器',desc:'四轮助行器，带座椅、靠背和篮子。可折叠便于存放和运输。'},
+    p008:{name:'坐便椅',desc:'钢架坐便椅，可拆卸便桶。可调高度，配扶手。'},
+    p009:{name:'淋浴椅',desc:'轻便铝制淋浴椅，排水孔设计。防滑橡胶脚垫。'},
+    p010:{name:'血压计',desc:'数字上臂式血压计，可存储60次读数。大液晶显示屏。'},
+    p011:{name:'制氧机（5升）',desc:'便携式5升制氧机。静音运行，流量可调1-5升/分钟。'},
+    p012:{name:'雾化器',desc:'压缩式雾化器，配成人和儿童面罩。用于吸入药物治疗。'},
+    p013:{name:'手动移位机',desc:'液压移位机，配吊带。安全地从床到轮椅的转移。承重150公斤。'},
+    p014:{name:'可调床栏',desc:'可折叠床安全栏。免工具安装，适合大多数床型。'},
+    p015:{name:'跨床桌',desc:'可调高度跨床桌，可倾斜桌面。带锁定脚轮，稳定性好。'},
+    cat_Mobility:'行动辅助', cat_HomeCare:'居家护理', cat_Bathroom:'浴室辅助',
+    cat_HealthMonitoring:'健康监测', cat_Respiratory:'呼吸辅助',
+    buy:'购买', rent:'租赁', per_day:'/天', in_stock:'有库存', all:'全部'
+  },
+  ms: {
+    p001:{name:'Kerusi Roda Standard',desc:'Kerusi roda boleh lipat ringan dengan tempat kaki boleh laras. Sesuai untuk kegunaan harian.'},
+    p002:{name:'Kerusi Roda Bermotor',desc:'Kerusi roda elektrik berkuasa bateri dengan kawalan kayu bedik. Jarak sehingga 20km setiap cas.'},
+    p003:{name:'Katil Hospital (Manual)',desc:'Katil hospital satu engkol dengan rel sisi dan pemegang tiang IV. Bahagian kepala boleh laras.'},
+    p004:{name:'Katil Hospital (Elektrik)',desc:'Katil hospital elektrik 3 fungsi dengan kawalan jauh. Kepala, lutut dan ketinggian boleh laras.'},
+    p005:{name:'Tongkat (Boleh Laras)',desc:'Tongkat aluminium boleh laras ketinggian dengan pegangan getah ergonomik. Hujung anti-gelincir.'},
+    p006:{name:'Tongkat Empat Kaki',desc:'Tongkat berjalan tapak empat titik untuk kestabilan tambahan. Boleh laras ketinggian dengan pegangan busa.'},
+    p007:{name:'Rollator',desc:'Rollator 4 roda dengan tempat duduk, sandaran dan bakul. Boleh dilipat untuk penyimpanan.'},
+    p008:{name:'Kerusi Tandas',desc:'Kerusi tandas rangka keluli dengan baldi boleh tanggal. Ketinggian boleh laras dengan tempat tangan.'},
+    p009:{name:'Kerusi Mandi',desc:'Kerusi mandi aluminium ringan dengan lubang saliran. Kaki getah anti-gelincir.'},
+    p010:{name:'Monitor Tekanan Darah',desc:'Monitor tekanan darah digital lengan atas dengan memori 60 bacaan. Paparan LCD besar.'},
+    p011:{name:'Penumpu Oksigen (5L)',desc:'Penumpu oksigen mudah alih 5 liter. Operasi senyap dengan kadar aliran boleh laras 1-5L/min.'},
+    p012:{name:'Mesin Nebulizer',desc:'Nebulizer pemampat dengan topeng dewasa dan kanak-kanak. Untuk mentadbir ubat sedutan.'},
+    p013:{name:'Pengangkat Pesakit (Manual)',desc:'Pengangkat pesakit hidraulik dengan anduh. Pemindahan selamat dari katil ke kerusi roda. Kapasiti 150kg.'},
+    p014:{name:'Rel Katil (Boleh Laras)',desc:'Rel keselamatan katil boleh lipat. Pemasangan mudah tanpa alat. Sesuai untuk kebanyakan saiz katil.'},
+    p015:{name:'Meja Atas Katil',desc:'Meja atas katil boleh laras ketinggian dengan permukaan boleh condong. Kastor boleh kunci.'},
+    cat_Mobility:'Mobiliti', cat_HomeCare:'Penjagaan Rumah', cat_Bathroom:'Bilik Air',
+    cat_HealthMonitoring:'Pemantauan Kesihatan', cat_Respiratory:'Pernafasan',
+    buy:'Beli', rent:'Sewa', per_day:'/hari', in_stock:'dalam stok', all:'Semua'
+  },
+  ta: {
+    p001:{name:'நிலையான சக்கர நாற்காலி',desc:'லகுவான மடிக்கக்கூடிய சக்கர நாற்காலி, சரிசெய்யக்கூடிய கால் தாங்கிகள். அன்றாட பயன்பாட்டிற்கு ஏற்றது.'},
+    p002:{name:'மின்சார சக்கர நாற்காலி',desc:'பேட்டரி இயங்கும் மின் சக்கர நாற்காலி, ஜாய்ஸ்டிக் கட்டுப்பாடு. ஒரு சார்ஜுக்கு 20கி.மீ வரை.'},
+    p003:{name:'கைமுறை மருத்துவ படுக்கை',desc:'ஒற்றை கிராங்க் மருத்துவ படுக்கை, பக்க தண்டவாளங்கள் மற்றும் IV தூண் பிடிப்பான். தலைப்பகுதி சரிசெய்யக்கூடியது.'},
+    p004:{name:'மின் மருத்துவ படுக்கை',desc:'3-செயல்பாடு மின் மருத்துவ படுக்கை, ரிமோட் கட்டுப்பாடு. தலை, முழங்கால் மற்றும் உயரம் சரிசெய்யக்கூடியது.'},
+    p005:{name:'சரிசெய்யக்கூடிய நடைக்கோல்',desc:'அலுமினிய உயர சரிசெய்யக்கூடிய நடைக்கோல், எர்கனாமிக் ரப்பர் பிடி. வழுக்கல் தடுப்பு நுனி.'},
+    p006:{name:'நான்கு கால் ஊன்றுகோல்',desc:'கூடுதல் நிலைத்தன்மைக்கான நான்கு-புள்ளி அடிப்படை நடை ஊன்றுகோல். உயரம் சரிசெய்யக்கூடியது.'},
+    p007:{name:'ரோலேட்டர் வாக்கர்',desc:'4-சக்கர ரோலேட்டர், இருக்கை, முதுகுத்தாங்கி மற்றும் கூடை. மடிக்கக்கூடியது.'},
+    p008:{name:'கழிவறை நாற்காலி',desc:'எஃகு சட்ட கழிவறை நாற்காலி, நீக்கக்கூடிய வாளி. சரிசெய்யக்கூடிய உயரம்.'},
+    p009:{name:'குளியல் நாற்காலி',desc:'லகுவான அலுமினிய குளியல் நாற்காலி, வடிகால் துளைகள். வழுக்கல் தடுப்பு ரப்பர் கால்கள்.'},
+    p010:{name:'இரத்த அழுத்த மானிட்டர்',desc:'டிஜிட்டல் மேல்-கை இரத்த அழுத்த மானிட்டர், 60 வாசிப்புகள் நினைவகம். பெரிய LCD திரை.'},
+    p011:{name:'ஆக்சிஜன் செறிவூட்டி (5L)',desc:'கையடக்க 5-லிட்டர் ஆக்சிஜன் செறிவூட்டி. அமைதியான இயக்கம், 1-5L/நிமிடம் சரிசெய்யக்கூடியது.'},
+    p012:{name:'நெபுலைசர்',desc:'கம்ப்ரசர் நெபுலைசர், பெரியவர் மற்றும் குழந்தை முகமூடிகள். சுவாச மருந்து வழங்க.'},
+    p013:{name:'நோயாளி தூக்கி (கைமுறை)',desc:'ஹைட்ராலிக் நோயாளி தூக்கி, ஸ்லிங் உடன். படுக்கையிலிருந்து சக்கர நாற்காலிக்கு பாதுகாப்பான இடமாற்றம். 150கி.கி திறன்.'},
+    p014:{name:'படுக்கை தண்டவாளம்',desc:'மடிக்கக்கூடிய படுக்கை பாதுகாப்பு தண்டவாளம். எளிதான நிறுவல், கருவிகள் தேவையில்லை.'},
+    p015:{name:'மேல்படுக்கை மேசை',desc:'உயர சரிசெய்யக்கூடிய மேல்படுக்கை மேசை, சாய்வு மேற்பரப்பு. பூட்டக்கூடிய கால்சக்கரங்கள்.'},
+    cat_Mobility:'இயக்கம்', cat_HomeCare:'இல்ல பராமரிப்பு', cat_Bathroom:'குளியலறை',
+    cat_HealthMonitoring:'சுகாதார கண்காணிப்பு', cat_Respiratory:'சுவாசம்',
+    buy:'வாங்கு', rent:'வாடகை', per_day:'/நாள்', in_stock:'கையிருப்பு உள்ளது', all:'அனைத்தும்'
+  }
+};
+
+function getProductText(productId, field) {
+  if (currentLang === 'en') return null;
+  const langData = PROD_LANG[currentLang];
+  if (!langData || !langData[productId]) return null;
+  return langData[productId][field] || null;
+}
+
+function getCategoryText(category) {
+  if (currentLang === 'en') return category;
+  const langData = PROD_LANG[currentLang];
+  if (!langData) return category;
+  const key = 'cat_' + category.replace(/\s+/g, '');
+  return langData[key] || category;
 }
 
 /* ── Weather & Time ──────────────────────────────– */
@@ -1708,10 +1800,12 @@ function renderProductFilters() {
   const cats = [...new Set(products.map(p => p.category))];
   allCategories = ['all', ...cats];
   currentCategoryIndex = 0;
+  const langData = PROD_LANG[currentLang];
+  const allLabel = (langData && langData.all) || 'All';
   const filterRow = $('product-filters');
   filterRow.innerHTML =
-    `<button class="filter-btn active" onclick="filterProducts('all',this)">All</button>` +
-    cats.map(c => `<button class="filter-btn" onclick="filterProducts('${c}',this)">${c}</button>`).join('');
+    `<button class="filter-btn active" onclick="filterProducts('all',this)">${allLabel}</button>` +
+    cats.map(c => `<button class="filter-btn" onclick="filterProducts('${c}',this)">${getCategoryText(c)}</button>`).join('');
 }
 
 let swipeInitialized = false;
@@ -1799,6 +1893,12 @@ function filterProducts(cat, btn) {
 
 function renderProducts(cat) {
   const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+  const langData = PROD_LANG[currentLang];
+  const buyLabel = (langData && langData.buy) || 'Purchase';
+  const rentLabel = (langData && langData.rent) || 'Rent';
+  const perDayLabel = (langData && langData.per_day) || '/day';
+  const inStockLabel = (langData && langData.in_stock) || 'in stock';
+  
   if (!filtered.length) {
     $('product-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>No products in this category</p></div>';
     return;
@@ -1806,20 +1906,23 @@ function renderProducts(cat) {
   $('product-list').innerHTML = filtered.map(p => {
     const catClass = 'cat-' + p.category.replace(/\s+/g,'-');
     const icon = CAT_ICONS[p.category] || '📦';
+    const pName = getProductText(p.id, 'name') || p.name;
+    const pDesc = getProductText(p.id, 'desc') || p.description;
+    const pCat = getCategoryText(p.category);
     return `
       <div class="product-card">
         <div class="product-img ${catClass}">${icon}</div>
         <div class="product-body">
-          <h4>${esc(p.name)}</h4>
-          <div class="product-cat">${esc(p.category)} · ${p.stock} in stock</div>
-          <div class="product-desc">${esc(p.description)}</div>
+          <h4>${esc(pName)}</h4>
+          <div class="product-cat">${esc(pCat)} · ${p.stock} ${inStockLabel}</div>
+          <div class="product-desc">${esc(pDesc)}</div>
           <div class="price-row">
-            <span class="price-tag">Buy: <strong>$${Number(p.salePrice).toFixed(0)}</strong></span>
-            <span class="price-tag"><span class="from">Rent from</span> <strong>$${Number(p.rentalPriceDay).toFixed(0)}</strong>/day</span>
+            <span class="price-tag">${buyLabel}: <strong>$${Number(p.salePrice).toFixed(0)}</strong></span>
+            <span class="price-tag"><strong>$${Number(p.rentalPriceDay).toFixed(0)}</strong>${perDayLabel}</span>
           </div>
           <div class="product-actions">
-            <button class="btn btn-sm btn-pri" onclick="openOrderModal('${p.id}','buy')">Purchase</button>
-            <button class="btn btn-sm btn-accent" onclick="openOrderModal('${p.id}','rent')">Rent</button>
+            <button class="btn btn-sm btn-pri" onclick="openOrderModal('${p.id}','buy')">${buyLabel}</button>
+            <button class="btn btn-sm btn-accent" onclick="openOrderModal('${p.id}','rent')">${rentLabel}</button>
           </div>
         </div>
       </div>
