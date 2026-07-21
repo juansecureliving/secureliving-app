@@ -679,6 +679,32 @@ button{cursor:pointer;border:none;background:none}
       <div id="caregivers-list" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
     </div>
 
+    <!-- App Usage -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="app_usage">App Usage</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
+          <div class="text-sm text-muted" data-i18n="session_duration">Session Duration</div>
+          <div style="font-size:16px;font-weight:700;color:var(--pri);margin-top:4px" id="session-duration">-- min</div>
+        </div>
+        <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
+          <div class="text-sm text-muted" data-i18n="last_active">Last Active</div>
+          <div style="font-size:14px;font-weight:600;color:var(--success);margin-top:4px" id="last-active">Just now</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:var(--pri-light);border-radius:8px;font-size:12px">
+        <p class="text-sm" style="margin-bottom:6px"><strong data-i18n="daily_stats">Daily Stats</strong></p>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span data-i18n="login_count">Login Count:</span>
+          <strong id="login-count">0</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span data-i18n="total_time">Total Time:</span>
+          <strong id="total-time">0h 0m</strong>
+        </div>
+      </div>
+    </div>
+
     <!-- Battery & Status -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="battery_status">Battery & Status</h3>
@@ -1116,6 +1142,9 @@ const LANG = {
     // Weather
     humidity:'Humidity', wind:'Wind', feels_like:'Feels Like',
     singapore:'Singapore', loading:'Loading...',
+    // App Usage
+    app_usage:'App Usage', session_duration:'Session Duration', last_active:'Last Active',
+    daily_stats:'Daily Stats', login_count:'Login Count', total_time:'Total Time',
     // Tabs
     tab_home:'Home', tab_appt:'Appointment', tab_products:'Products',
     tab_reports:'Reports', tab_profile:'Profile', tab_history:'History',
@@ -1199,6 +1228,8 @@ const LANG = {
     day:'日', week:'周', month:'月',
     no_orders:'暂无订单', qty:'数量',
     humidity:'湿度', wind:'风速', feels_like:'体感温度',
+    app_usage:'应用使用', session_duration:'会话时长', last_active:'最后活动',
+    daily_stats:'每日统计', login_count:'登录次数', total_time:'总时间',
     singapore:'新加坡', loading:'加载中...',
     tab_home:'首页', tab_appt:'预约', tab_products:'设备',
     tab_reports:'报告', tab_profile:'档案', tab_history:'历史',
@@ -1281,6 +1312,8 @@ const LANG = {
     day:'Hari', week:'Minggu', month:'Bulan',
     no_orders:'Tiada pesanan', qty:'Kuan',
     humidity:'Kelembapan', wind:'Angin', feels_like:'Terasa Seperti',
+    app_usage:'Penggunaan Aplikasi', session_duration:'Durasi Sesi', last_active:'Aktif Terakhir',
+    daily_stats:'Statistik Harian', login_count:'Jumlah Login', total_time:'Jumlah Waktu',
     singapore:'Singapura', loading:'Memuatkan...',
     tab_home:'Utama', tab_appt:'Temu Janji', tab_products:'Peralatan',
     tab_reports:'Laporan', tab_profile:'Profil', tab_history:'Sejarah',
@@ -1362,6 +1395,8 @@ const LANG = {
     day:'நாள்', week:'வாரம்', month:'மாதம்',
     no_orders:'ஆர்டர்கள் இல்லை', qty:'எண்',
     humidity:'ஈரப்பதம்', wind:'காற்று', feels_like:'உணர்வு வெப்பம்',
+    app_usage:'பயன்பாட்டு பயன்பாடு', session_duration:'அமர்வு காலம்', last_active:'கடைசியாக செயல்பட்ட',
+    daily_stats:'தினசரி புள்ளிவிவரங்கள்', login_count:'உள்நுழைவு எண்ணிக்கை', total_time:'மொத்த நேரம்',
     singapore:'சிங்கப்பூர்', loading:'ஏற்றுகிறது...',
     tab_home:'முகப்பு', tab_appt:'சந்திப்பு', tab_products:'உபகரணங்கள்',
     tab_reports:'அறிக்கை', tab_profile:'சுயவிவரம்', tab_history:'வரலாறு',
@@ -1676,6 +1711,11 @@ let caregivers = [];
 let safeZones = [];
 let locationHistory = [];
 let gpsWatchId = null;
+// App Usage tracking
+let sessionStartTime = Date.now();
+let loginCount = 0;
+let totalSessionTime = 0;
+let lastActivityTime = Date.now();
 
 function doLogout() {
   ME = null;
@@ -2579,7 +2619,29 @@ function renderHistoryTab() {
     show('history-self-view');
     requestLocationPermission();
     updateTrackingUI();
+    updateAppUsageDisplay();
   }
+}
+
+function updateAppUsageDisplay() {
+  const now = Date.now();
+  const sessionDuration = Math.round((now - sessionStartTime) / 60000); // minutes
+  const totalMinutes = (totalSessionTime + sessionDuration) % 60;
+  const totalHours = Math.floor((totalSessionTime + sessionDuration) / 60);
+  
+  if ($('session-duration')) $('session-duration').textContent = sessionDuration + ' min';
+  if ($('last-active')) {
+    const lastActivityMinutesAgo = Math.round((now - lastActivityTime) / 60000);
+    if (lastActivityMinutesAgo === 0) {
+      $('last-active').textContent = 'Just now';
+    } else if (lastActivityMinutesAgo === 1) {
+      $('last-active').textContent = '1 min ago';
+    } else {
+      $('last-active').textContent = lastActivityMinutesAgo + ' min ago';
+    }
+  }
+  if ($('login-count')) $('login-count').textContent = loginCount;
+  if ($('total-time')) $('total-time').textContent = totalHours + 'h ' + totalMinutes + 'm';
 }
 
 function requestLocationPermission() {
@@ -2848,6 +2910,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       ME = JSON.parse(saved);
       if (ME && ME.id && ME.name) {
+        loginCount++;
         enterApp();
       } else {
         localStorage.removeItem('al_member');
@@ -2860,6 +2923,12 @@ window.addEventListener('DOMContentLoaded', () => {
   } else if (guestMode === 'true') {
     enterGuest();
   }
+  
+  // Track user activity
+  document.addEventListener('click', () => { lastActivityTime = Date.now(); });
+  document.addEventListener('keypress', () => { lastActivityTime = Date.now(); });
+  document.addEventListener('scroll', () => { lastActivityTime = Date.now(); });
+  
   // Resize chart on orientation change
   window.addEventListener('resize', () => { if (ME) renderBPChart(); });
 });
