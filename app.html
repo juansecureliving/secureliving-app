@@ -730,7 +730,7 @@ button{cursor:pointer;border:none;background:none}
     <p data-i18n="guest_reports_msg">Create an account or sign in to log blood pressure readings and track your health.</p>
     <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
   </div>
-  <h2 class="section-title" data-i18n="health_reports">Health Reports</h2>
+  <h2 class="section-title" data-i18n="readings">Readings</h2>
 
   <!-- Add BP Reading -->
   <div class="card">
@@ -778,6 +778,85 @@ button{cursor:pointer;border:none;background:none}
       <button class="btn btn-sm btn-outline" onclick="loadBP()" data-i18n="refresh">Refresh</button>
     </div>
     <div id="bp-history"></div>
+  </div>
+
+  <!-- Blood Glucose Reading -->
+  <div class="card">
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"><span data-i18n="log_glucose">Log Blood Glucose</span></h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="glucose_value">Glucose (mg/dL)</label>
+        <input type="number" id="glucose-value" placeholder="e.g. 100" min="40" max="400">
+      </div>
+      <div class="form-group">
+        <label data-i18n="glucose_time">Time of Day</label>
+        <select id="glucose-time" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+          <option data-i18n="fasting">Fasting</option>
+          <option data-i18n="before_meal">Before Meal</option>
+          <option data-i18n="after_meal">After Meal</option>
+          <option data-i18n="bedtime">Bedtime</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="date">Date</label>
+        <input type="date" id="glucose-date">
+      </div>
+      <div class="form-group">
+        <label data-i18n="notes">Notes</label>
+        <input type="text" id="glucose-notes" placeholder="e.g. After breakfast">
+      </div>
+    </div>
+    <button class="btn btn-pri" onclick="addGlucose()" data-i18n="save_reading">Save Reading</button>
+  </div>
+
+  <!-- Glucose History -->
+  <div class="card">
+    <div class="card-header">
+      <h3 data-i18n="glucose_history">Glucose History</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadGlucose()" data-i18n="refresh">Refresh</button>
+    </div>
+    <div id="glucose-history"></div>
+  </div>
+
+  <!-- Cholesterol Reading -->
+  <div class="card">
+    <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"><span data-i18n="log_cholesterol">Log Cholesterol</span></h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="total_cholesterol">Total Cholesterol (mg/dL)</label>
+        <input type="number" id="chol-total" placeholder="e.g. 200" min="0" max="500">
+      </div>
+      <div class="form-group">
+        <label data-i18n="ldl">LDL (mg/dL)</label>
+        <input type="number" id="chol-ldl" placeholder="e.g. 100" min="0" max="300">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="hdl">HDL (mg/dL)</label>
+        <input type="number" id="chol-hdl" placeholder="e.g. 50" min="0" max="150">
+      </div>
+      <div class="form-group">
+        <label data-i18n="date">Date</label>
+        <input type="date" id="chol-date">
+      </div>
+    </div>
+    <div class="form-group">
+      <label data-i18n="notes">Notes</label>
+      <input type="text" id="chol-notes" placeholder="e.g. Fasting test">
+    </div>
+    <button class="btn btn-pri" onclick="addCholesterol()" data-i18n="save_reading">Save Reading</button>
+  </div>
+
+  <!-- Cholesterol History -->
+  <div class="card">
+    <div class="card-header">
+      <h3 data-i18n="cholesterol_history">Cholesterol History</h3>
+      <button class="btn btn-sm btn-outline" onclick="loadCholesterol()" data-i18n="refresh">Refresh</button>
+    </div>
+    <div id="cholesterol-history"></div>
   </div>
 
   <!-- <span data-i18n="health_summary">Health Summary</span> -->
@@ -857,11 +936,11 @@ button{cursor:pointer;border:none;background:none}
   </button>
   <button class="tab-btn" onclick="switchTab('history')" data-tab="history">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M3 12a9 9 0 0 0 9 9m0-18a9 9 0 0 0-9 9m18 0a9 9 0 0 1-9 9m0 0a9 9 0 0 1 9-9m0 0a9 9 0 1 1-9 9"/><polyline points="12 7 12 12 16 14"/></svg>
-    <span data-i18n="tab_history">History</span>
+    <span data-i18n="tab_monitor">Monitor</span>
   </button>
   <button class="tab-btn" onclick="switchTab('reports')" data-tab="reports">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    Reports
+    <span data-i18n="tab_readings">Readings</span>
   </button>
   <button class="tab-btn" onclick="switchTab('profile')" data-tab="profile">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1147,7 +1226,12 @@ const LANG = {
     daily_stats:'Daily Stats', login_count:'Login Count', total_time:'Total Time',
     // Tabs
     tab_home:'Home', tab_appt:'Appointment', tab_products:'Products',
-    tab_reports:'Reports', tab_profile:'Profile', tab_history:'History',
+    tab_reports:'Readings', tab_profile:'Profile', tab_monitor:'Monitor',
+    // Readings
+    readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
+    glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
+    glucose_history:'Glucose History', log_cholesterol:'Log Cholesterol', total_cholesterol:'Total Cholesterol',
+    ldl:'LDL', hdl:'HDL', cholesterol_history:'Cholesterol History',
     // Greetings
     welcome:'Welcome', good_morning:'Good Morning',
     good_afternoon:'Good Afternoon', good_evening:'Good Evening',
@@ -2201,6 +2285,117 @@ async function deleteBP(id) {
   try {
     await api({ action:'deleteBPReading', id });
     await loadBP();
+    toast('Deleted','info');
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+// Glucose Reading Functions
+async function addGlucose() {
+  const value = $('glucose-value').value;
+  if (!value) return toast('Enter glucose value','error');
+  loading(true);
+  try {
+    const r = await api({
+      action:'addGlucoseReading', memberId:ME.id,
+      value: value,
+      timeOfDay: $('glucose-time').value,
+      date: $('glucose-date').value,
+      notes: $('glucose-notes').value
+    });
+    if (r.ok) {
+      toast('Reading saved','success');
+      $('glucose-value').value = '';
+      $('glucose-time').value = 'fasting';
+      $('glucose-notes').value = '';
+      await loadGlucose();
+    }
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+async function loadGlucose() {
+  try {
+    const r = await api({ action:'getGlucoseReadings', memberId:ME.id });
+    if (!r.ok || !r.readings) return;
+    const t = LANG[currentLang] || LANG.en;
+    const html = r.readings.map(g => `
+      <div style="padding:10px;background:var(--pri-light);border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong>${g.value} mg/dL</strong>
+          <p class="text-sm text-muted">${g.timeOfDay} · ${formatDate(g.date)}</p>
+          ${g.notes ? `<p class="text-sm">${esc(g.notes)}</p>` : ''}
+        </div>
+        <button onclick="deleteGlucose('${g.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">×</button>
+      </div>
+    `).join('');
+    if ($('glucose-history')) $('glucose-history').innerHTML = html || '<p class="text-sm text-muted">No readings yet</p>';
+  } catch(e) {}
+}
+
+async function deleteGlucose(id) {
+  if (!confirm('Delete this reading?')) return;
+  loading(true);
+  try {
+    await api({ action:'deleteGlucoseReading', id });
+    await loadGlucose();
+    toast('Deleted','info');
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+// Cholesterol Reading Functions
+async function addCholesterol() {
+  const total = $('chol-total').value;
+  if (!total) return toast('Enter total cholesterol value','error');
+  loading(true);
+  try {
+    const r = await api({
+      action:'addCholesterolReading', memberId:ME.id,
+      totalCholesterol: total,
+      ldl: $('chol-ldl').value,
+      hdl: $('chol-hdl').value,
+      date: $('chol-date').value,
+      notes: $('chol-notes').value
+    });
+    if (r.ok) {
+      toast('Reading saved','success');
+      $('chol-total').value = '';
+      $('chol-ldl').value = '';
+      $('chol-hdl').value = '';
+      $('chol-notes').value = '';
+      await loadCholesterol();
+    }
+  } catch(e) { toast('Error','error'); }
+  finally { loading(false); }
+}
+
+async function loadCholesterol() {
+  try {
+    const r = await api({ action:'getCholesterolReadings', memberId:ME.id });
+    if (!r.ok || !r.readings) return;
+    const t = LANG[currentLang] || LANG.en;
+    const html = r.readings.map(c => `
+      <div style="padding:10px;background:var(--pri-light);border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong>Total: ${c.totalCholesterol} mg/dL</strong>
+          <p class="text-sm text-muted">LDL: ${c.ldl || '-'} · HDL: ${c.hdl || '-'} mg/dL</p>
+          <p class="text-sm text-muted">${formatDate(c.date)}</p>
+          ${c.notes ? `<p class="text-sm">${esc(c.notes)}</p>` : ''}
+        </div>
+        <button onclick="deleteCholesterol('${c.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">×</button>
+      </div>
+    `).join('');
+    if ($('cholesterol-history')) $('cholesterol-history').innerHTML = html || '<p class="text-sm text-muted">No readings yet</p>';
+  } catch(e) {}
+}
+
+async function deleteCholesterol(id) {
+  if (!confirm('Delete this reading?')) return;
+  loading(true);
+  try {
+    await api({ action:'deleteCholesterolReading', id });
+    await loadCholesterol();
     toast('Deleted','info');
   } catch(e) { toast('Error','error'); }
   finally { loading(false); }
