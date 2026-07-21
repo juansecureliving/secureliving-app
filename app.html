@@ -28,16 +28,12 @@ button{cursor:pointer;border:none;background:none}
 
 /* ── Loading & Toast ──────────────────────────── */
 #loading-overlay{position:fixed;inset:0;background:rgba(247,244,239,0.92);
-  display:flex;align-items:center;justify-content:center;z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.spinner{position:relative;width:50px;height:50px}
-.spinner::before{content:'';position:absolute;inset:0;
-  border:2.5px solid rgba(26,122,109,0.15);border-top-color:var(--pri);
-  border-radius:50%;animation:spin .9s linear infinite}
-.spinner::after{content:'';position:absolute;inset:5px;
-  border:1.5px dashed rgba(26,122,109,0.1);border-radius:50%;
-  animation:spin 1.8s linear infinite reverse}
-@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.spinner{width:44px;height:44px;border:3px solid rgba(26,122,109,0.15);
+  border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-label{margin-top:14px;font-size:13px;color:var(--muted);font-weight:500}
 #toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);
   padding:12px 24px;border-radius:8px;color:#fff;font-weight:500;
   z-index:10000;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90%}
@@ -169,6 +165,12 @@ button{cursor:pointer;border:none;background:none}
 .price-tag .from{font-size:11px;color:var(--muted)}
 .product-actions{display:flex;gap:8px}
 .product-actions .btn{flex:1;padding:10px 12px;font-size:13px}
+#product-list{transition:opacity .2s ease,transform .2s ease}
+#product-list.swipe-left{opacity:0;transform:translateX(-30px)}
+#product-list.swipe-right{opacity:0;transform:translateX(30px)}
+.swipe-hint{text-align:center;padding:8px;font-size:11px;color:var(--muted);opacity:.6}
+.swipe-hint span{display:inline-block;animation:swipeHint 2s ease-in-out infinite}
+@keyframes swipeHint{0%,100%{transform:translateX(0)}50%{transform:translateX(8px)}}
 
 /* ── Consultation ─────────────────────────────── */
 .appt-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
@@ -284,7 +286,7 @@ button{cursor:pointer;border:none;background:none}
 <body>
 
 <!-- Loading -->
-<div id="loading-overlay" class="hidden"><div class="spinner"></div></div>
+<div id="loading-overlay" class="hidden"><div class="spinner"></div><div class="spinner-label">Loading...</div></div>
 
 <!-- Toast -->
 <div id="toast"></div>
@@ -684,6 +686,7 @@ button{cursor:pointer;border:none;background:none}
   <h2 class="section-title">Equipment</h2>
   <p class="text-sm text-muted mb-16">Rent or purchase quality assistive equipment. We also offer repair and servicing for all items.</p>
   <div class="filter-row" id="product-filters"></div>
+  <div class="swipe-hint" id="swipe-hint"><span>← Swipe to browse categories →</span></div>
   <div id="product-list"></div>
 </div>
 
@@ -871,8 +874,6 @@ let selectedApptDur = '';
 let orderType = 'buy';
 let allCategories = [];
 let currentCategoryIndex = 0;
-let touchStartX = 0;
-let touchEndX = 0;
 
 /* ── Helpers ──────────────────────────────── */
 function $(id) { return document.getElementById(id); }
@@ -1559,56 +1560,86 @@ function renderProductFilters() {
     cats.map(c => `<button class="filter-btn" onclick="filterProducts('${c}',this)">${c}</button>`).join('');
 }
 
-let filterRowTouchStart = 0;
-let filterRowTouchEnd = 0;
+let swipeInitialized = false;
 
-// Add swipe to filter row when products tab is switched
 function addFilterSwipeListeners() {
-  const filterRow = $('product-filters');
-  if (!filterRow) return;
+  if (swipeInitialized) return;
+  swipeInitialized = true;
   
-  filterRow.addEventListener('touchstart', (e) => {
-    filterRowTouchStart = e.touches[0].clientX;
+  const productsTab = $('tab-products');
+  let startX = 0;
+  let startY = 0;
+  let swiping = false;
+  
+  productsTab.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    swiping = true;
   }, { passive: true });
   
-  filterRow.addEventListener('touchend', (e) => {
-    filterRowTouchEnd = e.changedTouches[0].clientX;
-    const diff = filterRowTouchStart - filterRowTouchEnd;
-    const swipeThreshold = 50;
-    
-    if (Math.abs(diff) > swipeThreshold) {
-      const buttons = document.querySelectorAll('.filter-btn');
-      
-      if (diff > 0) {
-        // Swiped left - move to next category
-        if (currentCategoryIndex < allCategories.length - 1) {
-          currentCategoryIndex++;
-        } else {
-          currentCategoryIndex = 0;
-        }
-      } else {
-        // Swiped right - move to previous category
-        if (currentCategoryIndex > 0) {
-          currentCategoryIndex--;
-        } else {
-          currentCategoryIndex = allCategories.length - 1;
-        }
-      }
-      
-      const cat = allCategories[currentCategoryIndex];
-      if (buttons[currentCategoryIndex]) {
-        buttons[currentCategoryIndex].click();
-        setTimeout(() => {
-          buttons[currentCategoryIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }, 100);
-      }
+  productsTab.addEventListener('touchmove', function(e) {
+    if (!swiping) return;
+    const diffY = Math.abs(e.touches[0].clientY - startY);
+    const diffX = Math.abs(e.touches[0].clientX - startX);
+    // If scrolling vertically more than horizontally, cancel swipe
+    if (diffY > diffX) {
+      swiping = false;
     }
+  }, { passive: true });
+  
+  productsTab.addEventListener('touchend', function(e) {
+    if (!swiping) return;
+    swiping = false;
+    
+    const endX = e.changedTouches[0].clientX;
+    const diff = startX - endX;
+    const threshold = 60;
+    
+    if (Math.abs(diff) < threshold) return;
+    
+    const productList = $('product-list');
+    const buttons = document.querySelectorAll('.filter-btn');
+    let newIndex = currentCategoryIndex;
+    
+    if (diff > 0 && currentCategoryIndex < allCategories.length - 1) {
+      // Swiped left — next category
+      newIndex = currentCategoryIndex + 1;
+      productList.classList.add('swipe-left');
+    } else if (diff < 0 && currentCategoryIndex > 0) {
+      // Swiped right — previous category
+      newIndex = currentCategoryIndex - 1;
+      productList.classList.add('swipe-right');
+    } else {
+      return;
+    }
+    
+    setTimeout(() => {
+      currentCategoryIndex = newIndex;
+      const cat = allCategories[currentCategoryIndex];
+      
+      // Update filter buttons
+      buttons.forEach(b => b.classList.remove('active'));
+      if (buttons[currentCategoryIndex]) {
+        buttons[currentCategoryIndex].classList.add('active');
+        buttons[currentCategoryIndex].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+      }
+      
+      // Render new products
+      renderProducts(cat);
+      
+      // Animate in
+      productList.classList.remove('swipe-left', 'swipe-right');
+    }, 200);
+    
   }, { passive: true });
 }
 
 function filterProducts(cat, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  // Sync currentCategoryIndex
+  const idx = allCategories.indexOf(cat);
+  if (idx !== -1) currentCategoryIndex = idx;
   renderProducts(cat);
 }
 
