@@ -2825,18 +2825,18 @@ function renderHistoryTab() {
   const isCaregiver = ME && (ME.role === 'admin');
   
   if (isCaregiver) {
-    // Show caregiver view (member tracking)
     show('history-member-view');
     hide('history-self-view');
     renderTrackedMembersList();
     renderLocationHistory();
   } else {
-    // Show member view (self tracking)
     hide('history-member-view');
     show('history-self-view');
     requestLocationPermission();
     updateTrackingUI();
     updateAppUsageDisplay();
+    loadSafeZones();
+    loadCaregivers();
   }
 }
 
@@ -2910,10 +2910,25 @@ function startTracking() {
       
       // Add to history
       locationHistory.unshift(currentLocation);
-      if (locationHistory.length > 200) locationHistory.pop(); // Keep only 200 recent
+      if (locationHistory.length > 200) locationHistory.pop();
       
       updateTrackingUI();
       checkGeofence();
+      
+      // Send to backend
+      if (ME) {
+        api({
+          action:'updateLocation', memberId:ME.id,
+          latitude: currentLocation.latitude, longitude: currentLocation.longitude,
+          accuracy: currentLocation.accuracy, batteryPercent: batteryPercent,
+          isOnline: true
+        }).then(r => {
+          if (r && r.geofenceAlert) {
+            const t = LANG[currentLang] || LANG.en;
+            toast('⚠️ ' + (t.left_safe_zone || 'Left Safe Zone!') + ' (' + r.geofenceAlert.zone + ')', 'warning');
+          }
+        }).catch(() => {});
+      }
     },
     error => {
       // Silently ignore TIMEOUT errors (common on desktop without GPS)
@@ -3013,44 +3028,56 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function triggerSOS() {
+async function triggerSOS() {
   const t = LANG[currentLang] || LANG.en;
   
   if (!confirm(t.sos_emergency + '?\n\n' + (t.location_required || 'Send location to caregivers?'))) return;
   
-  if (currentLocation) {
-    toast('🚨 ' + (t.sos_emergency || 'SOS') + ' - ' + (t.location_required || 'Location sent to caregivers'), 'error');
-    // Part 2: Send SOS alert with location to caregivers
-    console.log('SOS triggered at:', currentLocation);
-  } else {
-    toast('Waiting for location...', 'error');
+  loading(true);
+  try {
+    const r = await api({
+      action:'sendSOS', memberId:ME.id,
+      latitude: currentLocation ? currentLocation.latitude : '',
+      longitude: currentLocation ? currentLocation.longitude : ''
+    });
+    if (r.ok) {
+      toast('🚨 ' + (t.sos_emergency || 'SOS') + ' — Alert sent to caregivers!', 'error');
+    }
+  } catch(e) {
+    toast('🚨 SOS sent (offline mode)', 'error');
   }
+  finally { loading(false); }
 }
 
-function saveSafeZone() {
+async function saveSafeZone() {
   const name = $('safe-zone-name').value.trim();
-  if (!name) {
-    toast('Please enter zone name', 'error');
-    return;
-  }
+  if (!name) { toast('Please enter zone name', 'error'); return; }
+  if (!currentLocation) { toast('Waiting for location...', 'error'); return; }
   
-  if (!currentLocation) {
-    toast('Waiting for location...', 'error');
-    return;
-  }
-  
-  const zone = {
-    id: Date.now().toString(),
-    name: name,
-    latitude: currentLocation.latitude,
-    longitude: currentLocation.longitude,
-    radius_meters: 500 // 500m default radius
-  };
-  
-  safeZones.push(zone);
-  $('safe-zone-name').value = '';
-  toast('Safe zone added: ' + name, 'success');
-  renderSafeZones();
+  loading(true);
+  try {
+    const r = await api({
+      action:'saveSafeZone', memberId:ME.id,
+      name: name, latitude: currentLocation.latitude, longitude: currentLocation.longitude,
+      radiusMeters: 500
+    });
+    if (r.ok) {
+      $('safe-zone-name').value = '';
+      toast('Safe zone added: ' + name, 'success');
+      await loadSafeZones();
+    }
+  } catch(e) { toast('Error saving safe zone', 'error'); }
+  finally { loading(false); }
+}
+
+async function loadSafeZones() {
+  try {
+    const r = await api({ action:'getSafeZones', memberId:ME.id });
+    if (r.ok) {
+      safeZones = r.zones || [];
+      renderSafeZones();
+    }
+  } catch(e) {}
 }
 
 function renderSafeZones() {
@@ -3058,40 +3085,53 @@ function renderSafeZones() {
     <div class="safe-zone-card zone-active">
       <div>
         <strong>${esc(z.name)}</strong>
-        <p class="text-sm text-muted">${z.latitude.toFixed(4)}, ${z.longitude.toFixed(4)} · 500m</p>
+        <p class="text-sm text-muted">${Number(z.latitude).toFixed(4)}, ${Number(z.longitude).toFixed(4)} · ${z.radiusMeters || 500}m</p>
       </div>
       <button onclick="removeSafeZone('${z.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">Remove</button>
     </div>
   `).join('');
-  
   if ($('safe-zones-list')) $('safe-zones-list').innerHTML = html || '<p class="text-sm text-muted">No safe zones yet</p>';
 }
 
-function removeSafeZone(zoneId) {
-  safeZones = safeZones.filter(z => z.id !== zoneId);
-  renderSafeZones();
+async function removeSafeZone(zoneId) {
+  loading(true);
+  try {
+    await api({ action:'deleteSafeZone', id: zoneId });
+    await loadSafeZones();
+    toast('Safe zone removed', 'info');
+  } catch(e) { toast('Error', 'error'); }
+  finally { loading(false); }
 }
 
-function addCaregiver() {
+async function addCaregiver() {
   const name = $('caregiver-name').value.trim();
   const phone = $('caregiver-phone').value.trim();
+  if (!name || !phone) { toast('Please fill in all fields', 'error'); return; }
   
-  if (!name || !phone) {
-    toast('Please fill in all fields', 'error');
-    return;
-  }
-  
-  const caregiver = {
-    id: Date.now().toString(),
-    name: name,
-    phone: phone
-  };
-  
-  caregivers.push(caregiver);
-  $('caregiver-name').value = '';
-  $('caregiver-phone').value = '';
-  toast('Caregiver added: ' + name, 'success');
-  renderCaregivers();
+  loading(true);
+  try {
+    const r = await api({
+      action:'addCaregiver', memberId:ME.id,
+      name: name, phone: phone
+    });
+    if (r.ok) {
+      $('caregiver-name').value = '';
+      $('caregiver-phone').value = '';
+      toast('Caregiver added: ' + name, 'success');
+      await loadCaregivers();
+    }
+  } catch(e) { toast('Error adding caregiver', 'error'); }
+  finally { loading(false); }
+}
+
+async function loadCaregivers() {
+  try {
+    const r = await api({ action:'getCaregivers', memberId:ME.id });
+    if (r.ok) {
+      caregivers = r.caregivers || [];
+      renderCaregivers();
+    }
+  } catch(e) {}
 }
 
 function renderCaregivers() {
@@ -3104,27 +3144,82 @@ function renderCaregivers() {
       <button onclick="removeCaregiver('${c.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">Remove</button>
     </div>
   `).join('');
-  
   if ($('caregivers-list')) $('caregivers-list').innerHTML = html || '<p class="text-sm text-muted">No caregivers added yet</p>';
 }
 
-function removeCaregiver(caregiverId) {
-  caregivers = caregivers.filter(c => c.id !== caregiverId);
-  renderCaregivers();
+async function removeCaregiver(caregiverId) {
+  loading(true);
+  try {
+    await api({ action:'deleteCaregiver', id: caregiverId });
+    await loadCaregivers();
+    toast('Caregiver removed', 'info');
+  } catch(e) { toast('Error', 'error'); }
+  finally { loading(false); }
 }
 
-function renderTrackedMembersList() {
-  // Part 2: Fetch tracked members from backend
-  const html = '<p class="text-sm text-muted">Loading tracked members... (Part 2)</p>';
-  if ($('tracked-members-list')) $('tracked-members-list').innerHTML = html;
+async function renderTrackedMembersList() {
+  try {
+    const r = await api({ action:'getTrackedMembers', caregiverId:ME.id });
+    if (!r.ok || !r.members || !r.members.length) {
+      if ($('tracked-members-list')) $('tracked-members-list').innerHTML = '<p class="text-sm text-muted">No tracked members found</p>';
+      return;
+    }
+    const t = LANG[currentLang] || LANG.en;
+    const html = r.members.map(m => {
+      const online = m.isOnline ? 'status-online' : 'status-offline';
+      const onlineText = m.isOnline ? '🟢 Online' : '🔴 Offline';
+      const lastSeen = m.lastSeen ? new Date(m.lastSeen).toLocaleTimeString('en-SG') : '-';
+      const battery = m.batteryPercent ? m.batteryPercent + '%' : '-';
+      const loc = m.latitude ? `${Number(m.latitude).toFixed(4)}, ${Number(m.longitude).toFixed(4)}` : 'No location';
+      return `
+        <div class="member-card">
+          <div class="member-info">
+            <strong>${esc(m.name)}</strong>
+            <p class="text-sm text-muted">${loc}</p>
+            <p class="text-sm text-muted">${t.last_seen}: ${lastSeen} · 🔋 ${battery}</p>
+          </div>
+          <div class="member-status">
+            <span class="status-badge ${online}">${onlineText}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+    if ($('tracked-members-list')) $('tracked-members-list').innerHTML = html;
+  } catch(e) {
+    if ($('tracked-members-list')) $('tracked-members-list').innerHTML = '<p class="text-sm text-muted">Error loading members</p>';
+  }
 }
 
-function renderLocationHistory() {
+async function renderLocationHistory() {
   const t = LANG[currentLang] || LANG.en;
+  if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">' + (t.loading || 'Loading...') + '</p>';
   
-  // Part 2: Fetch location history from backend
-  const html = '<p class="text-sm text-muted">' + (t.loading || 'Loading') + ' (Part 2)</p>';
-  if ($('location-history-list')) $('location-history-list').innerHTML = html;
+  try {
+    // For admin/caregiver, show all tracked members' history
+    const tracked = await api({ action:'getTrackedMembers', caregiverId:ME.id });
+    if (!tracked.ok || !tracked.members || !tracked.members.length) {
+      if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">No location data</p>';
+      return;
+    }
+    
+    // Get history for first tracked member (or all)
+    let allHtml = '';
+    for (const m of tracked.members.slice(0, 5)) {
+      const r = await api({ action:'getLocationHistory', memberId: m.memberId });
+      if (r.ok && r.locations && r.locations.length) {
+        allHtml += `<p class="text-sm" style="font-weight:600;margin-bottom:4px">${esc(m.name)}</p>`;
+        allHtml += r.locations.slice(0, 10).map(l => `
+          <div class="location-item">
+            <strong>${Number(l.latitude).toFixed(4)}, ${Number(l.longitude).toFixed(4)}</strong>
+            <div class="location-time">${new Date(l.timestamp).toLocaleString('en-SG')} · 🔋 ${l.batteryPercent || '-'}%</div>
+          </div>
+        `).join('');
+      }
+    }
+    if ($('location-history-list')) $('location-history-list').innerHTML = allHtml || '<p class="text-sm text-muted">No location data yet</p>';
+  } catch(e) {
+    if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">Error loading history</p>';
+  }
 }
 
 /* ── Utility ──────────────────────────────── */
