@@ -1423,35 +1423,37 @@ async function fetchWeather() {
       return 'Unknown';
     };
     
-    // Update current weather
-    $('current-temp').textContent = Math.round(current.temperature_2m);
-    $('weather-desc').textContent = getWeatherDesc(current.weather_code);
-    $('humidity').textContent = current.relative_humidity_2m + '%';
-    $('wind-speed').textContent = Math.round(current.wind_speed_10m) + ' km/h';
-    $('feels-like').textContent = Math.round(current.apparent_temperature) + '°C';
-    $('weather-icon').textContent = getWeatherEmoji(current.weather_code);
+    // Update current weather (only if elements exist)
+    if ($('current-temp')) $('current-temp').textContent = Math.round(current.temperature_2m);
+    if ($('weather-desc')) $('weather-desc').textContent = getWeatherDesc(current.weather_code);
+    if ($('humidity')) $('humidity').textContent = current.relative_humidity_2m + '%';
+    if ($('wind-speed')) $('wind-speed').textContent = Math.round(current.wind_speed_10m) + ' km/h';
+    if ($('feels-like')) $('feels-like').textContent = Math.round(current.apparent_temperature) + '°C';
+    if ($('weather-icon')) $('weather-icon').textContent = getWeatherEmoji(current.weather_code);
     
-    // Update forecast
-    const forecastHtml = daily.time.slice(0, 4).map((date, i) => {
-      const d = new Date(date);
-      const dayName = d.toLocaleDateString('en-SG', { weekday:'short' });
-      const maxTemp = Math.round(daily.temperature_2m_max[i]);
-      const minTemp = Math.round(daily.temperature_2m_min[i]);
-      const icon = getWeatherEmoji(daily.weather_code[i]);
-      return `
-        <div class="forecast-card">
-          <div class="forecast-time">${dayName}</div>
-          <div class="forecast-icon">${icon}</div>
-          <div class="forecast-temp">${maxTemp}°</div>
-          <div style="font-size:10px;opacity:.6">${minTemp}°</div>
-        </div>
-      `;
-    }).join('');
-    $('weather-forecast').innerHTML = forecastHtml;
+    // Update forecast (only if element exists)
+    if ($('weather-forecast')) {
+      const forecastHtml = daily.time.slice(0, 4).map((date, i) => {
+        const d = new Date(date);
+        const dayName = d.toLocaleDateString('en-SG', { weekday:'short' });
+        const maxTemp = Math.round(daily.temperature_2m_max[i]);
+        const minTemp = Math.round(daily.temperature_2m_min[i]);
+        const icon = getWeatherEmoji(daily.weather_code[i]);
+        return `
+          <div class="forecast-card">
+            <div class="forecast-time">${dayName}</div>
+            <div class="forecast-icon">${icon}</div>
+            <div class="forecast-temp">${maxTemp}°</div>
+            <div style="font-size:10px;opacity:.6">${minTemp}°</div>
+          </div>
+        `;
+      }).join('');
+      $('weather-forecast').innerHTML = forecastHtml;
+    }
   } catch(e) {
     console.error('Weather error:', e);
-    $('current-temp').textContent = '--';
-    $('weather-desc').textContent = 'Weather unavailable';
+    if ($('current-temp')) $('current-temp').textContent = '--';
+    if ($('weather-desc')) $('weather-desc').textContent = 'Weather unavailable';
   }
 }
 
