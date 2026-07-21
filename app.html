@@ -848,7 +848,7 @@ async function doLogin() {
     if (!r.ok) return toast(r.error,'error');
     ME = r.member;
     localStorage.setItem('al_member', JSON.stringify(ME));
-    enterApp();
+    await enterApp();
   } catch(e) { toast('Connection error','error'); }
   finally { loading(false); }
 }
@@ -878,7 +878,7 @@ async function doRegister() {
     ME = r.member;
     localStorage.setItem('al_member', JSON.stringify(ME));
     toast('Account created!','success');
-    enterApp();
+    await enterApp();
   } catch(e) { toast('Connection error','error'); }
   finally { loading(false); }
 }
