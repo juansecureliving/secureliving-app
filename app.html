@@ -1226,7 +1226,7 @@ const LANG = {
     daily_stats:'Daily Stats', login_count:'Login Count', total_time:'Total Time',
     // Tabs
     tab_home:'Home', tab_appt:'Appointment', tab_products:'Products',
-    tab_reports:'Readings', tab_profile:'Profile', tab_monitor:'Monitor',
+    tab_monitor:'Monitor', tab_readings:'Readings', tab_profile:'Profile',
     // Readings
     readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
@@ -1316,7 +1316,7 @@ const LANG = {
     daily_stats:'每日统计', login_count:'登录次数', total_time:'总时间',
     singapore:'新加坡', loading:'加载中...',
     tab_home:'首页', tab_appt:'预约', tab_products:'设备',
-    tab_reports:'报告', tab_profile:'档案', tab_history:'历史',
+    tab_monitor:'监控', tab_readings:'读数', tab_profile:'档案',
     welcome:'欢迎', good_morning:'早上好',
     good_afternoon:'下午好', good_evening:'晚上好',
     welcome_back:'欢迎回来', phone_number:'手机号码',
@@ -1400,7 +1400,7 @@ const LANG = {
     daily_stats:'Statistik Harian', login_count:'Jumlah Login', total_time:'Jumlah Waktu',
     singapore:'Singapura', loading:'Memuatkan...',
     tab_home:'Utama', tab_appt:'Temu Janji', tab_products:'Peralatan',
-    tab_reports:'Laporan', tab_profile:'Profil', tab_history:'Sejarah',
+    tab_monitor:'Monitor', tab_readings:'Bacaan', tab_profile:'Profil',
     welcome:'Selamat Datang', good_morning:'Selamat Pagi',
     good_afternoon:'Selamat Tengah Hari', good_evening:'Selamat Petang',
     welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
@@ -1483,7 +1483,7 @@ const LANG = {
     daily_stats:'தினசரி புள்ளிவிவரங்கள்', login_count:'உள்நுழைவு எண்ணிக்கை', total_time:'மொத்த நேரம்',
     singapore:'சிங்கப்பூர்', loading:'ஏற்றுகிறது...',
     tab_home:'முகப்பு', tab_appt:'சந்திப்பு', tab_products:'உபகரணங்கள்',
-    tab_reports:'அறிக்கை', tab_profile:'சுயவிவரம்', tab_history:'வரலாறு',
+    tab_monitor:'கண்காணி', tab_readings:'விளக்கம்', tab_profile:'சுயவிவரம்',
     welcome:'வரவேற்கிறோம்', good_morning:'காலை வணக்கம்',
     good_afternoon:'மதிய வணக்கம்', good_evening:'மாலை வணக்கம்',
     welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
@@ -1519,7 +1519,7 @@ function applyLanguage() {
   });
   
   // 2. Update tab bar labels (special handling for SVG icons)
-  const tabLabels = ['tab_home','tab_appt','tab_products','tab_reports','tab_profile'];
+  const tabLabels = ['tab_home','tab_appt','tab_products','tab_monitor','tab_readings','tab_profile'];
   const tabBtns = document.querySelectorAll('.tab-btn');
   tabBtns.forEach((btn, i) => {
     if (tabLabels[i] && dict[tabLabels[i]]) {
