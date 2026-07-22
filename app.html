@@ -1386,6 +1386,8 @@ const LANG = {
     first_name:'First Name', surname:'Surname', date_of_birth:'Date of Birth', confirm_password:'Confirm Password',
     emergency_contact_name:'Emergency Contact Name',
     delete_photo:'Delete Photo',
+    calling_now:'Calling now:', call_now:'Call Now', cancel:'Cancel',
+    no_caregiver_found:'No caregiver or emergency contact found. Please add a caregiver first.',
     password:'Password', sign_in:'Sign In',
     new_here:'New here?', create_account:'Create an account',
     register:'Register', confirm_pw:'Confirm',
@@ -1474,6 +1476,8 @@ const LANG = {
     first_name:'名字', surname:'姓氏', date_of_birth:'出生日期', confirm_password:'确认密码',
     emergency_contact_name:'紧急联系人姓名',
     delete_photo:'删除照片',
+    calling_now:'正在拨打：', call_now:'立即拨打', cancel:'取消',
+    no_caregiver_found:'未找到照护者或紧急联系人。请先添加照护者。',
     password:'密码', sign_in:'登录',
     new_here:'新用户？', create_account:'创建账户',
     register:'注册', confirm_pw:'确认',
@@ -1563,6 +1567,8 @@ const LANG = {
     first_name:'Nama Pertama', surname:'Nama Keluarga', date_of_birth:'Tarikh Lahir', confirm_password:'Sahkan Kata Laluan',
     emergency_contact_name:'Nama Hubungan Kecemasan',
     delete_photo:'Padam Foto',
+    calling_now:'Sedang menghubungi:', call_now:'Hubungi Sekarang', cancel:'Batal',
+    no_caregiver_found:'Tiada penjaga atau kenalan kecemasan ditemui. Sila tambah penjaga terlebih dahulu.',
     password:'Kata Laluan', sign_in:'Log Masuk',
     new_here:'Baru di sini?', create_account:'Daftar akaun',
     register:'Daftar', confirm_pw:'Sahkan',
@@ -1651,6 +1657,8 @@ const LANG = {
     first_name:'முதல் பெயர்', surname:'குடும்ப பெயர்', date_of_birth:'பிறந்த தேதி', confirm_password:'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
     emergency_contact_name:'அவசரகால தொடர்பு பெயர்',
     delete_photo:'புகைப்படத்தை நீக்கவும்',
+    calling_now:'இப்போது அழைக்கிறது:', call_now:'இப்போது அழைக்கவும்', cancel:'ரத்து செய்',
+    no_caregiver_found:'பராமரிப்பாளர் அல்லது அவசரகால தொடர்பு இல்லை. முதலில் பராமரிப்பாளரை சேர்க்கவும்.',
     password:'கடவுச்சொல்', sign_in:'உள்நுழை',
     new_here:'புதியவரா?', create_account:'கணக்கு உருவாக்கு',
     register:'பதிவு', confirm_pw:'உறுதிசெய்',
@@ -3446,26 +3454,35 @@ async function triggerSOS() {
   }
   if (!callPhone && ME.emergencyPhone) {
     callPhone = ME.emergencyPhone;
-    callName = ME.emergencyName || 'Emergency Contact';
+    callName = ME.emergencyName || (t.emergency_contact_name || 'Emergency Contact');
   }
   
   if (!callPhone) {
-    toast('No caregiver or emergency contact found. Please add a caregiver first.', 'error');
+    toast(t.no_caregiver_found || 'No caregiver or emergency contact found. Please add a caregiver first.', 'error');
     return;
   }
   
-  // Confirm and call immediately
-  if (!confirm('🚨 SOS EMERGENCY\n\nCalling ' + callName + ' (' + callPhone + ') now?')) return;
+  // Show custom SOS modal
+  $('sos-call-name').textContent = callName;
+  $('sos-call-phone').textContent = callPhone;
+  $('sos-call-link').href = 'tel:' + callPhone;
+  $('sos-call-link').onclick = function() {
+    // Save SOS alert to database (don't wait)
+    api({
+      action:'sendSOS', memberId:ME.id,
+      latitude: currentLocation ? currentLocation.latitude : '',
+      longitude: currentLocation ? currentLocation.longitude : ''
+    }).catch(() => {});
+    closeSOSModal();
+  };
   
-  // Save SOS alert to database (don't wait)
-  api({
-    action:'sendSOS', memberId:ME.id,
-    latitude: currentLocation ? currentLocation.latitude : '',
-    longitude: currentLocation ? currentLocation.longitude : ''
-  }).catch(() => {});
-  
-  // Call immediately
-  window.location.href = 'tel:' + callPhone;
+  const modal = $('sos-modal');
+  modal.style.display = 'flex';
+  applyLanguage();
+}
+
+function closeSOSModal() {
+  $('sos-modal').style.display = 'none';
 }
 
 async function saveSafeZone() {
@@ -3723,5 +3740,38 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', () => { if (ME) renderBPChart(); });
 });
 </script>
+<!-- SOS Emergency Modal -->
+<div id="sos-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px">
+  <div style="background:#fff;border-radius:20px;max-width:360px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:sosSlideUp 0.3s ease">
+    <!-- Header -->
+    <div style="background:var(--danger);padding:28px 24px;text-align:center">
+      <div style="font-size:48px;margin-bottom:8px">🚨</div>
+      <h2 style="color:#fff;font-family:var(--font-display);font-size:22px;font-weight:700;margin:0" data-i18n="sos_emergency">SOS - EMERGENCY</h2>
+    </div>
+    <!-- Body -->
+    <div style="padding:24px;text-align:center">
+      <p style="font-family:var(--font-body);font-size:15px;color:var(--text);margin-bottom:6px" data-i18n="calling_now">Calling now:</p>
+      <p id="sos-call-name" style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--pri);margin-bottom:4px"></p>
+      <p id="sos-call-phone" style="font-family:var(--font-body);font-size:16px;color:var(--muted);margin-bottom:20px"></p>
+      
+      <!-- Call Button -->
+      <a id="sos-call-link" href="#" style="display:flex;align-items:center;justify-content:center;gap:10px;background:var(--success);color:#fff;font-family:var(--font-display);font-size:18px;font-weight:700;padding:16px;border-radius:14px;text-decoration:none;margin-bottom:12px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span data-i18n="call_now">Call Now</span>
+      </a>
+      
+      <!-- Cancel Button -->
+      <button onclick="closeSOSModal()" style="background:none;border:2px solid var(--border);color:var(--muted);font-family:var(--font-body);font-size:14px;font-weight:500;padding:12px;border-radius:12px;width:100%;cursor:pointer" data-i18n="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes sosSlideUp {
+  from { transform:translateY(40px); opacity:0 }
+  to { transform:translateY(0); opacity:1 }
+}
+</style>
+
 </body>
 </html>
