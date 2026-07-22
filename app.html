@@ -3617,25 +3617,36 @@ async function renderTrackedMembersList() {
     const t = LANG[currentLang] || LANG.en;
     const html = r.members.map(m => {
       const online = m.isOnline ? 'status-online' : 'status-offline';
-      const onlineText = m.isOnline ? '🟢 Online' : '🔴 Offline';
+      const statusColor = m.isOnline ? 'var(--success)' : 'var(--danger)';
+      const statusLabel = m.isOnline ? 'Online' : 'Offline';
       const lastSeen = m.lastSeen ? new Date(m.lastSeen).toLocaleTimeString('en-SG') : '-';
       const battery = m.batteryPercent ? m.batteryPercent + '%' : '-';
-      const loc = m.latitude ? `${Number(m.latitude).toFixed(4)}, ${Number(m.longitude).toFixed(4)}` : 'No location';
+      const memberId = m.memberId || m.id || '';
       return `
-        <div class="member-card">
-          <div class="member-info">
-            <strong>${esc(m.name)}</strong>
-            <p class="text-sm text-muted">${loc}</p>
-            <p class="text-sm text-muted">${t.last_seen}: ${lastSeen}</p>
+        <div class="member-card" style="padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--card)">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <strong style="font-size:15px">${esc(m.name)}</strong>
+              <p class="text-sm text-muted" id="addr-${memberId}" style="margin-top:4px">Loading address...</p>
+            </div>
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${statusColor};flex-shrink:0;margin-top:6px"></span>
           </div>
-          <div class="member-status" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-            <span class="status-badge ${online}" style="white-space:nowrap">${onlineText}</span>
-            <span style="font-size:12px;color:var(--muted)">🔋 ${battery}</span>
+          <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--muted)">
+            <span>${t.last_seen}: ${lastSeen}</span>
+            <span>🔋 ${battery}</span>
           </div>
         </div>
       `;
     }).join('');
     if ($('tracked-members-list')) $('tracked-members-list').innerHTML = html;
+    
+    // Reverse geocode addresses for each member
+    r.members.forEach(m => {
+      if (m.latitude && m.longitude) {
+        const memberId = m.memberId || m.id || '';
+        reverseGeocode(m.latitude, m.longitude, 'addr-' + memberId);
+      }
+    });
     
     // Render caregiver map with member pins
     const membersWithLoc = r.members.filter(m => m.latitude && m.longitude);
@@ -3653,10 +3664,13 @@ async function renderTrackedMembersList() {
       // Add new markers
       const bounds = [];
       membersWithLoc.forEach(m => {
+        const popupId = 'popup-' + (m.memberId || m.id || '');
         const marker = L.marker([m.latitude, m.longitude]).addTo(caregiverMap)
-          .bindPopup('<strong>' + esc(m.name) + '</strong><br>🔋 ' + (m.batteryPercent || '-') + '%<br>' + (m.isOnline ? '🟢 Online' : '🔴 Offline'));
+          .bindPopup('<strong>' + esc(m.name) + '</strong><br><span id="' + popupId + '">Loading...</span><br>🔋 ' + (m.batteryPercent || '-') + '%');
         caregiverMarkers.push(marker);
         bounds.push([m.latitude, m.longitude]);
+        // Reverse geocode for popup
+        reverseGeocode(m.latitude, m.longitude, popupId);
       });
       if (bounds.length > 1) caregiverMap.fitBounds(bounds, { padding: [30, 30] });
     }
@@ -3703,6 +3717,44 @@ function esc(s) {
   const d = document.createElement('div');
   d.textContent = String(s);
   return d.innerHTML;
+}
+
+// Reverse geocode using OpenStreetMap Nominatim (free, no API key)
+const geocodeCache = {};
+async function reverseGeocode(lat, lng, elementId) {
+  const key = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)}`;
+  
+  // Check cache first
+  if (geocodeCache[key]) {
+    const el = $(elementId);
+    if (el) el.textContent = geocodeCache[key];
+    return;
+  }
+  
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+      headers: { 'Accept-Language': 'en' }
+    });
+    const data = await resp.json();
+    
+    if (data && data.address) {
+      const a = data.address;
+      // Build a short readable address
+      let addr = '';
+      if (a.building) addr += a.building + ', ';
+      if (a.road) addr += a.road;
+      if (a.neighbourhood) addr += ', ' + a.neighbourhood;
+      else if (a.suburb) addr += ', ' + a.suburb;
+      if (!addr && data.display_name) addr = data.display_name.split(',').slice(0, 3).join(',');
+      
+      geocodeCache[key] = addr || 'Unknown location';
+      const el = $(elementId);
+      if (el) el.textContent = addr || 'Unknown location';
+    }
+  } catch(e) {
+    const el = $(elementId);
+    if (el) el.textContent = `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
+  }
 }
 
 /* ── Init ─────────────────────────────────── */
