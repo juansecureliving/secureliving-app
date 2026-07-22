@@ -2247,7 +2247,10 @@ async function deleteProfilePicture() {
     });
     
     if (r.ok) {
+      // Clear from ME object and localStorage
+      ME.profilePicture = '';
       localStorage.removeItem(`al_profile_pic_${ME.id}`);
+      localStorage.setItem('al_member', JSON.stringify(ME));
       renderProfile();
       toast('Profile picture deleted', 'success');
     } else {
@@ -2284,8 +2287,10 @@ async function handlePictureSelect(event) {
       });
       
       if (r.ok && r.fileUrl) {
-        // Store in localStorage (optional, for faster loading)
+        // Update ME object and localStorage
+        ME.profilePicture = r.fileUrl;
         localStorage.setItem(`al_profile_pic_${ME.id}`, r.fileUrl);
+        localStorage.setItem('al_member', JSON.stringify(ME));
         renderProfile();
         toast('Profile picture updated!', 'success');
       } else {
@@ -2303,9 +2308,9 @@ async function handlePictureSelect(event) {
 function renderProfile() {
   const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   
-  // Show profile picture if exists
-  const picUrl = localStorage.getItem(`al_profile_pic_${ME.id}`);
-  if (picUrl) {
+  // Show profile picture if exists in ME object
+  const picUrl = ME.profilePicture || localStorage.getItem(`al_profile_pic_${ME.id}`);
+  if (picUrl && picUrl.trim()) {
     $('profile-picture').src = picUrl;
     $('profile-picture').style.display = 'block';
     $('profile-avatar-fallback').style.display = 'none';
