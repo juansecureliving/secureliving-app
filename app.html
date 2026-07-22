@@ -2076,9 +2076,10 @@ async function enterApp() {
     $('top-avatar').textContent = initials;
     $('top-name').textContent = name.split(' ')[0];
 
+    const firstName = name.split(' ')[0];
     const hour = new Date().getHours();
     const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-    if ($('greeting-text')) $('greeting-text').textContent = greet + ',';
+    if ($('greeting-text')) $('greeting-text').textContent = greet + ', ' + firstName;
     if ($('greeting-initials')) $('greeting-initials').textContent = initials;
 
     // Set default dates
