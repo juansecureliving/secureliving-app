@@ -803,19 +803,6 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
 
-    <!-- Battery & Status (Caregiver/Admin) -->
-    <div class="card" id="battery-status-section">
-      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="battery_status">Battery & Status</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
-          <div class="text-sm text-muted" data-i18n="battery_status">Battery</div>
-          <div style="font-size:20px;font-weight:700;color:var(--pri);margin-top:4px" id="battery-percent">--</div>
-        </div>
-        <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
-          <div class="text-sm text-muted" data-i18n="online_status">Online Status</div>
-          <div style="font-size:14px;font-weight:600;color:var(--success);margin-top:4px" id="online-status">🟢 Online</div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -2161,18 +2148,19 @@ async function enterApp() {
     hide('loading-overlay');
     show('app');
     
-    // Auto-refresh tracking data every 15 seconds when Monitor tab is active
+    // Auto-refresh tracking data every 5 seconds when Monitor tab is active for real-time updates
     setInterval(() => {
       if ($('tab-history') && $('tab-history').classList.contains('active')) {
         const isStaff = ME && (ME.role === 'admin' || ME.role === 'caregiver');
         if (isStaff) {
+          renderTrackedMembersList();
           renderLocationHistory();
           loadSOSAlerts();
         } else {
           updateTrackingUI();
         }
       }
-    }, 15000);
+    }, 5000);
   } catch(e) {
     console.error('enterApp error:', e);
     hide('loading-overlay');
@@ -3638,10 +3626,11 @@ async function renderTrackedMembersList() {
           <div class="member-info">
             <strong>${esc(m.name)}</strong>
             <p class="text-sm text-muted">${loc}</p>
-            <p class="text-sm text-muted">${t.last_seen}: ${lastSeen} · 🔋 ${battery}</p>
+            <p class="text-sm text-muted">${t.last_seen}: ${lastSeen}</p>
           </div>
-          <div class="member-status">
-            <span class="status-badge ${online}">${onlineText}</span>
+          <div class="member-status" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <span class="status-badge ${online}" style="white-space:nowrap">${onlineText}</span>
+            <span style="font-size:12px;color:var(--muted)">🔋 ${battery}</span>
           </div>
         </div>
       `;
