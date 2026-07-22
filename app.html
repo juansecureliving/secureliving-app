@@ -2275,43 +2275,69 @@ async function handlePictureSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
   
-  // Check file size (max 3MB for compression)
-  if (file.size > 3 * 1024 * 1024) {
-    toast('Image size must be less than 3MB', 'error');
+  if (file.size > 10 * 1024 * 1024) {
+    toast('Image too large', 'error');
     return;
   }
   
   loading(true);
   try {
-    // Convert file to base64
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64 = e.target.result.split(',')[1];
-      
-      const r = await api({
-        action:'uploadProfilePicture',
-        memberId: ME.id,
-        fileData: base64,
-        mimeType: file.type
-      });
-      
-      if (r.ok && r.fileUrl) {
-        // Update ME object and localStorage
-        ME.profilePicture = r.fileUrl;
-        localStorage.setItem(`al_profile_pic_${ME.id}`, r.fileUrl);
-        localStorage.setItem('al_member', JSON.stringify(ME));
-        renderProfile();
-        toast('Profile picture updated!', 'success');
-      } else {
-        toast(r.error || 'Failed to upload picture', 'error');
-      }
-      loading(false);
-    };
-    reader.readAsDataURL(file);
+    // Compress image to small thumbnail (150x150)
+    const compressed = await compressImage(file, 150, 0.7);
+    const base64 = compressed.split(',')[1];
+    
+    const r = await api({
+      action:'uploadProfilePicture',
+      memberId: ME.id,
+      fileData: base64,
+      mimeType: 'image/jpeg'
+    });
+    
+    if (r.ok && r.fileUrl) {
+      ME.profilePicture = r.fileUrl;
+      localStorage.setItem(`al_profile_pic_${ME.id}`, r.fileUrl);
+      localStorage.setItem('al_member', JSON.stringify(ME));
+      renderProfile();
+      toast('Profile picture updated!', 'success');
+    } else {
+      toast(r.error || 'Failed to upload picture', 'error');
+    }
   } catch(e) {
     toast('Error uploading picture', 'error');
-    loading(false);
   }
+  finally { loading(false); }
+}
+
+function compressImage(file, maxSize, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width;
+        let h = img.height;
+        
+        // Scale down to maxSize
+        if (w > h) {
+          if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; }
+        } else {
+          if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function renderProfile() {
