@@ -781,8 +781,8 @@ button{cursor:pointer;border:none;background:none}
       <p class="text-sm text-muted" style="text-align:center;margin-top:8px" data-i18n="location_required">Location will be sent to caregivers</p>
     </div>
 
-    <!-- Safe Zone Setup -->
-    <div class="card">
+    <!-- Safe Zone Setup (Caregiver/Admin Only) -->
+    <div class="card" id="safe-zone-section" style="display:none">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="safe_zone">Safe Zone</h3>
       <div style="padding:12px;background:var(--pri-light);border-radius:8px;margin-bottom:12px">
         <p class="text-sm" style="margin-bottom:8px"><strong data-i18n="setup_safe_zone">Setup Safe Zone</strong></p>
@@ -792,8 +792,8 @@ button{cursor:pointer;border:none;background:none}
       <div id="safe-zones-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
 
-    <!-- Add Caregiver -->
-    <div class="card">
+    <!-- Add Caregiver (Member Only) -->
+    <div class="card" id="add-caregiver-section">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="add_caregiver">Add Caregiver</h3>
       <div style="display:flex;flex-direction:column;gap:8px">
         <input type="text" id="caregiver-name" placeholder="Name" data-i18n="placeholder" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
@@ -803,8 +803,8 @@ button{cursor:pointer;border:none;background:none}
       <div id="caregivers-list" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
     </div>
 
-    <!-- App Usage -->
-    <div class="card">
+    <!-- App Usage (Caregiver/Admin Only) -->
+    <div class="card" id="app-usage-section" style="display:none">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="app_usage">App Usage</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
@@ -829,8 +829,8 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
 
-    <!-- Battery & Status -->
-    <div class="card">
+    <!-- Battery & Status (Caregiver/Admin Only) -->
+    <div class="card" id="battery-status-section" style="display:none">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="battery_status">Battery & Status</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div style="padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--border)">
@@ -1231,7 +1231,7 @@ button{cursor:pointer;border:none;background:none}
 /* ═══════════════════════════════════════════
    CONFIG — Replace with your deployment URL
    ═══════════════════════════════════════════ */
-const API = 'https://script.google.com/macros/s/AKfycbwnyzBAmSjBpu9abOm_XbaP8-z1wXOApumPGJ6WQKUp1gdIaOLyIYxJpH1p1DwLX46Chg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxolRxdDO0-xGs6Z6LdSGr4cSJAQsZOZtNb0lTro-fYr235LeVAFRTymg-QAkk0nQaCvg/exec';
 
 /* ── State ────────────────────────────────── */
 let ME = null;         // logged-in member
@@ -3147,15 +3147,35 @@ function renderHistoryTab() {
   // Determine if user is caregiver/admin or member
   const isCaregiver = ME && (ME.role === 'admin');
   
+  // Get section elements
+  const safezoneSection = $('safe-zone-section');
+  const appUsageSection = $('app-usage-section');
+  const batterySection = $('battery-status-section');
+  const addCaregiverSection = $('add-caregiver-section');
+  
   if (isCaregiver) {
+    // CAREGIVER/ADMIN VIEW
     show('history-member-view');
     hide('history-self-view');
+    // Hide member-only sections
+    if (addCaregiverSection) addCaregiverSection.style.display = 'none';
+    // Show caregiver sections
+    if (safezoneSection) safezoneSection.style.display = 'block';
+    if (appUsageSection) appUsageSection.style.display = 'block';
+    if (batterySection) batterySection.style.display = 'block';
     renderTrackedMembersList();
     renderLocationHistory();
     setTimeout(() => { if (caregiverMap) caregiverMap.invalidateSize(); }, 400);
   } else {
+    // MEMBER/GUEST VIEW
     hide('history-member-view');
     show('history-self-view');
+    // Show member-only sections
+    if (addCaregiverSection) addCaregiverSection.style.display = 'block';
+    // Hide caregiver-only sections
+    if (safezoneSection) safezoneSection.style.display = 'none';
+    if (appUsageSection) appUsageSection.style.display = 'none';
+    if (batterySection) batterySection.style.display = 'none';
     requestLocationPermission();
     updateTrackingUI();
     updateAppUsageDisplay();
