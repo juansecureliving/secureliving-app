@@ -3417,7 +3417,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 async function triggerSOS() {
   const t = LANG[currentLang] || LANG.en;
   
-  // First check if caregivers exist
+  // Load caregivers if not loaded
   let cgList = caregivers || [];
   if (!cgList.length) {
     try {
@@ -3426,57 +3426,46 @@ async function triggerSOS() {
     } catch(e) {}
   }
   
-  if (!cgList.length) {
-    // No caregivers - use emergency contact from profile
-    const ePhone = ME.emergencyPhone || '';
-    if (ePhone) {
-      if (confirm('🚨 SOS EMERGENCY\n\nNo caregivers found.\nCall emergency contact (' + ePhone + ')?')) {
-        // Save alert to database
-        api({
-          action:'sendSOS', memberId:ME.id,
-          latitude: currentLocation ? currentLocation.latitude : '',
-          longitude: currentLocation ? currentLocation.longitude : ''
-        }).catch(() => {});
-        window.location.href = 'tel:' + ePhone;
-      }
-    } else {
-      toast('No caregivers or emergency contact found. Please add a caregiver first.', 'error');
+  // Find primary caregiver
+  const primaryId = localStorage.getItem(`al_primary_cg_${ME.id}`) || '';
+  let callPhone = '';
+  let callName = '';
+  
+  if (primaryId && cgList.length) {
+    const primary = cgList.find(c => c.id === primaryId);
+    if (primary) {
+      callPhone = primary.phone;
+      callName = primary.name;
     }
+  }
+  
+  // Fallback: first caregiver, then emergency contact
+  if (!callPhone && cgList.length) {
+    callPhone = cgList[0].phone;
+    callName = cgList[0].name;
+  }
+  if (!callPhone && ME.emergencyPhone) {
+    callPhone = ME.emergencyPhone;
+    callName = ME.emergencyName || 'Emergency Contact';
+  }
+  
+  if (!callPhone) {
+    toast('No caregiver or emergency contact found. Please add a caregiver first.', 'error');
     return;
   }
   
-  // Build caregiver list for selection
-  let msg = '🚨 SOS EMERGENCY\n\nWho do you want to call?\n\n';
-  cgList.forEach((c, i) => {
-    msg += (i + 1) + '. ' + c.name + ' (' + c.phone + ')\n';
-  });
-  msg += '\nEnter number (1-' + cgList.length + '):';
+  // Confirm and call immediately
+  if (!confirm('🚨 SOS EMERGENCY\n\nCalling ' + callName + ' (' + callPhone + ') now?')) return;
   
-  const choice = prompt(msg);
-  if (!choice) return;
+  // Save SOS alert to database (don't wait)
+  api({
+    action:'sendSOS', memberId:ME.id,
+    latitude: currentLocation ? currentLocation.latitude : '',
+    longitude: currentLocation ? currentLocation.longitude : ''
+  }).catch(() => {});
   
-  const idx = parseInt(choice) - 1;
-  if (isNaN(idx) || idx < 0 || idx >= cgList.length) {
-    toast('Invalid selection', 'error');
-    return;
-  }
-  
-  const selectedCaregiver = cgList[idx];
-  
-  // Save SOS alert to database
-  loading(true);
-  try {
-    await api({
-      action:'sendSOS', memberId:ME.id,
-      latitude: currentLocation ? currentLocation.latitude : '',
-      longitude: currentLocation ? currentLocation.longitude : ''
-    });
-  } catch(e) {}
-  finally { loading(false); }
-  
-  // Call the caregiver directly
-  toast('🚨 Calling ' + selectedCaregiver.name + '...', 'error');
-  window.location.href = 'tel:' + selectedCaregiver.phone;
+  // Call immediately
+  window.location.href = 'tel:' + callPhone;
 }
 
 async function saveSafeZone() {
@@ -3565,16 +3554,29 @@ async function loadCaregivers() {
 }
 
 function renderCaregivers() {
-  const html = caregivers.map(c => `
-    <div class="caregiver-card">
+  const primaryId = localStorage.getItem(`al_primary_cg_${ME.id}`) || '';
+  const html = caregivers.map(c => {
+    const isPrimary = c.id === primaryId;
+    return `
+    <div class="caregiver-card" style="border:${isPrimary ? '2px solid var(--pri)' : '1px solid var(--border)'};padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center">
       <div>
-        <strong>${esc(c.name)}</strong>
+        <strong>${esc(c.name)}</strong>${isPrimary ? ' <span style="background:var(--pri);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:4px">PRIMARY</span>' : ''}
         <p class="text-sm text-muted">${esc(c.phone)}</p>
       </div>
-      <button onclick="removeCaregiver('${c.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">Remove</button>
+      <div style="display:flex;gap:6px">
+        ${!isPrimary ? `<button onclick="setPrimaryCaregiver('${c.id}')" style="background:var(--pri);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Set Primary</button>` : ''}
+        <button onclick="removeCaregiver('${c.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
   if ($('caregivers-list')) $('caregivers-list').innerHTML = html || '<p class="text-sm text-muted">No caregivers added yet</p>';
+}
+
+function setPrimaryCaregiver(caregiverId) {
+  localStorage.setItem(`al_primary_cg_${ME.id}`, caregiverId);
+  renderCaregivers();
+  const cg = caregivers.find(c => c.id === caregiverId);
+  toast('Primary caregiver set: ' + (cg ? cg.name : ''), 'success');
 }
 
 async function removeCaregiver(caregiverId) {
