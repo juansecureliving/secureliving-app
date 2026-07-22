@@ -320,6 +320,16 @@ button{cursor:pointer;border:none;background:none}
 <!-- ═══════════ AUTH SCREENS ═══════════ -->
 <div id="auth-screen">
 
+<!-- Language Selector (Auth Screen Only) -->
+<div style="position:absolute;top:12px;right:12px;z-index:100">
+  <select id="lang-select-auth" onchange="setLanguageAuth(this.value)" style="background:rgba(26,122,109,0.1);color:#1A7A6D;border:1px solid rgba(26,122,109,0.3);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;outline:none;cursor:pointer">
+    <option value="en" style="color:#333">English</option>
+    <option value="zh" style="color:#333">中文</option>
+    <option value="ms" style="color:#333">Melayu</option>
+    <option value="ta" style="color:#333">தமிழ்</option>
+  </select>
+</div>
+
 <!-- Login -->
 <div id="login-screen" class="auth-wrapper">
   <div class="auth-logo">
@@ -1619,6 +1629,15 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('al_lang', lang);
   applyLanguage();
+}
+
+function setLanguageAuth(lang) {
+  currentLang = lang;
+  localStorage.setItem('al_lang', lang);
+  applyLanguage();
+  // Update the dropdown to reflect current selection
+  const langSelect = $('lang-select-auth');
+  if (langSelect) langSelect.value = lang;
 }
 
 function applyLanguage() {
@@ -3402,6 +3421,12 @@ function esc(s) {
 
 /* ── Init ─────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', () => {
+  // Initialize language from localStorage
+  const savedLang = localStorage.getItem('al_lang') || 'en';
+  currentLang = savedLang;
+  if ($('lang-select-auth')) $('lang-select-auth').value = savedLang;
+  applyLanguage();
+  
   const saved = localStorage.getItem('al_member');
   const guestMode = localStorage.getItem('al_guest');
   if (saved) {
