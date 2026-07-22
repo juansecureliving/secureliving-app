@@ -758,6 +758,14 @@ button{cursor:pointer;border:none;background:none}
       <div id="location-history-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto"></div>
     </div>
 
+    <!-- SOS Alerts (Caregiver/Admin) -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px;color:var(--danger)">🚨 SOS Alerts</h3>
+      <div id="sos-alerts-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto">
+        <p class="text-sm text-muted">No alerts</p>
+      </div>
+    </div>
+
     <!-- Safe Zone Setup (Caregiver/Admin) -->
     <div class="card" id="safe-zone-section">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="safe_zone">Safe Zone</h3>
@@ -3153,6 +3161,7 @@ function renderHistoryTab() {
     hide('history-self-view');
     renderTrackedMembersList();
     renderLocationHistory();
+    loadSOSAlerts();
     setTimeout(() => { if (caregiverMap) caregiverMap.invalidateSize(); }, 400);
   } else {
     // MEMBER/GUEST VIEW
@@ -3162,6 +3171,42 @@ function renderHistoryTab() {
     updateTrackingUI();
     loadCaregivers();
     setTimeout(() => { if (selfMap) selfMap.invalidateSize(); }, 400);
+  }
+}
+
+async function loadSOSAlerts() {
+  try {
+    const r = await api({ action:'getSOSAlerts' });
+    if (!r.ok || !r.alerts || !r.alerts.length) {
+      if ($('sos-alerts-list')) $('sos-alerts-list').innerHTML = '<p class="text-sm text-muted">No alerts</p>';
+      return;
+    }
+    
+    const members = await api({ action:'getTrackedMembers', caregiverId: ME.id });
+    const memberMap = {};
+    if (members.ok && members.members) {
+      members.members.forEach(m => { memberMap[m.memberId] = m.name; });
+    }
+    
+    const html = r.alerts.slice(0, 10).map(a => {
+      const name = memberMap[a.memberId] || a.memberId;
+      const time = new Date(a.timestamp).toLocaleString('en-SG');
+      const loc = a.latitude ? `${Number(a.latitude).toFixed(4)}, ${Number(a.longitude).toFixed(4)}` : 'No location';
+      const mapLink = a.latitude ? `https://www.google.com/maps?q=${a.latitude},${a.longitude}` : '';
+      return `
+        <div style="padding:10px;background:rgba(220,53,69,0.08);border-radius:8px;border-left:3px solid var(--danger)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong style="color:var(--danger)">🚨 ${esc(name)}</strong>
+            <span class="text-sm text-muted">${time}</span>
+          </div>
+          <div class="text-sm text-muted" style="margin-top:4px">${loc}</div>
+          ${mapLink ? `<a href="${mapLink}" target="_blank" style="font-size:12px;color:var(--pri);margin-top:4px;display:inline-block">View on Map →</a>` : ''}
+        </div>
+      `;
+    }).join('');
+    if ($('sos-alerts-list')) $('sos-alerts-list').innerHTML = html;
+  } catch(e) {
+    if ($('sos-alerts-list')) $('sos-alerts-list').innerHTML = '<p class="text-sm text-muted">Error loading alerts</p>';
   }
 }
 
@@ -3372,22 +3417,66 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 async function triggerSOS() {
   const t = LANG[currentLang] || LANG.en;
   
-  if (!confirm(t.sos_emergency + '?\n\n' + (t.location_required || 'Send location to caregivers?'))) return;
+  // First check if caregivers exist
+  let cgList = caregivers || [];
+  if (!cgList.length) {
+    try {
+      const r = await api({ action:'getCaregivers', memberId:ME.id });
+      if (r.ok) cgList = r.caregivers || [];
+    } catch(e) {}
+  }
   
+  if (!cgList.length) {
+    // No caregivers - use emergency contact from profile
+    const ePhone = ME.emergencyPhone || '';
+    if (ePhone) {
+      if (confirm('🚨 SOS EMERGENCY\n\nNo caregivers found.\nCall emergency contact (' + ePhone + ')?')) {
+        // Save alert to database
+        api({
+          action:'sendSOS', memberId:ME.id,
+          latitude: currentLocation ? currentLocation.latitude : '',
+          longitude: currentLocation ? currentLocation.longitude : ''
+        }).catch(() => {});
+        window.location.href = 'tel:' + ePhone;
+      }
+    } else {
+      toast('No caregivers or emergency contact found. Please add a caregiver first.', 'error');
+    }
+    return;
+  }
+  
+  // Build caregiver list for selection
+  let msg = '🚨 SOS EMERGENCY\n\nWho do you want to call?\n\n';
+  cgList.forEach((c, i) => {
+    msg += (i + 1) + '. ' + c.name + ' (' + c.phone + ')\n';
+  });
+  msg += '\nEnter number (1-' + cgList.length + '):';
+  
+  const choice = prompt(msg);
+  if (!choice) return;
+  
+  const idx = parseInt(choice) - 1;
+  if (isNaN(idx) || idx < 0 || idx >= cgList.length) {
+    toast('Invalid selection', 'error');
+    return;
+  }
+  
+  const selectedCaregiver = cgList[idx];
+  
+  // Save SOS alert to database
   loading(true);
   try {
-    const r = await api({
+    await api({
       action:'sendSOS', memberId:ME.id,
       latitude: currentLocation ? currentLocation.latitude : '',
       longitude: currentLocation ? currentLocation.longitude : ''
     });
-    if (r.ok) {
-      toast('🚨 ' + (t.sos_emergency || 'SOS') + ' — Alert sent to caregivers!', 'error');
-    }
-  } catch(e) {
-    toast('🚨 SOS sent (offline mode)', 'error');
-  }
+  } catch(e) {}
   finally { loading(false); }
+  
+  // Call the caregiver directly
+  toast('🚨 Calling ' + selectedCaregiver.name + '...', 'error');
+  window.location.href = 'tel:' + selectedCaregiver.phone;
 }
 
 async function saveSafeZone() {
