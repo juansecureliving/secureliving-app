@@ -1230,7 +1230,7 @@ button{cursor:pointer;border:none;background:none}
 /* ═══════════════════════════════════════════
    CONFIG — Replace with your deployment URL
    ═══════════════════════════════════════════ */
-const API = 'https://script.google.com/macros/s/AKfycbwnyzBAmSjBpu9abOm_XbaP8-z1wXOApumPGJ6WQKUp1gdIaOLyIYxJpH1p1DwLX46Chg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxolRxdDO0-xGs6Z6LdSGr4cSJAQsZOZtNb0lTro-fYr235LeVAFRTymg-QAkk0nQaCvg/exec';
 
 /* ── State ────────────────────────────────── */
 let ME = null;         // logged-in member
@@ -2235,29 +2235,28 @@ async function handlePictureSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
   
-  // Check file size (max 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    toast('Image size must be less than 5MB', 'error');
+  // Check file size (max 3MB for compression)
+  if (file.size > 3 * 1024 * 1024) {
+    toast('Image size must be less than 3MB', 'error');
     return;
   }
   
   loading(true);
   try {
-    // Convert file to base64 for transmission
+    // Convert file to base64
     const reader = new FileReader();
     reader.onload = async (e) => {
       const base64 = e.target.result.split(',')[1];
-      const filename = `profile_${ME.id}_${Date.now()}.jpg`;
       
       const r = await api({
         action:'uploadProfilePicture',
         memberId: ME.id,
-        filename: filename,
         fileData: base64,
         mimeType: file.type
       });
       
       if (r.ok && r.fileUrl) {
+        // Store in localStorage (optional, for faster loading)
         localStorage.setItem(`al_profile_pic_${ME.id}`, r.fileUrl);
         renderProfile();
         toast('Profile picture updated!', 'success');
