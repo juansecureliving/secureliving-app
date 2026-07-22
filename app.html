@@ -1008,6 +1008,7 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <h2 id="profile-name"></h2>
     <p id="profile-phone" class="text-muted"></p>
+    <button class="btn btn-sm btn-outline" onclick="deleteProfilePicture()" id="delete-photo-btn" style="margin-top:8px;display:none" data-i18n="delete_photo">Delete Photo</button>
   </div>
   
   <!-- Hidden file input -->
@@ -1230,7 +1231,7 @@ button{cursor:pointer;border:none;background:none}
 /* ═══════════════════════════════════════════
    CONFIG — Replace with your deployment URL
    ═══════════════════════════════════════════ */
-const API = 'https://script.google.com/macros/s/AKfycbwnyzBAmSjBpu9abOm_XbaP8-z1wXOApumPGJ6WQKUp1gdIaOLyIYxJpH1p1DwLX46Chg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxolRxdDO0-xGs6Z6LdSGr4cSJAQsZOZtNb0lTro-fYr235LeVAFRTymg-QAkk0nQaCvg/exec';
 
 /* ── State ────────────────────────────────── */
 let ME = null;         // logged-in member
@@ -1376,6 +1377,7 @@ const LANG = {
     block:'Block #', street_name:'Street Name', level:'#Level', unit_no:'Unit No.', emergency_phone:'Emergency Phone',
     first_name:'First Name', surname:'Surname', date_of_birth:'Date of Birth', confirm_password:'Confirm Password',
     emergency_contact_name:'Emergency Contact Name',
+    delete_photo:'Delete Photo',
     password:'Password', sign_in:'Sign In',
     new_here:'New here?', create_account:'Create an account',
     register:'Register', confirm_pw:'Confirm',
@@ -1463,6 +1465,7 @@ const LANG = {
     block:'楼号', street_name:'街道名称', level:'#楼层', unit_no:'单元号', emergency_phone:'紧急电话',
     first_name:'名字', surname:'姓氏', date_of_birth:'出生日期', confirm_password:'确认密码',
     emergency_contact_name:'紧急联系人姓名',
+    delete_photo:'删除照片',
     password:'密码', sign_in:'登录',
     new_here:'新用户？', create_account:'创建账户',
     register:'注册', confirm_pw:'确认',
@@ -1551,6 +1554,7 @@ const LANG = {
     block:'No. Blok', street_name:'Nama Jalan', level:'#Tingkat', unit_no:'No. Unit', emergency_phone:'Telefon Kecemasan',
     first_name:'Nama Pertama', surname:'Nama Keluarga', date_of_birth:'Tarikh Lahir', confirm_password:'Sahkan Kata Laluan',
     emergency_contact_name:'Nama Hubungan Kecemasan',
+    delete_photo:'Padam Foto',
     password:'Kata Laluan', sign_in:'Log Masuk',
     new_here:'Baru di sini?', create_account:'Daftar akaun',
     register:'Daftar', confirm_pw:'Sahkan',
@@ -1638,6 +1642,7 @@ const LANG = {
     block:'தொகுதி எண்', street_name:'தெரு பெயர்', level:'#நிலை', unit_no:'அலகு எண்', emergency_phone:'அவசரகால தொலைபேசி',
     first_name:'முதல் பெயர்', surname:'குடும்ப பெயர்', date_of_birth:'பிறந்த தேதி', confirm_password:'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
     emergency_contact_name:'அவசரகால தொடர்பு பெயர்',
+    delete_photo:'புகைப்படத்தை நீக்கவும்',
     password:'கடவுச்சொல்', sign_in:'உள்நுழை',
     new_here:'புதியவரா?', create_account:'கணக்கு உருவாக்கு',
     register:'பதிவு', confirm_pw:'உறுதிசெய்',
@@ -2231,6 +2236,29 @@ function openPictureUpload() {
   input.click();
 }
 
+async function deleteProfilePicture() {
+  if (!confirm('Delete profile picture?')) return;
+  
+  loading(true);
+  try {
+    const r = await api({
+      action: 'deleteProfilePicture',
+      memberId: ME.id
+    });
+    
+    if (r.ok) {
+      localStorage.removeItem(`al_profile_pic_${ME.id}`);
+      renderProfile();
+      toast('Profile picture deleted', 'success');
+    } else {
+      toast(r.error || 'Failed to delete picture', 'error');
+    }
+  } catch(e) {
+    toast('Error deleting picture', 'error');
+  }
+  finally { loading(false); }
+}
+
 async function handlePictureSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -2281,10 +2309,12 @@ function renderProfile() {
     $('profile-picture').src = picUrl;
     $('profile-picture').style.display = 'block';
     $('profile-avatar-fallback').style.display = 'none';
+    $('delete-photo-btn').style.display = 'inline-block';
   } else {
     $('profile-picture').style.display = 'none';
     $('profile-avatar-fallback').textContent = initials;
     $('profile-avatar-fallback').style.display = 'flex';
+    $('delete-photo-btn').style.display = 'none';
   }
   
   $('profile-name').textContent = ME.name;
