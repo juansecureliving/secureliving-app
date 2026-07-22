@@ -2160,6 +2160,19 @@ async function enterApp() {
     console.log('All data loaded, showing app');
     hide('loading-overlay');
     show('app');
+    
+    // Auto-refresh tracking data every 15 seconds when Monitor tab is active
+    setInterval(() => {
+      if ($('tab-history') && $('tab-history').classList.contains('active')) {
+        const isStaff = ME && (ME.role === 'admin' || ME.role === 'caregiver');
+        if (isStaff) {
+          renderLocationHistory();
+          loadSOSAlerts();
+        } else {
+          updateTrackingUI();
+        }
+      }
+    }, 15000);
   } catch(e) {
     console.error('enterApp error:', e);
     hide('loading-overlay');
