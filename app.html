@@ -391,12 +391,12 @@ button{cursor:pointer;border:none;background:none}
     
     <div class="form-row">
       <div class="form-group">
-        <label>First Name *</label>
-        <input type="text" id="reg-fname" placeholder="First name">
+        <label data-i18n="first_name">First Name *</label>
+        <input type="text" id="reg-fname">
       </div>
       <div class="form-group">
-        <label>Surname *</label>
-        <input type="text" id="reg-lname" placeholder="Last name">
+        <label data-i18n="surname">Surname *</label>
+        <input type="text" id="reg-lname">
       </div>
     </div>
     
@@ -406,7 +406,7 @@ button{cursor:pointer;border:none;background:none}
     </div>
     
     <div class="form-group">
-      <label>Date of Birth</label>
+      <label data-i18n="date_of_birth">Date of Birth *</label>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
         <select id="reg-dob-day" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
           <option value="">Day</option>
@@ -450,7 +450,7 @@ button{cursor:pointer;border:none;background:none}
       <input type="email" id="reg-email" placeholder="your@email.com">
     </div>
     <div class="form-group">
-      <label data-i18n="gender">Gender</label>
+      <label data-i18n="gender">Gender *</label>
       <select id="reg-gender">
         <option value="">Select</option>
         <option>Male</option>
@@ -460,12 +460,12 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Password *</label>
-        <input type="password" id="reg-pw" placeholder="Min 6 chars">
+        <label data-i18n="password">Password *</label>
+        <input type="password" id="reg-pw">
       </div>
       <div class="form-group">
-        <label>Confirm *</label>
-        <input type="password" id="reg-pw2" placeholder="Repeat">
+        <label data-i18n="confirm_password">Confirm Password *</label>
+        <input type="password" id="reg-pw2">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 2fr 0.8fr 0.8fr;gap:8px" class="form-row">
@@ -487,21 +487,21 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
     <div class="form-group">
-      <label data-i18n="postal_code">Postal Code</label>
-      <input type="text" id="reg-postal" placeholder="e.g. 520123">
+      <label data-i18n="postal_code">Postal Code *</label>
+      <input type="text" id="reg-postal">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Emergency Contact Name</label>
-        <input type="text" id="reg-ename" placeholder="First name">
+        <label data-i18n="emergency_contact_name">Emergency Contact Name *</label>
+        <input type="text" id="reg-ename">
       </div>
       <div class="form-group">
-        <label>Surname</label>
-        <input type="text" id="reg-elname" placeholder="Last name">
+        <label data-i18n="surname">Surname *</label>
+        <input type="text" id="reg-elname">
       </div>
     </div>
     <div class="form-group">
-      <label data-i18n="emergency_phone">Emergency Phone</label>
+      <label data-i18n="emergency_phone">Emergency Phone *</label>
       <input type="tel" id="reg-ephone" maxlength="8" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </div>
     <button class="btn btn-pri" onclick="doRegister()" data-i18n="create_account_btn">Create Account</button>
@@ -1355,6 +1355,8 @@ const LANG = {
     welcome_back:'Welcome Back', phone_number:'Phone Number',
     account_type:'Account Type', member:'Member', caregiver:'Caregiver',
     block:'Block #', street_name:'Street Name', level:'#Level', unit_no:'Unit No.', emergency_phone:'Emergency Phone',
+    first_name:'First Name', surname:'Surname', date_of_birth:'Date of Birth', confirm_password:'Confirm Password',
+    emergency_contact_name:'Emergency Contact Name',
     password:'Password', sign_in:'Sign In',
     new_here:'New here?', create_account:'Create an account',
     register:'Register', confirm_pw:'Confirm',
@@ -1440,6 +1442,8 @@ const LANG = {
     welcome_back:'欢迎回来', phone_number:'手机号码',
     account_type:'账户类型', member:'成员', caregiver:'照护者',
     block:'楼号', street_name:'街道名称', level:'#楼层', unit_no:'单元号', emergency_phone:'紧急电话',
+    first_name:'名字', surname:'姓氏', date_of_birth:'出生日期', confirm_password:'确认密码',
+    emergency_contact_name:'紧急联系人姓名',
     password:'密码', sign_in:'登录',
     new_here:'新用户？', create_account:'创建账户',
     register:'注册', confirm_pw:'确认',
@@ -1526,6 +1530,8 @@ const LANG = {
     welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
     account_type:'Jenis Akaun', member:'Ahli', caregiver:'Penjaga',
     block:'No. Blok', street_name:'Nama Jalan', level:'#Tingkat', unit_no:'No. Unit', emergency_phone:'Telefon Kecemasan',
+    first_name:'Nama Pertama', surname:'Nama Keluarga', date_of_birth:'Tarikh Lahir', confirm_password:'Sahkan Kata Laluan',
+    emergency_contact_name:'Nama Hubungan Kecemasan',
     password:'Kata Laluan', sign_in:'Log Masuk',
     new_here:'Baru di sini?', create_account:'Daftar akaun',
     register:'Daftar', confirm_pw:'Sahkan',
@@ -1611,6 +1617,8 @@ const LANG = {
     welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
     account_type:'கணக்கு வகை', member:'உறுப்பினர்', caregiver:'பராமரிப்பாளர்',
     block:'தொகுதி எண்', street_name:'தெரு பெயர்', level:'#நிலை', unit_no:'அலகு எண்', emergency_phone:'அவசரகால தொலைபேசி',
+    first_name:'முதல் பெயர்', surname:'குடும்ப பெயர்', date_of_birth:'பிறந்த தேதி', confirm_password:'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
+    emergency_contact_name:'அவசரகால தொடர்பு பெயர்',
     password:'கடவுச்சொல்', sign_in:'உள்நுழை',
     new_here:'புதியவரா?', create_account:'கணக்கு உருவாக்கு',
     register:'பதிவு', confirm_pw:'உறுதிசெய்',
@@ -1911,17 +1919,24 @@ async function doRegister() {
   const phone = $('reg-phone').value.trim();
   const pw = $('reg-pw').value;
   const pw2 = $('reg-pw2').value;
+  const gender = $('reg-gender').value;
+  const postal = $('reg-postal').value.trim();
+  const ename = $('reg-ename').value.trim();
+  const elname = $('reg-elname').value.trim();
+  const ephone = $('reg-ephone').value.trim();
   
   if (!role) return toast('Please select account type','error');
-  if (!fname || !lname || !phone || !pw) return toast('Fill required fields','error');
+  if (!fname || !lname || !phone || !pw || !gender || !postal || !ename || !elname || !ephone) return toast('All fields are required','error');
   if (phone.length !== 8) return toast('Phone must be 8 digits','error');
+  if (ephone.length !== 8) return toast('Emergency phone must be 8 digits','error');
   if (pw.length < 6) return toast('Password must be at least 6 characters','error');
   if (pw !== pw2) return toast('Passwords do not match','error');
 
   const dobDay = $('reg-dob-day').value;
   const dobMonth = $('reg-dob-month').value;
   const dobYear = $('reg-dob-year').value;
-  const dob = dobYear && dobMonth && dobDay ? `${dobYear}-${dobMonth}-${dobDay}` : '';
+  if (!dobDay || !dobMonth || !dobYear) return toast('Date of birth is required','error');
+  const dob = `${dobYear}-${dobMonth}-${dobDay}`;
   
   const unitLevel = $('reg-unit-level').value.trim();
   const unitNum = $('reg-unit-num').value.trim();
