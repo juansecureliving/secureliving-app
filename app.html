@@ -362,12 +362,16 @@ button{cursor:pointer;border:none;background:none}
       <label data-i18n="account_type">Account Type *</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
         <div style="padding:12px;border:2px solid var(--pri);border-radius:8px;cursor:pointer;text-align:center" onclick="selectRole('member')" id="role-member-btn">
-          <div style="font-size:24px;margin-bottom:4px">👤</div>
+          <div style="margin-bottom:4px;display:flex;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;color:var(--pri)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
           <div style="font-weight:600;font-size:13px" data-i18n="member">Member</div>
           <div style="font-size:11px;color:var(--muted)">Patient/Senior</div>
         </div>
         <div style="padding:12px;border:2px solid #ccc;border-radius:8px;cursor:pointer;text-align:center" onclick="selectRole('caregiver')" id="role-caregiver-btn">
-          <div style="font-size:24px;margin-bottom:4px">🤝</div>
+          <div style="margin-bottom:4px;display:flex;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;color:#ccc"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87m-4-12a4 4 0 0 1 0 7.75"/></svg>
+          </div>
           <div style="font-weight:600;font-size:13px" data-i18n="caregiver">Caregiver</div>
           <div style="font-size:11px;color:var(--muted)">Family/Staff</div>
         </div>
@@ -375,22 +379,44 @@ button{cursor:pointer;border:none;background:none}
       <input type="hidden" id="reg-role" value="">
     </div>
     
-    <div class="form-group">
-      <label>Full Name *</label>
-      <input type="text" id="reg-name" placeholder="Your full name">
-    </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Phone *</label>
-        <input type="tel" id="reg-phone" placeholder="91234567">
+        <label>First Name *</label>
+        <input type="text" id="reg-fname" placeholder="First name">
       </div>
       <div class="form-group">
-        <label>Date of Birth</label>
-        <input type="date" id="reg-dob">
+        <label>Surname *</label>
+        <input type="text" id="reg-lname" placeholder="Last name">
       </div>
     </div>
+    
     <div class="form-group">
-      <label data-i18n="email">Email</label>
+      <label data-i18n="phone_number">Phone Number *</label>
+      <input type="tel" id="reg-phone" placeholder="91234567" maxlength="8" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+    </div>
+    
+    <div class="form-group">
+      <label>Date of Birth</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <select id="reg-dob-day" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+          <option value="">Day</option>
+          ${Array.from({length:31}, (_, i) => `<option value="${String(i+1).padStart(2,'0')}">${i+1}</option>`).join('')}
+        </select>
+        <select id="reg-dob-month" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+          <option value="">Month</option>
+          <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option><option value="04">Apr</option>
+          <option value="05">May</option><option value="06">Jun</option><option value="07">Jul</option><option value="08">Aug</option>
+          <option value="09">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+        </select>
+        <select id="reg-dob-year" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+          <option value="">Year</option>
+          ${Array.from({length:100}, (_, i) => {const year = new Date().getFullYear() - i; return `<option value="${year}">${year}</option>`}).join('')}
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label data-i18n="email">Email (Optional)</label>
       <input type="email" id="reg-email" placeholder="your@email.com">
     </div>
     <div class="form-group">
@@ -412,9 +438,19 @@ button{cursor:pointer;border:none;background:none}
         <input type="password" id="reg-pw2" placeholder="Repeat">
       </div>
     </div>
-    <div class="form-group">
-      <label data-i18n="address">Address</label>
-      <input type="text" id="reg-address" placeholder="Block, Street, Unit">
+    <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px" class="form-row">
+      <div class="form-group">
+        <label>Blk #</label>
+        <input type="text" id="reg-blk" placeholder="123" style="width:100%">
+      </div>
+      <div class="form-group">
+        <label>Street Name</label>
+        <input type="text" id="reg-street" placeholder="Jalan Sutera" style="width:100%">
+      </div>
+      <div class="form-group">
+        <label>Unit</label>
+        <input type="text" id="reg-unit" placeholder="#01-123" style="width:100%">
+      </div>
     </div>
     <div class="form-group">
       <label data-i18n="postal_code">Postal Code</label>
@@ -422,13 +458,17 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Emergency Contact</label>
-        <input type="text" id="reg-ename" placeholder="Name">
+        <label>Emergency Contact Name</label>
+        <input type="text" id="reg-ename" placeholder="First name">
       </div>
       <div class="form-group">
-        <label>Emergency Phone</label>
-        <input type="tel" id="reg-ephone" placeholder="Phone">
+        <label>Surname</label>
+        <input type="text" id="reg-elname" placeholder="Last name">
       </div>
+    </div>
+    <div class="form-group">
+      <label>Emergency Phone</label>
+      <input type="tel" id="reg-ephone" placeholder="91234567" maxlength="8" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </div>
     <button class="btn btn-pri" onclick="doRegister()" data-i18n="create_account_btn">Create Account</button>
     <div class="auth-switch">
@@ -1818,26 +1858,36 @@ async function doLogin() {
 
 async function doRegister() {
   const role = $('reg-role').value.trim();
-  const name = $('reg-name').value.trim();
+  const fname = $('reg-fname').value.trim();
+  const lname = $('reg-lname').value.trim();
+  const name = fname + ' ' + lname;
   const phone = $('reg-phone').value.trim();
   const pw = $('reg-pw').value;
   const pw2 = $('reg-pw2').value;
   
   if (!role) return toast('Please select account type','error');
-  if (!name || !phone || !pw) return toast('Fill required fields','error');
+  if (!fname || !lname || !phone || !pw) return toast('Fill required fields','error');
+  if (phone.length !== 8) return toast('Phone must be 8 digits','error');
   if (pw.length < 6) return toast('Password must be at least 6 characters','error');
   if (pw !== pw2) return toast('Passwords do not match','error');
+
+  const dobDay = $('reg-dob-day').value;
+  const dobMonth = $('reg-dob-month').value;
+  const dobYear = $('reg-dob-year').value;
+  const dob = dobYear && dobMonth && dobDay ? `${dobYear}-${dobMonth}-${dobDay}` : '';
+  
+  const address = [$('reg-blk').value.trim(), $('reg-street').value.trim(), $('reg-unit').value.trim()].filter(Boolean).join(', ');
 
   loading(true);
   try {
     const r = await api({
       action:'register', name, phone, password:pw, role: role,
       email: $('reg-email').value.trim(),
-      dob: $('reg-dob').value,
+      dob: dob,
       gender: $('reg-gender').value,
-      address: $('reg-address').value.trim(),
+      address: address,
       postalCode: $('reg-postal').value.trim(),
-      emergencyName: $('reg-ename').value.trim(),
+      emergencyName: ($('reg-ename').value.trim() + ' ' + $('reg-elname').value.trim()).trim(),
       emergencyPhone: $('reg-ephone').value.trim()
     });
     if (!r.ok) return toast(r.error,'error');
