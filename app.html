@@ -2165,7 +2165,16 @@ function switchTab(tab) {
   const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
   if (tabBtn) tabBtn.classList.add('active');
 
-  if (tab === 'profile' && !isGuest) renderProfile();
+  if (tab === 'profile' && !isGuest) {
+    // Refresh member data from database to get latest profile picture
+    api({ action:'getMember', memberId: ME.id }).then(r => {
+      if (r.ok && r.member) {
+        ME.profilePicture = r.member.profilePicture || '';
+        localStorage.setItem('al_member', JSON.stringify(ME));
+      }
+      renderProfile();
+    }).catch(() => renderProfile());
+  }
   if (tab === 'reports' && !isGuest) renderBPChart();
   if (tab === 'history' && !isGuest) renderHistoryTab();
   if (tab === 'products') setTimeout(() => addFilterSwipeListeners(), 100);
@@ -2242,12 +2251,12 @@ async function deleteProfilePicture() {
   loading(true);
   try {
     const r = await api({
-      action: 'deleteProfilePicture',
-      memberId: ME.id
+      action: 'updateMember',
+      memberId: ME.id,
+      profilePicture: ''
     });
     
     if (r.ok) {
-      // Clear from ME object and localStorage
       ME.profilePicture = '';
       localStorage.removeItem(`al_profile_pic_${ME.id}`);
       localStorage.setItem('al_member', JSON.stringify(ME));
