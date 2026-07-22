@@ -392,7 +392,7 @@ button{cursor:pointer;border:none;background:none}
     
     <div class="form-group">
       <label data-i18n="phone_number">Phone Number *</label>
-      <input type="tel" id="reg-phone" placeholder="91234567" maxlength="8" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <input type="tel" id="reg-phone" maxlength="8" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </div>
     
     <div class="form-group">
@@ -460,20 +460,20 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <div style="display:grid;grid-template-columns:1fr 2fr 0.8fr 0.8fr;gap:8px" class="form-row">
       <div class="form-group">
-        <label>Blk #</label>
-        <input type="text" id="reg-blk" placeholder="123" style="width:100%">
+        <label data-i18n="block">Block #</label>
+        <input type="text" id="reg-blk" style="width:100%">
       </div>
       <div class="form-group">
-        <label>Street Name</label>
-        <input type="text" id="reg-street" placeholder="Jalan Sutera" style="width:100%">
+        <label data-i18n="street_name">Street Name</label>
+        <input type="text" id="reg-street" style="width:100%">
       </div>
       <div class="form-group">
-        <label>#01</label>
-        <input type="text" id="reg-unit-level" placeholder="01" style="width:100%">
+        <label data-i18n="level">#Level</label>
+        <input type="text" id="reg-unit-level" style="width:100%">
       </div>
       <div class="form-group">
-        <label>Unit</label>
-        <input type="text" id="reg-unit-num" placeholder="123" style="width:100%">
+        <label data-i18n="unit_no">Unit No.</label>
+        <input type="text" id="reg-unit-num" style="width:100%">
       </div>
     </div>
     <div class="form-group">
@@ -491,8 +491,8 @@ button{cursor:pointer;border:none;background:none}
       </div>
     </div>
     <div class="form-group">
-      <label>Emergency Phone</label>
-      <input type="tel" id="reg-ephone" placeholder="91234567" maxlength="8" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <label data-i18n="emergency_phone">Emergency Phone</label>
+      <input type="tel" id="reg-ephone" maxlength="8" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
     </div>
     <button class="btn btn-pri" onclick="doRegister()" data-i18n="create_account_btn">Create Account</button>
     <div class="auth-switch">
@@ -1344,6 +1344,7 @@ const LANG = {
     // Auth
     welcome_back:'Welcome Back', phone_number:'Phone Number',
     account_type:'Account Type', member:'Member', caregiver:'Caregiver',
+    block:'Block #', street_name:'Street Name', level:'#Level', unit_no:'Unit No.', emergency_phone:'Emergency Phone',
     password:'Password', sign_in:'Sign In',
     new_here:'New here?', create_account:'Create an account',
     register:'Register', confirm_pw:'Confirm',
@@ -1428,6 +1429,7 @@ const LANG = {
     good_afternoon:'下午好', good_evening:'晚上好',
     welcome_back:'欢迎回来', phone_number:'手机号码',
     account_type:'账户类型', member:'成员', caregiver:'照护者',
+    block:'楼号', street_name:'街道名称', level:'#楼层', unit_no:'单元号', emergency_phone:'紧急电话',
     password:'密码', sign_in:'登录',
     new_here:'新用户？', create_account:'创建账户',
     register:'注册', confirm_pw:'确认',
@@ -1513,6 +1515,7 @@ const LANG = {
     good_afternoon:'Selamat Tengah Hari', good_evening:'Selamat Petang',
     welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
     account_type:'Jenis Akaun', member:'Ahli', caregiver:'Penjaga',
+    block:'No. Blok', street_name:'Nama Jalan', level:'#Tingkat', unit_no:'No. Unit', emergency_phone:'Telefon Kecemasan',
     password:'Kata Laluan', sign_in:'Log Masuk',
     new_here:'Baru di sini?', create_account:'Daftar akaun',
     register:'Daftar', confirm_pw:'Sahkan',
@@ -1597,6 +1600,7 @@ const LANG = {
     good_afternoon:'மதிய வணக்கம்', good_evening:'மாலை வணக்கம்',
     welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
     account_type:'கணக்கு வகை', member:'உறுப்பினர்', caregiver:'பராமரிப்பாளர்',
+    block:'தொகுதி எண்', street_name:'தெரு பெயர்', level:'#நிலை', unit_no:'அலகு எண்', emergency_phone:'அவசரகால தொலைபேசி',
     password:'கடவுச்சொல்', sign_in:'உள்நுழை',
     new_here:'புதியவரா?', create_account:'கணக்கு உருவாக்கு',
     register:'பதிவு', confirm_pw:'உறுதிசெய்',
