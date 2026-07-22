@@ -2308,13 +2308,26 @@ async function handlePictureSelect(event) {
 function renderProfile() {
   const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   
-  // Show profile picture if exists in ME object
-  const picUrl = ME.profilePicture || localStorage.getItem(`al_profile_pic_${ME.id}`);
-  if (picUrl && picUrl.trim()) {
-    $('profile-picture').src = picUrl;
-    $('profile-picture').style.display = 'block';
-    $('profile-avatar-fallback').style.display = 'none';
-    $('delete-photo-btn').style.display = 'inline-block';
+  // Try to get picture from ME object (database) or localStorage
+  let picUrl = '';
+  if (ME && ME.profilePicture && ME.profilePicture.trim()) {
+    picUrl = ME.profilePicture;
+  } else if (ME && ME.id) {
+    const cached = localStorage.getItem(`al_profile_pic_${ME.id}`);
+    if (cached && cached.trim()) {
+      picUrl = cached;
+    }
+  }
+  
+  if (picUrl) {
+    try {
+      $('profile-picture').src = picUrl;
+      $('profile-picture').style.display = 'block';
+      $('profile-avatar-fallback').style.display = 'none';
+      $('delete-photo-btn').style.display = 'inline-block';
+    } catch(e) {
+      console.log('Error loading picture:', e);
+    }
   } else {
     $('profile-picture').style.display = 'none';
     $('profile-avatar-fallback').textContent = initials;
