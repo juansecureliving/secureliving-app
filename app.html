@@ -99,10 +99,10 @@ button{cursor:pointer;border:none;background:none}
   border-top:1px solid #E2DFD8;display:flex;z-index:100;
   padding-bottom:env(safe-area-inset-bottom)}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:8px 4px 6px;gap:2px;font-size:10px;color:var(--muted);
+  padding:12px 4px 10px;gap:4px;font-size:11px;color:var(--muted);
   font-weight:500;transition:color .2s}
 .tab-btn.active{color:var(--pri)}
-.tab-btn svg{width:22px;height:22px}
+.tab-btn svg{width:28px;height:28px}
 .tab-btn.active svg{stroke-width:2.5}
 
 .tab-content{display:none;padding:16px;max-width:600px;margin:0 auto}
@@ -218,7 +218,8 @@ button{cursor:pointer;border:none;background:none}
 
 /* ── Health Profile ───────────────────────────── */
 .profile-header{text-align:center;padding:24px 0}
-.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--pri);
+.profile-avatar{width:100px;height:100px;border-radius:50%;background:var(--pri);
+  color:#fff;font-weight:600;font-size:40px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
   color:#fff;display:flex;align-items:center;justify-content:center;
   font-size:32px;font-family:var(--font-display);margin:0 auto 10px}
 .profile-header h2{font-family:var(--font-display);font-size:22px}
@@ -998,10 +999,20 @@ button{cursor:pointer;border:none;background:none}
     <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
   </div>
   <div class="profile-header">
-    <div class="profile-avatar" id="profile-avatar"></div>
+    <div class="profile-avatar" id="profile-avatar" style="cursor:pointer;position:relative;overflow:hidden" onclick="openPictureUpload()">
+      <img id="profile-picture" style="width:100%;height:100%;object-fit:cover;display:none">
+      <div id="profile-avatar-fallback" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:600"></div>
+      <div style="position:absolute;bottom:0;right:0;background:var(--pri);color:#fff;padding:6px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+    </div>
     <h2 id="profile-name"></h2>
     <p id="profile-phone" class="text-muted"></p>
   </div>
+  
+  <!-- Hidden file input -->
+  <input type="file" id="profile-pic-input" accept="image/*" style="display:none" onchange="handlePictureSelect(event)">
+  <input type="hidden" id="profile-picture-url">
 
   <!-- Health Profile Card -->
   <div class="card">
@@ -2215,9 +2226,68 @@ async function loadHealthProfile() {
   } catch(e) {}
 }
 
+function openPictureUpload() {
+  const input = $('profile-pic-input');
+  input.click();
+}
+
+async function handlePictureSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  // Check file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Image size must be less than 5MB', 'error');
+    return;
+  }
+  
+  loading(true);
+  try {
+    // Convert file to base64 for transmission
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result.split(',')[1];
+      const filename = `profile_${ME.id}_${Date.now()}.jpg`;
+      
+      const r = await api({
+        action:'uploadProfilePicture',
+        memberId: ME.id,
+        filename: filename,
+        fileData: base64,
+        mimeType: file.type
+      });
+      
+      if (r.ok && r.fileUrl) {
+        localStorage.setItem(`al_profile_pic_${ME.id}`, r.fileUrl);
+        renderProfile();
+        toast('Profile picture updated!', 'success');
+      } else {
+        toast(r.error || 'Failed to upload picture', 'error');
+      }
+      loading(false);
+    };
+    reader.readAsDataURL(file);
+  } catch(e) {
+    toast('Error uploading picture', 'error');
+    loading(false);
+  }
+}
+
 function renderProfile() {
   const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  $('profile-avatar').textContent = initials;
+  
+  // Show profile picture if exists
+  const picUrl = localStorage.getItem(`al_profile_pic_${ME.id}`);
+  if (picUrl) {
+    $('profile-picture').src = picUrl;
+    $('profile-picture').style.display = 'block';
+    $('profile-avatar-fallback').style.display = 'none';
+  } else {
+    $('profile-picture').style.display = 'none';
+    $('profile-avatar-fallback').textContent = initials;
+    $('profile-avatar-fallback').style.display = 'flex';
+  }
+  
   $('profile-name').textContent = ME.name;
   $('profile-phone').textContent = ME.phone;
   const t = LANG[currentLang] || LANG.en;
@@ -2342,7 +2412,7 @@ function renderBP() {
   const sum = $('bp-summary');
   const t = LANG[currentLang] || LANG.en;
   if (!bpReadings.length) {
-    sum.innerHTML = `<div class="empty-state" style="width:100%"><div class="empty-icon">💓</div><p>${t.no_readings}</p></div>`;
+    sum.innerHTML = `<div class="empty-state" style="width:100%"><p>${t.no_readings}</p></div>`;
     $('bp-history').innerHTML = '';
     renderHealthSummary();
     return;
@@ -2690,7 +2760,7 @@ async function loadAppointments() {
     };
     
     if (!r.appointments.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>${t.no_appointments}</p></div>`;
+      el.innerHTML = `<div class="empty-state"><p>${t.no_appointments}</p></div>`;
       return;
     }
     el.innerHTML = r.appointments.map(a => {
@@ -2961,7 +3031,7 @@ async function loadOrders() {
     const statusMap = { pending:t.pending, confirmed:t.confirmed, cancelled:t.cancelled, completed:t.completed };
     
     if (!r.orders.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>${t.no_orders}</p></div>`;
+      el.innerHTML = `<div class="empty-state"><p>${t.no_orders}</p></div>`;
       return;
     }
     el.innerHTML = r.orders.map(o => {
