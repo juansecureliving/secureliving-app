@@ -356,6 +356,25 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div class="auth-card">
     <h2 data-i18n="register">Register</h2>
+    
+    <!-- Role Selection -->
+    <div class="form-group">
+      <label data-i18n="account_type">Account Type *</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+        <div style="padding:12px;border:2px solid var(--pri);border-radius:8px;cursor:pointer;text-align:center" onclick="selectRole('member')" id="role-member-btn">
+          <div style="font-size:24px;margin-bottom:4px">👤</div>
+          <div style="font-weight:600;font-size:13px" data-i18n="member">Member</div>
+          <div style="font-size:11px;color:var(--muted)">Patient/Senior</div>
+        </div>
+        <div style="padding:12px;border:2px solid #ccc;border-radius:8px;cursor:pointer;text-align:center" onclick="selectRole('caregiver')" id="role-caregiver-btn">
+          <div style="font-size:24px;margin-bottom:4px">🤝</div>
+          <div style="font-weight:600;font-size:13px" data-i18n="caregiver">Caregiver</div>
+          <div style="font-size:11px;color:var(--muted)">Family/Staff</div>
+        </div>
+      </div>
+      <input type="hidden" id="reg-role" value="">
+    </div>
+    
     <div class="form-group">
       <label>Full Name *</label>
       <input type="text" id="reg-name" placeholder="Your full name">
@@ -1260,6 +1279,7 @@ const LANG = {
     good_afternoon:'Good Afternoon', good_evening:'Good Evening',
     // Auth
     welcome_back:'Welcome Back', phone_number:'Phone Number',
+    account_type:'Account Type', member:'Member', caregiver:'Caregiver',
     password:'Password', sign_in:'Sign In',
     new_here:'New here?', create_account:'Create an account',
     register:'Register', confirm_pw:'Confirm',
@@ -1343,6 +1363,7 @@ const LANG = {
     welcome:'欢迎', good_morning:'早上好',
     good_afternoon:'下午好', good_evening:'晚上好',
     welcome_back:'欢迎回来', phone_number:'手机号码',
+    account_type:'账户类型', member:'成员', caregiver:'照护者',
     password:'密码', sign_in:'登录',
     new_here:'新用户？', create_account:'创建账户',
     register:'注册', confirm_pw:'确认',
@@ -1427,6 +1448,7 @@ const LANG = {
     welcome:'Selamat Datang', good_morning:'Selamat Pagi',
     good_afternoon:'Selamat Tengah Hari', good_evening:'Selamat Petang',
     welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
+    account_type:'Jenis Akaun', member:'Ahli', caregiver:'Penjaga',
     password:'Kata Laluan', sign_in:'Log Masuk',
     new_here:'Baru di sini?', create_account:'Daftar akaun',
     register:'Daftar', confirm_pw:'Sahkan',
@@ -1510,6 +1532,7 @@ const LANG = {
     welcome:'வரவேற்கிறோம்', good_morning:'காலை வணக்கம்',
     good_afternoon:'மதிய வணக்கம்', good_evening:'மாலை வணக்கம்',
     welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
+    account_type:'கணக்கு வகை', member:'உறுப்பினர்', caregiver:'பராமரிப்பாளர்',
     password:'கடவுச்சொல்', sign_in:'உள்நுழை',
     new_here:'புதியவரா?', create_account:'கணக்கு உருவாக்கு',
     register:'பதிவு', confirm_pw:'உறுதிசெய்',
@@ -1762,6 +1785,20 @@ async function fetchWeather() {
 
 /* ── Auth ─────────────────────────────────── */
 function showLogin() { show('login-screen'); hide('register-screen'); }
+function selectRole(role) {
+  $('reg-role').value = role;
+  const memberBtn = $('role-member-btn');
+  const caregiverBtn = $('role-caregiver-btn');
+  
+  if (role === 'member') {
+    memberBtn.style.borderColor = 'var(--pri)';
+    caregiverBtn.style.borderColor = '#ccc';
+  } else {
+    memberBtn.style.borderColor = '#ccc';
+    caregiverBtn.style.borderColor = 'var(--pri)';
+  }
+}
+
 function showRegister() { hide('login-screen'); show('register-screen'); }
 
 async function doLogin() {
@@ -1780,10 +1817,13 @@ async function doLogin() {
 }
 
 async function doRegister() {
+  const role = $('reg-role').value.trim();
   const name = $('reg-name').value.trim();
   const phone = $('reg-phone').value.trim();
   const pw = $('reg-pw').value;
   const pw2 = $('reg-pw2').value;
+  
+  if (!role) return toast('Please select account type','error');
   if (!name || !phone || !pw) return toast('Fill required fields','error');
   if (pw.length < 6) return toast('Password must be at least 6 characters','error');
   if (pw !== pw2) return toast('Passwords do not match','error');
@@ -1791,7 +1831,7 @@ async function doRegister() {
   loading(true);
   try {
     const r = await api({
-      action:'register', name, phone, password:pw,
+      action:'register', name, phone, password:pw, role: role,
       email: $('reg-email').value.trim(),
       dob: $('reg-dob').value,
       gender: $('reg-gender').value,
