@@ -3627,7 +3627,7 @@ async function renderTrackedMembersList() {
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
               <strong style="font-size:15px">${esc(m.name)}</strong>
-              <p class="text-sm text-muted" id="addr-${memberId}" style="margin-top:4px">Loading address...</p>
+              <p class="text-sm text-muted" id="addr-${memberId}" style="margin-top:4px">${m.latitude ? Number(m.latitude).toFixed(4) + ', ' + Number(m.longitude).toFixed(4) : 'No location'}</p>
             </div>
             <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${statusColor};flex-shrink:0;margin-top:6px"></span>
           </div>
@@ -3799,7 +3799,7 @@ async function renderRouteHistory() {
                   <span style="color:var(--success);font-weight:700;font-size:14px">●</span>
                   <div>
                     <span style="color:var(--muted)">${startTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                    <span id="${fromId}" style="margin-left:4px;color:var(--text)">Loading...</span>
+                    <span id="${fromId}" style="margin-left:4px;color:var(--text)">${Number(start.latitude).toFixed(4)}, ${Number(start.longitude).toFixed(4)}</span>
                   </div>
                 </div>
                 <div style="border-left:2px dashed var(--border);margin-left:5px;padding-left:14px;margin-bottom:3px">
@@ -3809,7 +3809,7 @@ async function renderRouteHistory() {
                   <span style="color:var(--danger);font-weight:700;font-size:14px">●</span>
                   <div>
                     <span style="color:var(--muted)">${endTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                    <span id="${toId}" style="margin-left:4px;color:var(--text)">Loading...</span>
+                    <span id="${toId}" style="margin-left:4px;color:var(--text)">${Number(end.latitude).toFixed(4)}, ${Number(end.longitude).toFixed(4)}</span>
                   </div>
                 </div>
               </div>
@@ -3893,6 +3893,7 @@ function esc(s) {
 const geocodeCache = {};
 async function reverseGeocode(lat, lng, elementId) {
   const key = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)}`;
+  const fallback = `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
   
   if (geocodeCache[key]) {
     const el = $(elementId);
@@ -3902,14 +3903,17 @@ async function reverseGeocode(lat, lng, elementId) {
   
   try {
     const r = await api({ action: 'reverseGeocode', lat: lat, lng: lng });
-    if (r.ok && r.address) {
+    if (r.ok && r.address && r.address !== 'Unknown') {
       geocodeCache[key] = r.address;
       const el = $(elementId);
       if (el) el.textContent = r.address;
+    } else {
+      const el = $(elementId);
+      if (el) el.textContent = fallback;
     }
   } catch(e) {
     const el = $(elementId);
-    if (el) el.textContent = `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
+    if (el) el.textContent = fallback;
   }
 }
 
