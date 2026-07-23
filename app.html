@@ -3809,7 +3809,7 @@ async function renderRouteHistory() {
           </div>
         `;
         
-        allSessions.push({ trip, mapId });
+        allSessions.push({ trip, mapId, idx: routeCount });
         routeCount++;
       }
     }
@@ -3846,6 +3846,14 @@ async function renderRouteHistory() {
           routeMiniMaps.push(miniMap);
         } catch(e) {}
       });
+      
+      // Geocode route addresses (staggered)
+      allSessions.forEach((item, i) => {
+        const startPt = item.trip[0];
+        const endPt = item.trip[item.trip.length - 1];
+        if (!startPt.address) setTimeout(() => geocodeElement(startPt.latitude, startPt.longitude, 'rfrom-' + item.idx), i * 2000);
+        if (!endPt.address) setTimeout(() => geocodeElement(endPt.latitude, endPt.longitude, 'rto-' + item.idx), i * 2000 + 1000);
+      });
     }, 300);
     
   } catch(e) {
@@ -3872,6 +3880,17 @@ function esc(s) {
   const d = document.createElement('div');
   d.textContent = String(s);
   return d.innerHTML;
+}
+
+// Geocode via backend - updates element text with address
+async function geocodeElement(lat, lng, elementId) {
+  try {
+    const r = await api({ action: 'reverseGeocode', lat: Number(lat), lng: Number(lng) });
+    if (r && r.ok && r.address && r.address !== 'Unknown') {
+      const el = $(elementId);
+      if (el) el.textContent = r.address;
+    }
+  } catch(e) {}
 }
 
 /* ── Init ─────────────────────────────────── */
