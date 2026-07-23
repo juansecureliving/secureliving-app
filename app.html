@@ -3889,12 +3889,10 @@ function esc(s) {
   return d.innerHTML;
 }
 
-// Reverse geocode using backend (no CORS) with localStorage cache
+// Reverse geocode using backend with localStorage cache
 const geocodeCache = JSON.parse(localStorage.getItem('al_geocache') || '{}');
-let geocodeQueue = [];
-let geocodeRunning = false;
 
-function reverseGeocode(lat, lng, elementId) {
+async function reverseGeocode(lat, lng, elementId) {
   const key = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)}`;
   
   // Check cache first
@@ -3904,46 +3902,19 @@ function reverseGeocode(lat, lng, elementId) {
     return;
   }
   
-  // Add to queue (sequential processing to avoid rate limits)
-  geocodeQueue.push({ lat, lng, elementId, key });
-  processGeocodeQueue();
-}
-
-async function processGeocodeQueue() {
-  if (geocodeRunning || geocodeQueue.length === 0) return;
-  geocodeRunning = true;
-  
-  while (geocodeQueue.length > 0) {
-    const item = geocodeQueue.shift();
-    
-    // Skip if already cached by a previous call
-    if (geocodeCache[item.key]) {
-      const el = $(item.elementId);
-      if (el) el.textContent = geocodeCache[item.key];
-      continue;
+  try {
+    console.log('Geocoding:', lat, lng, 'for', elementId);
+    const r = await api({ action: 'reverseGeocode', lat: Number(lat), lng: Number(lng) });
+    console.log('Geocode result:', JSON.stringify(r));
+    if (r && r.ok && r.address && r.address !== 'Unknown') {
+      geocodeCache[key] = r.address;
+      try { localStorage.setItem('al_geocache', JSON.stringify(geocodeCache)); } catch(e) {}
+      const el = $(elementId);
+      if (el) el.textContent = r.address;
     }
-    
-    try {
-      const r = await api({ action: 'reverseGeocode', lat: item.lat, lng: item.lng });
-      if (r.ok && r.address && r.address !== 'Unknown') {
-        geocodeCache[item.key] = r.address;
-        localStorage.setItem('al_geocache', JSON.stringify(geocodeCache));
-        const el = $(item.elementId);
-        if (el) el.textContent = r.address;
-      } else {
-        const el = $(item.elementId);
-        if (el) el.textContent = `${Number(item.lat).toFixed(4)}, ${Number(item.lng).toFixed(4)}`;
-      }
-    } catch(e) {
-      const el = $(item.elementId);
-      if (el) el.textContent = `${Number(item.lat).toFixed(4)}, ${Number(item.lng).toFixed(4)}`;
-    }
-    
-    // Wait 800ms between calls to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 800));
+  } catch(e) {
+    console.log('Geocode error:', e);
   }
-  
-  geocodeRunning = false;
 }
 
 /* ── Init ─────────────────────────────────── */
