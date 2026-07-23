@@ -3707,7 +3707,7 @@ async function renderRouteHistory() {
     
     let allHtml = '';
     let routeCount = 0;
-    const allSessions = []; // Store session data for map rendering
+    const allSessions = [];
     
     for (const m of tracked.members.slice(0, 5)) {
       const memberId = m.memberId || m.id || '';
@@ -3718,39 +3718,68 @@ async function renderRouteHistory() {
         .filter(l => l.latitude && l.longitude)
         .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
       
-      // Group into sessions
-      const sessions = [];
-      let currentSession = [locations[0]];
+      // Build trips: detect significant location changes (>500m from last known position)
+      const trips = [];
+      let tripStart = locations[0];
+      let tripPoints = [locations[0]];
+      
       for (let i = 1; i < locations.length; i++) {
-        const gap = new Date(locations[i].timestamp) - new Date(locations[i-1].timestamp);
         const dist = calculateDistance(
-          locations[i-1].latitude, locations[i-1].longitude,
+          tripPoints[tripPoints.length - 1].latitude, tripPoints[tripPoints.length - 1].longitude,
           locations[i].latitude, locations[i].longitude
         );
-        if (gap > 2 * 60 * 1000 || dist > 0.1) {
-          if (currentSession.length >= 2) sessions.push(currentSession);
-          currentSession = [locations[i]];
-        } else {
-          currentSession.push(locations[i]);
+        tripPoints.push(locations[i]);
+        
+        // Check if total trip distance is significant
+        const totalTripDist = calculateDistance(
+          tripStart.latitude, tripStart.longitude,
+          locations[i].latitude, locations[i].longitude
+        );
+        
+        // New trip when gap > 10 min
+        const gap = new Date(locations[i].timestamp) - new Date(locations[i-1].timestamp);
+        if (gap > 10 * 60 * 1000 && totalTripDist > 0.5) {
+          trips.push(tripPoints.slice());
+          tripStart = locations[i];
+          tripPoints = [locations[i]];
         }
       }
-      if (currentSession.length >= 2) sessions.push(currentSession);
+      // Final trip if distance > 500m
+      const finalDist = calculateDistance(
+        tripStart.latitude, tripStart.longitude,
+        tripPoints[tripPoints.length - 1].latitude, tripPoints[tripPoints.length - 1].longitude
+      );
+      if (tripPoints.length >= 2 && finalDist > 0.5) {
+        trips.push(tripPoints);
+      }
       
-      for (let s = sessions.length - 1; s >= 0; s--) {
-        const session = sessions[s];
-        const start = session[0];
-        const end = session[session.length - 1];
+      // Also check if ALL points form one big trip
+      if (trips.length === 0 && locations.length >= 2) {
+        const overallDist = calculateDistance(
+          locations[0].latitude, locations[0].longitude,
+          locations[locations.length - 1].latitude, locations[locations.length - 1].longitude
+        );
+        if (overallDist > 0.5) trips.push(locations);
+      }
+      
+      // Render trips (newest first)
+      for (let t = trips.length - 1; t >= 0; t--) {
+        const trip = trips[t];
+        const start = trip[0];
+        const end = trip[trip.length - 1];
         const startTime = new Date(start.timestamp);
         const endTime = new Date(end.timestamp);
         const duration = Math.round((endTime - startTime) / 60000);
         
         let totalDist = 0;
-        for (let i = 1; i < session.length; i++) {
+        for (let i = 1; i < trip.length; i++) {
           totalDist += calculateDistance(
-            session[i-1].latitude, session[i-1].longitude,
-            session[i].latitude, session[i].longitude
+            trip[i-1].latitude, trip[i-1].longitude,
+            trip[i].latitude, trip[i].longitude
           );
         }
+        
+        if (totalDist < 0.3) continue; // Skip tiny movements
         
         const mapId = `rmap-${routeCount}`;
         const fromId = `rfrom-${routeCount}`;
@@ -3789,21 +3818,21 @@ async function renderRouteHistory() {
           </div>
         `;
         
-        allSessions.push({ session, mapId, fromId, toId, routeCount });
+        allSessions.push({ trip, mapId, fromId, toId });
         routeCount++;
       }
     }
     
-    el.innerHTML = allHtml || '<p class="text-sm text-muted">No routes recorded yet</p>';
+    el.innerHTML = allHtml || '<p class="text-sm text-muted">No significant movements recorded yet</p>';
     
-    // Render mini maps and geocode after DOM is ready
+    // Render mini maps after DOM is ready
     setTimeout(() => {
       allSessions.forEach((item, idx) => {
         const mapEl = $(item.mapId);
         if (!mapEl) return;
         
         try {
-          const points = item.session.map(l => [Number(l.latitude), Number(l.longitude)]);
+          const points = item.trip.map(l => [Number(l.latitude), Number(l.longitude)]);
           const miniMap = L.map(item.mapId, {
             zoomControl: false, attributionControl: false,
             dragging: false, scrollWheelZoom: false,
@@ -3812,13 +3841,11 @@ async function renderRouteHistory() {
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(miniMap);
           L.polyline(points, { color: '#1A7A6D', weight: 4, opacity: 0.9 }).addTo(miniMap);
           
-          // Green start dot
           L.marker(points[0], { icon: L.divIcon({
             className: '', iconSize: [12, 12], iconAnchor: [6, 6],
             html: '<div style="width:12px;height:12px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>'
           })}).addTo(miniMap);
           
-          // Red end dot
           L.marker(points[points.length - 1], { icon: L.divIcon({
             className: '', iconSize: [12, 12], iconAnchor: [6, 6],
             html: '<div style="width:12px;height:12px;background:#ef4444;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>'
@@ -3826,13 +3853,13 @@ async function renderRouteHistory() {
           
           miniMap.fitBounds(points, { padding: [20, 20] });
           routeMiniMaps.push(miniMap);
-        } catch(e) { console.log('Mini map error:', e); }
+        } catch(e) {}
         
-        // Stagger geocode calls to avoid rate limiting
-        const start = item.session[0];
-        const end = item.session[item.session.length - 1];
-        setTimeout(() => reverseGeocode(start.latitude, start.longitude, item.fromId), idx * 1000);
-        setTimeout(() => reverseGeocode(end.latitude, end.longitude, item.toId), idx * 1000 + 500);
+        // Geocode via backend (staggered)
+        const start = item.trip[0];
+        const end = item.trip[item.trip.length - 1];
+        setTimeout(() => reverseGeocode(start.latitude, start.longitude, item.fromId), idx * 1500);
+        setTimeout(() => reverseGeocode(end.latitude, end.longitude, item.toId), idx * 1500 + 750);
       });
     }, 300);
     
@@ -3862,12 +3889,11 @@ function esc(s) {
   return d.innerHTML;
 }
 
-// Reverse geocode using OpenStreetMap Nominatim (free, no API key)
+// Reverse geocode using backend (no CORS issues)
 const geocodeCache = {};
 async function reverseGeocode(lat, lng, elementId) {
   const key = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)}`;
   
-  // Check cache first
   if (geocodeCache[key]) {
     const el = $(elementId);
     if (el) el.textContent = geocodeCache[key];
@@ -3875,24 +3901,11 @@ async function reverseGeocode(lat, lng, elementId) {
   }
   
   try {
-    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
-      headers: { 'Accept-Language': 'en' }
-    });
-    const data = await resp.json();
-    
-    if (data && data.address) {
-      const a = data.address;
-      // Build a short readable address
-      let addr = '';
-      if (a.building) addr += a.building + ', ';
-      if (a.road) addr += a.road;
-      if (a.neighbourhood) addr += ', ' + a.neighbourhood;
-      else if (a.suburb) addr += ', ' + a.suburb;
-      if (!addr && data.display_name) addr = data.display_name.split(',').slice(0, 3).join(',');
-      
-      geocodeCache[key] = addr || 'Unknown location';
+    const r = await api({ action: 'reverseGeocode', lat: lat, lng: lng });
+    if (r.ok && r.address) {
+      geocodeCache[key] = r.address;
       const el = $(elementId);
-      if (el) el.textContent = addr || 'Unknown location';
+      if (el) el.textContent = r.address;
     }
   } catch(e) {
     const el = $(elementId);
