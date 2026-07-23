@@ -763,7 +763,7 @@ button{cursor:pointer;border:none;background:none}
     <!-- Location History (Route Sessions) -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="location_history">Location History</h3>
-      <div id="route-history-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto">
+      <div id="route-history-list" style="display:flex;flex-direction:column;gap:12px;max-height:540px;overflow-y:auto">
         <p class="text-sm text-muted">No routes recorded yet</p>
       </div>
     </div>
@@ -3688,6 +3688,8 @@ async function renderTrackedMembersList() {
 }
 
 // Route history
+let routeMiniMaps = [];
+
 async function renderRouteHistory() {
   const el = $('route-history-list');
   if (!el) return;
@@ -3699,8 +3701,13 @@ async function renderRouteHistory() {
       return;
     }
     
+    // Clean up old mini maps
+    routeMiniMaps.forEach(m => { try { m.remove(); } catch(e) {} });
+    routeMiniMaps = [];
+    
     let allHtml = '';
     let routeCount = 0;
+    const allSessions = []; // Store session data for map rendering
     
     for (const m of tracked.members.slice(0, 5)) {
       const memberId = m.memberId || m.id || '';
@@ -3711,10 +3718,9 @@ async function renderRouteHistory() {
         .filter(l => l.latitude && l.longitude)
         .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
       
-      // Group into sessions (gap > 2 min or >100m movement)
+      // Group into sessions
       const sessions = [];
       let currentSession = [locations[0]];
-      
       for (let i = 1; i < locations.length; i++) {
         const gap = new Date(locations[i].timestamp) - new Date(locations[i-1].timestamp);
         const dist = calculateDistance(
@@ -3730,7 +3736,6 @@ async function renderRouteHistory() {
       }
       if (currentSession.length >= 2) sessions.push(currentSession);
       
-      // Render each session (newest first)
       for (let s = sessions.length - 1; s >= 0; s--) {
         const session = sessions[s];
         const start = session[0];
@@ -3747,48 +3752,90 @@ async function renderRouteHistory() {
           );
         }
         
-        const fromId = `rh-from-${routeCount}`;
-        const toId = `rh-to-${routeCount}`;
-        const mapLink = `https://www.google.com/maps/dir/${start.latitude},${start.longitude}/${end.latitude},${end.longitude}`;
+        const mapId = `rmap-${routeCount}`;
+        const fromId = `rfrom-${routeCount}`;
+        const toId = `rto-${routeCount}`;
+        const routeLink = `https://www.google.com/maps/dir/?api=1&origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&travelmode=driving`;
         
         allHtml += `
-          <div style="padding:12px;background:rgba(26,122,109,0.05);border-radius:10px;border-left:3px solid var(--pri)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <strong style="font-size:13px">${esc(m.name)}</strong>
-              <span style="background:var(--pri);color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">${totalDist.toFixed(2)} km</span>
-            </div>
-            <div style="font-size:12px">
-              <div style="display:flex;gap:6px;align-items:start;margin-bottom:4px">
-                <span style="color:var(--success);font-weight:700;font-size:14px">●</span>
-                <div>
-                  <span style="color:var(--muted)">${startTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                  <span id="${fromId}" style="margin-left:4px">${Number(start.latitude).toFixed(4)}, ${Number(start.longitude).toFixed(4)}</span>
+          <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)">
+            <div id="${mapId}" style="width:100%;height:160px;background:#e8e8e8"></div>
+            <div style="padding:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <strong style="font-size:13px">${esc(m.name)}</strong>
+                <span style="background:var(--pri);color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">${totalDist.toFixed(2)} km</span>
+              </div>
+              <div style="font-size:12px">
+                <div style="display:flex;gap:6px;align-items:start;margin-bottom:3px">
+                  <span style="color:var(--success);font-weight:700;font-size:14px">●</span>
+                  <div>
+                    <span style="color:var(--muted)">${startTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
+                    <span id="${fromId}" style="margin-left:4px;color:var(--text)">Loading...</span>
+                  </div>
+                </div>
+                <div style="border-left:2px dashed var(--border);margin-left:5px;padding-left:14px;margin-bottom:3px">
+                  <span style="color:var(--muted);font-size:11px">⏱ ${duration} min · 🔋 ${end.batteryPercent || '-'}% · ${startTime.toLocaleDateString('en-SG', {day:'numeric',month:'short'})}</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:start">
+                  <span style="color:var(--danger);font-weight:700;font-size:14px">●</span>
+                  <div>
+                    <span style="color:var(--muted)">${endTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
+                    <span id="${toId}" style="margin-left:4px;color:var(--text)">Loading...</span>
+                  </div>
                 </div>
               </div>
-              <div style="border-left:2px dashed var(--border);margin-left:5px;padding-left:14px;margin-bottom:4px">
-                <span style="color:var(--muted);font-size:11px">⏱ ${duration} min · 🔋 ${end.batteryPercent || '-'}% · ${startTime.toLocaleDateString('en-SG', {day:'numeric',month:'short'})}</span>
-              </div>
-              <div style="display:flex;gap:6px;align-items:start">
-                <span style="color:var(--danger);font-weight:700;font-size:14px">●</span>
-                <div>
-                  <span style="color:var(--muted)">${endTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                  <span id="${toId}" style="margin-left:4px">${Number(end.latitude).toFixed(4)}, ${Number(end.longitude).toFixed(4)}</span>
-                </div>
-              </div>
+              <a href="${routeLink}" target="_blank" rel="noopener" style="display:block;text-align:right;font-size:11px;color:var(--pri);margin-top:6px;text-decoration:none;font-weight:600">View Route on Maps →</a>
             </div>
-            <a href="${mapLink}" target="_blank" style="display:block;text-align:right;font-size:11px;color:var(--pri);margin-top:6px;text-decoration:none">View Route →</a>
           </div>
         `;
         
-        // Rate-limited geocoding (stagger by 500ms each)
-        setTimeout(() => reverseGeocode(start.latitude, start.longitude, fromId), routeCount * 500);
-        setTimeout(() => reverseGeocode(end.latitude, end.longitude, toId), routeCount * 500 + 250);
-        
+        allSessions.push({ session, mapId, fromId, toId, routeCount });
         routeCount++;
       }
     }
     
     el.innerHTML = allHtml || '<p class="text-sm text-muted">No routes recorded yet</p>';
+    
+    // Render mini maps and geocode after DOM is ready
+    setTimeout(() => {
+      allSessions.forEach((item, idx) => {
+        const mapEl = $(item.mapId);
+        if (!mapEl) return;
+        
+        try {
+          const points = item.session.map(l => [Number(l.latitude), Number(l.longitude)]);
+          const miniMap = L.map(item.mapId, {
+            zoomControl: false, attributionControl: false,
+            dragging: false, scrollWheelZoom: false,
+            doubleClickZoom: false, touchZoom: false
+          });
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(miniMap);
+          L.polyline(points, { color: '#1A7A6D', weight: 4, opacity: 0.9 }).addTo(miniMap);
+          
+          // Green start dot
+          L.marker(points[0], { icon: L.divIcon({
+            className: '', iconSize: [12, 12], iconAnchor: [6, 6],
+            html: '<div style="width:12px;height:12px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>'
+          })}).addTo(miniMap);
+          
+          // Red end dot
+          L.marker(points[points.length - 1], { icon: L.divIcon({
+            className: '', iconSize: [12, 12], iconAnchor: [6, 6],
+            html: '<div style="width:12px;height:12px;background:#ef4444;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>'
+          })}).addTo(miniMap);
+          
+          miniMap.fitBounds(points, { padding: [20, 20] });
+          routeMiniMaps.push(miniMap);
+        } catch(e) { console.log('Mini map error:', e); }
+        
+        // Stagger geocode calls to avoid rate limiting
+        const start = item.session[0];
+        const end = item.session[item.session.length - 1];
+        setTimeout(() => reverseGeocode(start.latitude, start.longitude, item.fromId), idx * 1000);
+        setTimeout(() => reverseGeocode(end.latitude, end.longitude, item.toId), idx * 1000 + 500);
+      });
+    }, 300);
+    
   } catch(e) {
     console.log('Route history error:', e);
     el.innerHTML = '<p class="text-sm text-muted">Error loading routes</p>';
