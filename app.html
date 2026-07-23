@@ -763,7 +763,7 @@ button{cursor:pointer;border:none;background:none}
     <!-- Location History (Route Sessions) -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="location_history">Location History</h3>
-      <div id="route-history-list" style="display:flex;flex-direction:column;gap:12px">
+      <div id="route-history-list" style="display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto;padding-right:8px">
         <p class="text-sm text-muted">No routes recorded yet</p>
       </div>
     </div>
@@ -3733,8 +3733,8 @@ async function renderRouteHistory() {
       }
       if (currentSession.length >= 2) sessions.push(currentSession);
       
-      // Render each session as a route card
-      for (let s = sessions.length - 1; s >= 0 && routeCount < 10; s--) {
+      // Render each session as a route card (limit to 3 most recent)
+      for (let s = sessions.length - 1; s >= 0 && routeCount < 3; s--) {
         const session = sessions[s];
         const start = session[0];
         const end = session[session.length - 1];
@@ -3818,7 +3818,7 @@ async function renderRouteHistory() {
       }
       if (currentSession.length >= 2) sessions.push(currentSession);
       
-      for (let s = sessions.length - 1; s >= 0 && routeCount < 10; s--) {
+      for (let s = sessions.length - 1; s >= 0 && routeCount < 3; s--) {
         const session = sessions[s];
         const mapId = `route-map-${routeCount}`;
         const fromId = `route-from-${routeCount}`;
