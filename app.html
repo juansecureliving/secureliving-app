@@ -1227,7 +1227,7 @@ button{cursor:pointer;border:none;background:none}
 /* ═══════════════════════════════════════════
    CONFIG — Replace with your deployment URL
    ═══════════════════════════════════════════ */
-const API = 'https://script.google.com/macros/s/AKfycbxolRxdDO0-xGs6Z6LdSGr4cSJAQsZOZtNb0lTro-fYr235LeVAFRTymg-QAkk0nQaCvg/exec';
+const API = 'https://script.google.com/macros/s/AKfycbwnyzBAmSjBpu9abOm_XbaP8-z1wXOApumPGJ6WQKUp1gdIaOLyIYxJpH1p1DwLX46Chg/exec';
 
 /* ── State ────────────────────────────────── */
 let ME = null;         // logged-in member
@@ -3880,13 +3880,13 @@ function esc(s) {
   return d.innerHTML;
 }
 
-// Reverse geocode using backend with localStorage cache
+// Reverse geocode using BigDataCloud (free, no API key, no CORS issues)
 const geocodeCache = JSON.parse(localStorage.getItem('al_geocache') || '{}');
 
 async function reverseGeocode(lat, lng, elementId) {
+  if (!elementId) return;
   const key = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)}`;
   
-  // Check cache first
   if (geocodeCache[key]) {
     const el = $(elementId);
     if (el) el.textContent = geocodeCache[key];
@@ -3894,14 +3894,34 @@ async function reverseGeocode(lat, lng, elementId) {
   }
   
   try {
-    console.log('Geocoding:', lat, lng, 'for', elementId);
-    const r = await api({ action: 'reverseGeocode', lat: Number(lat), lng: Number(lng) });
-    console.log('Geocode result:', JSON.stringify(r));
-    if (r && r.ok && r.address && r.address !== 'Unknown') {
-      geocodeCache[key] = r.address;
-      try { localStorage.setItem('al_geocache', JSON.stringify(geocodeCache)); } catch(e) {}
-      const el = $(elementId);
-      if (el) el.textContent = r.address;
+    const resp = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
+    const data = await resp.json();
+    if (data) {
+      let parts = [];
+      if (data.locality) parts.push(data.locality);
+      else if (data.city) parts.push(data.city);
+      if (data.principalSubdivision) parts.push(data.principalSubdivision);
+      
+      // Build readable address
+      let addr = '';
+      if (data.localityInfo && data.localityInfo.administrative) {
+        const admins = data.localityInfo.administrative;
+        const neighborhood = admins.find(a => a.order >= 8);
+        const area = admins.find(a => a.order >= 6 && a.order < 8);
+        if (neighborhood) addr = neighborhood.name;
+        if (area && area.name !== (neighborhood && neighborhood.name)) {
+          addr = addr ? addr + ', ' + area.name : area.name;
+        }
+      }
+      if (!addr) addr = parts.join(', ');
+      if (!addr) addr = data.locality || data.city || '';
+      
+      if (addr) {
+        geocodeCache[key] = addr;
+        try { localStorage.setItem('al_geocache', JSON.stringify(geocodeCache)); } catch(e) {}
+        const el = $(elementId);
+        if (el) el.textContent = addr;
+      }
     }
   } catch(e) {
     console.log('Geocode error:', e);
