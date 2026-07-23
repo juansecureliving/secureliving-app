@@ -754,16 +754,10 @@ button{cursor:pointer;border:none;background:none}
       <div id="tracked-members-list" style="display:grid;gap:10px"></div>
     </div>
 
-    <!-- Live Map -->
+    <!-- Live Map with Route -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="live_map">Live Map</h3>
-      <div id="tracking-map" style="width:100%;height:300px;border-radius:12px;background:#e8e8e8;z-index:1"></div>
-    </div>
-
-    <!-- Location History -->
-    <div class="card">
-      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="location_history">Location History</h3>
-      <div id="location-history-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto"></div>
+      <div id="tracking-map" style="width:100%;height:400px;border-radius:12px;background:#e8e8e8;z-index:1"></div>
     </div>
 
     <!-- SOS Alerts (Caregiver/Admin) -->
@@ -2153,7 +2147,6 @@ async function enterApp() {
         const isStaff = ME && (ME.role === 'admin' || ME.role === 'caregiver');
         if (isStaff) {
           renderTrackedMembersList();
-          renderLocationHistory();
           loadSOSAlerts();
         } else {
           updateTrackingUI();
@@ -3168,7 +3161,6 @@ function renderHistoryTab() {
     show('history-member-view');
     hide('history-self-view');
     renderTrackedMembersList();
-    renderLocationHistory();
     loadSOSAlerts();
     setTimeout(() => { if (caregiverMap) caregiverMap.invalidateSize(); }, 400);
   } else {
@@ -3647,31 +3639,81 @@ async function renderTrackedMembersList() {
       }
     });
     
-    // Render caregiver map with member pins
+    // Render caregiver map with member pins and route
     const membersWithLoc = r.members.filter(m => m.latitude && m.longitude);
     if (membersWithLoc.length && $('tracking-map')) {
       if (!caregiverMap) {
         const first = membersWithLoc[0];
         caregiverMap = L.map('tracking-map', { zoomControl: true, attributionControl: false })
-          .setView([first.latitude, first.longitude], 13);
+          .setView([first.latitude, first.longitude], 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(caregiverMap);
         setTimeout(() => caregiverMap.invalidateSize(), 300);
       }
-      // Clear old markers
+      // Clear old markers and routes
       caregiverMarkers.forEach(m => caregiverMap.removeLayer(m));
       caregiverMarkers = [];
-      // Add new markers
+      
+      // Add current location markers
       const bounds = [];
       membersWithLoc.forEach(m => {
+        // Custom icon for current location (colored circle)
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="width:32px;height:32px;background:var(--pri);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700">${esc(m.name.charAt(0))}</div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
+        });
         const popupId = 'popup-' + (m.memberId || m.id || '');
-        const marker = L.marker([m.latitude, m.longitude]).addTo(caregiverMap)
+        const marker = L.marker([m.latitude, m.longitude], { icon }).addTo(caregiverMap)
           .bindPopup('<strong>' + esc(m.name) + '</strong><br><span id="' + popupId + '">Loading...</span><br>🔋 ' + (m.batteryPercent || '-') + '%');
         caregiverMarkers.push(marker);
         bounds.push([m.latitude, m.longitude]);
-        // Reverse geocode for popup
         reverseGeocode(m.latitude, m.longitude, popupId);
       });
+      
+      // Draw route polylines for each member from location history
+      for (const m of membersWithLoc) {
+        const memberId = m.memberId || m.id || '';
+        try {
+          const hist = await api({ action:'getLocationHistory', memberId });
+          if (hist.ok && hist.locations && hist.locations.length > 1) {
+            // Sort by timestamp
+            const sorted = hist.locations
+              .filter(l => l.latitude && l.longitude)
+              .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            
+            if (sorted.length > 1) {
+              // Create polyline route
+              const routePoints = sorted.map(l => [Number(l.latitude), Number(l.longitude)]);
+              const polyline = L.polyline(routePoints, {
+                color: '#1A7A6D',
+                weight: 4,
+                opacity: 0.8,
+                smoothFactor: 1,
+                dashArray: null
+              }).addTo(caregiverMap);
+              caregiverMarkers.push(polyline);
+              
+              // Add start point marker (small gray dot)
+              const startIcon = L.divIcon({
+                className: '',
+                html: '<div style="width:10px;height:10px;background:#888;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>',
+                iconSize: [10, 10],
+                iconAnchor: [5, 5]
+              });
+              const startMarker = L.marker(routePoints[0], { icon: startIcon }).addTo(caregiverMap)
+                .bindPopup('<span class="text-sm">Start point</span>');
+              caregiverMarkers.push(startMarker);
+              
+              // Include route in bounds
+              routePoints.forEach(p => bounds.push(p));
+            }
+          }
+        } catch(e) { /* skip if history fails */ }
+      }
+      
       if (bounds.length > 1) caregiverMap.fitBounds(bounds, { padding: [30, 30] });
+      else if (bounds.length === 1) caregiverMap.setView(bounds[0], 15);
     }
   } catch(e) {
     if ($('tracked-members-list')) $('tracked-members-list').innerHTML = '<p class="text-sm text-muted">Error loading members</p>';
