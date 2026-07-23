@@ -3640,15 +3640,7 @@ async function renderTrackedMembersList() {
     }).join('');
     if ($('tracked-members-list')) $('tracked-members-list').innerHTML = html;
     
-    // Reverse geocode addresses for each member
-    r.members.forEach(m => {
-      if (m.latitude && m.longitude) {
-        const memberId = m.memberId || m.id || '';
-        reverseGeocode(m.latitude, m.longitude, 'addr-' + memberId);
-      }
-    });
-    
-    // Render caregiver map with member pins and route
+    // Render caregiver map with member pins
     const membersWithLoc = r.members.filter(m => m.latitude && m.longitude);
     if (membersWithLoc.length && $('tracking-map')) {
       if (!caregiverMap) {
@@ -3671,12 +3663,11 @@ async function renderTrackedMembersList() {
           iconSize: [32, 32],
           iconAnchor: [16, 16]
         });
-        const popupId = 'popup-' + (m.memberId || m.id || '');
+        const popupAddr = m.address || (Number(m.latitude).toFixed(4) + ', ' + Number(m.longitude).toFixed(4));
         const marker = L.marker([m.latitude, m.longitude], { icon }).addTo(caregiverMap)
-          .bindPopup('<strong>' + esc(m.name) + '</strong><br><span id="' + popupId + '">Loading...</span><br>🔋 ' + (m.batteryPercent || '-') + '%');
+          .bindPopup('<strong>' + esc(m.name) + '</strong><br>' + esc(popupAddr) + '<br>🔋 ' + (m.batteryPercent || '-') + '%');
         caregiverMarkers.push(marker);
         bounds.push([m.latitude, m.longitude]);
-        reverseGeocode(m.latitude, m.longitude, popupId);
       });
       
       if (bounds.length > 1) caregiverMap.fitBounds(bounds, { padding: [30, 30] });
