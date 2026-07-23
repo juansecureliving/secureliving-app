@@ -3684,31 +3684,85 @@ async function renderLocationHistory() {
   if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">' + (t.loading || 'Loading...') + '</p>';
   
   try {
-    // For admin/caregiver, show all tracked members' history
+    // Get tracked members
     const tracked = await api({ action:'getTrackedMembers', caregiverId:ME.id });
     if (!tracked.ok || !tracked.members || !tracked.members.length) {
-      if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">No location data</p>';
+      if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">No tracked members</p>';
       return;
     }
     
-    // Get history for first tracked member (or all)
+    // Build movement timeline for all members
     let allHtml = '';
     for (const m of tracked.members.slice(0, 5)) {
       const r = await api({ action:'getLocationHistory', memberId: m.memberId });
-      if (r.ok && r.locations && r.locations.length) {
-        allHtml += `<p class="text-sm" style="font-weight:600;margin-bottom:4px">${esc(m.name)}</p>`;
-        allHtml += r.locations.slice(0, 10).map(l => `
-          <div class="location-item">
-            <strong>${Number(l.latitude).toFixed(4)}, ${Number(l.longitude).toFixed(4)}</strong>
-            <div class="location-time">${new Date(l.timestamp).toLocaleString('en-SG')} · 🔋 ${l.batteryPercent || '-'}%</div>
+      if (!r.ok || !r.locations || r.locations.length < 2) continue;
+      
+      allHtml += `<div style="margin-bottom:20px">
+        <p class="text-sm" style="font-weight:600;margin-bottom:8px;color:var(--pri)">${esc(m.name)}</p>`;
+      
+      // Process movements: when member moves from one location to another
+      const locations = r.locations.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      
+      for (let i = 1; i < locations.length; i++) {
+        const from = locations[i - 1];
+        const to = locations[i];
+        
+        // Calculate distance moved (simple haversine)
+        const distance = calculateDistance(
+          from.latitude, from.longitude,
+          to.latitude, to.longitude
+        );
+        
+        // Only show significant movements (>50 meters)
+        if (distance < 0.05) continue;
+        
+        const fromTime = new Date(from.timestamp);
+        const toTime = new Date(to.timestamp);
+        const duration = Math.round((toTime - fromTime) / 60000); // minutes
+        const speed = (distance / (duration || 1)).toFixed(2); // km per minute
+        
+        allHtml += `
+          <div style="padding:10px;background:rgba(26,122,109,0.05);border-left:3px solid var(--pri);border-radius:6px;margin-bottom:6px">
+            <div style="display:flex;justify-content:space-between;align-items:start;font-size:12px">
+              <div>
+                <p style="margin:0;color:var(--text)"><strong>From:</strong> <span id="from-${i}">${Number(from.latitude).toFixed(4)}, ${Number(from.longitude).toFixed(4)}</span></p>
+                <p style="margin:4px 0;color:var(--muted);font-size:11px">${fromTime.toLocaleTimeString('en-SG')}</p>
+              </div>
+              <span style="background:var(--pri);color:#fff;padding:2px 6px;border-radius:4px;font-weight:600">${distance.toFixed(2)} km</span>
+            </div>
+            <div style="margin:6px 0;text-align:center">→ Traveled for ${duration} min at ${speed} km/min</div>
+            <div>
+              <p style="margin:4px 0;color:var(--text)"><strong>To:</strong> <span id="to-${i}">${Number(to.latitude).toFixed(4)}, ${Number(to.longitude).toFixed(4)}</span></p>
+              <p style="margin:4px 0;color:var(--muted);font-size:11px">${toTime.toLocaleTimeString('en-SG')} · 🔋 ${to.batteryPercent || '-'}%</p>
+            </div>
           </div>
-        `).join('');
+        `;
+        
+        // Reverse geocode both addresses
+        reverseGeocode(from.latitude, from.longitude, `from-${i}`);
+        reverseGeocode(to.latitude, to.longitude, `to-${i}`);
       }
+      
+      allHtml += '</div>';
     }
-    if ($('location-history-list')) $('location-history-list').innerHTML = allHtml || '<p class="text-sm text-muted">No location data yet</p>';
+    
+    if ($('location-history-list')) $('location-history-list').innerHTML = allHtml || '<p class="text-sm text-muted">No movements recorded yet</p>';
   } catch(e) {
+    console.log('History error:', e);
     if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">Error loading history</p>';
   }
+}
+
+// Calculate distance between two coordinates (Haversine formula) - returns km
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
 }
 
 /* ── Utility ──────────────────────────────── */
