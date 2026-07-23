@@ -293,6 +293,8 @@ button{cursor:pointer;border:none;background:none}
 .location-item .location-coord{font-size:11px;opacity:.7;margin-top:2px}
 .caregiver-card{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
 .safe-zone-card{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.radius-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
+.radius-btn.selected{background:var(--pri);color:#fff;border-color:var(--pri)}
 .zone-active{border-left:3px solid var(--success)}
 
 /* ── Utilities ────────────────────────────────── */
@@ -780,11 +782,34 @@ button{cursor:pointer;border:none;background:none}
     <div class="card" id="safe-zone-section">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="safe_zone">Safe Zone</h3>
       <div style="padding:12px;background:var(--pri-light);border-radius:8px;margin-bottom:12px">
-        <p class="text-sm" style="margin-bottom:8px"><strong data-i18n="setup_safe_zone">Setup Safe Zone</strong></p>
-        <input type="text" id="safe-zone-name" placeholder="Zone name" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px">
-        <button class="btn btn-sm btn-pri" onclick="saveSafeZone()" data-i18n="save_changes">Save</button>
+        <p class="text-sm" style="margin-bottom:10px"><strong data-i18n="setup_safe_zone">Setup Safe Zone</strong></p>
+        
+        <!-- Member selector -->
+        <select id="safe-zone-member" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px;background:#fff">
+          <option value="" data-i18n="select_member">Select Member</option>
+        </select>
+        
+        <!-- Zone name -->
+        <input type="text" id="safe-zone-name" data-i18n-placeholder="zone_name_placeholder" placeholder="Zone name (e.g. Home, School)" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px">
+        
+        <!-- Postal code -->
+        <input type="text" id="safe-zone-postal" data-i18n-placeholder="postal_code_placeholder" placeholder="Postal code (e.g. 653296)" maxlength="6" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px">
+        
+        <!-- Radius selector -->
+        <p class="text-sm text-muted" style="margin-bottom:6px" data-i18n="select_radius">Select Radius</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="radius-options">
+          <button class="radius-btn" data-radius="500" onclick="selectRadius(500)">500m</button>
+          <button class="radius-btn selected" data-radius="1000" onclick="selectRadius(1000)">1 km</button>
+          <button class="radius-btn" data-radius="2000" onclick="selectRadius(2000)">2 km</button>
+          <button class="radius-btn" data-radius="3000" onclick="selectRadius(3000)">3 km</button>
+          <button class="radius-btn" data-radius="5000" onclick="selectRadius(5000)">5 km</button>
+        </div>
+        
+        <button class="btn btn-sm btn-pri" onclick="saveSafeZone()" data-i18n="add_zone">Add Zone</button>
       </div>
-      <div id="safe-zones-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      
+      <!-- Existing zones list -->
+      <div id="safe-zones-list" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
 
     <!-- App Usage (Caregiver/Admin) -->
@@ -1298,6 +1323,10 @@ const LANG = {
     sos_emergency:'SOS - Emergency', left_safe_zone:'Left Safe Zone!',
     member_location:'Member Location', tracked_members:'Tracked Members',
     setup_safe_zone:'Setup Safe Zone', add_caregiver:'Add Caregiver',
+    select_member:'Select Member', zone_name_placeholder:'Zone name (e.g. Home, School)',
+    postal_code_placeholder:'Postal code (e.g. 653296)', select_radius:'Select Radius',
+    add_zone:'Add Zone', zone_added:'Safe zone added', enter_zone_name:'Please enter zone name',
+    enter_postal:'Please enter a valid postal code', no_safe_zones:'No safe zones yet', remove:'Remove',
     caregiver_name:'Caregiver Name', caregiver_phone:'Caregiver Phone',
     enable_tracking:'Enable Location Tracking', tracking_enabled:'Tracking Enabled',
     tracking_disabled:'Tracking Disabled', location_permission:'Location Permission',
@@ -1405,6 +1434,10 @@ const LANG = {
     sos_emergency:'SOS - 紧急', left_safe_zone:'离开安全区域！',
     member_location:'成员位置', tracked_members:'被追踪的成员',
     setup_safe_zone:'设置安全区域', add_caregiver:'添加照护者',
+    select_member:'选择成员', zone_name_placeholder:'区域名称（如：家、学校）',
+    postal_code_placeholder:'邮政编码（如：653296）', select_radius:'选择半径',
+    add_zone:'添加区域', zone_added:'安全区域已添加', enter_zone_name:'请输入区域名称',
+    enter_postal:'请输入有效的邮政编码', no_safe_zones:'暂无安全区域', remove:'移除',
     caregiver_name:'照护者姓名', caregiver_phone:'照护者电话',
     enable_tracking:'启用位置追踪', tracking_enabled:'追踪已启用',
     tracking_disabled:'追踪已禁用', location_permission:'位置权限',
@@ -1496,6 +1529,10 @@ const LANG = {
     sos_emergency:'SOS - Kecemasan', left_safe_zone:'Meninggalkan Zon Selamat!',
     member_location:'Lokasi Ahli', tracked_members:'Ahli Dipantau',
     setup_safe_zone:'Sediakan Zon Selamat', add_caregiver:'Tambah Penjaga',
+    select_member:'Pilih Ahli', zone_name_placeholder:'Nama zon (cth: Rumah, Sekolah)',
+    postal_code_placeholder:'Poskod (cth: 653296)', select_radius:'Pilih Radius',
+    add_zone:'Tambah Zon', zone_added:'Zon selamat ditambah', enter_zone_name:'Sila masukkan nama zon',
+    enter_postal:'Sila masukkan poskod yang sah', no_safe_zones:'Tiada zon selamat', remove:'Buang',
     caregiver_name:'Nama Penjaga', caregiver_phone:'Telefon Penjaga',
     enable_tracking:'Dayakan Penjejakan Lokasi', tracking_enabled:'Penjejakan Didayakan',
     tracking_disabled:'Penjejakan Dilumpuhkan', location_permission:'Kebenaran Lokasi',
@@ -1586,6 +1623,10 @@ const LANG = {
     sos_emergency:'SOS - அவசரம்', left_safe_zone:'பாதுகாப்பான பகுதியை விட்டு வெளியேறினார்!',
     member_location:'உறுப்பினர் இடம்', tracked_members:'கண்காணிக்கப்பட்ட உறுப்பினர்கள்',
     setup_safe_zone:'பாதுகாப்பான பகுதியை அமைக்கவும்', add_caregiver:'பராமரிப்பாளரைச் சேர்க்கவும்',
+    select_member:'உறுப்பினரைத் தேர்ந்தெடுக்கவும்', zone_name_placeholder:'பகுதி பெயர் (எ.கா: வீடு, பள்ளி)',
+    postal_code_placeholder:'அஞ்சல் குறியீடு (எ.கா: 653296)', select_radius:'ஆரத்தைத் தேர்ந்தெடுக்கவும்',
+    add_zone:'பகுதியைச் சேர்', zone_added:'பாதுகாப்பான பகுதி சேர்க்கப்பட்டது', enter_zone_name:'பகுதி பெயரை உள்ளிடவும்',
+    enter_postal:'சரியான அஞ்சல் குறியீட்டை உள்ளிடவும்', no_safe_zones:'பாதுகாப்பான பகுதிகள் இல்லை', remove:'நீக்கு',
     caregiver_name:'பராமரிப்பாளர் பெயர்', caregiver_phone:'பராமரிப்பாளர் தொலைபேசி',
     enable_tracking:'இட கண்காணிப்பை இயக்கவும்', tracking_enabled:'கண்காணிப்பு இயக்கப்பட்டது',
     tracking_disabled:'கண்காணிப்பு முடக்கப்பட்டது', location_permission:'இட அனுமதி',
@@ -3171,6 +3212,7 @@ function renderHistoryTab() {
     renderTrackedMembersList();
     renderRouteHistory();
     loadSOSAlerts();
+    loadSafeZones();
     setTimeout(() => { if (caregiverMap) caregiverMap.invalidateSize(); }, 400);
   } else {
     // MEMBER/GUEST VIEW
@@ -3486,22 +3528,53 @@ function closeSOSModal() {
   $('sos-modal').style.display = 'none';
 }
 
+let selectedRadius = 1000;
+
+function selectRadius(r) {
+  selectedRadius = r;
+  document.querySelectorAll('.radius-btn').forEach(b => {
+    b.classList.toggle('selected', Number(b.dataset.radius) === r);
+  });
+}
+
+function populateSafeZoneMemberSelect() {
+  const sel = $('safe-zone-member');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">' + (LANG[currentLang]?.select_member || 'Select Member') + '</option>';
+  // Get tracked members from the already-loaded list
+  if (window._trackedMembers) {
+    window._trackedMembers.forEach(m => {
+      sel.innerHTML += `<option value="${m.memberId}">${esc(m.name)}</option>`;
+    });
+  }
+}
+
 async function saveSafeZone() {
+  const t = LANG[currentLang] || LANG.en;
   const name = $('safe-zone-name').value.trim();
-  if (!name) { toast('Please enter zone name', 'error'); return; }
-  if (!currentLocation) { toast('Waiting for location...', 'error'); return; }
+  const postal = $('safe-zone-postal').value.trim();
+  const memberId = $('safe-zone-member').value;
+  
+  if (!memberId) { toast(t.select_member || 'Please select a member', 'error'); return; }
+  if (!name) { toast(t.enter_zone_name || 'Please enter zone name', 'error'); return; }
+  if (!postal || postal.length < 5) { toast(t.enter_postal || 'Please enter a valid postal code', 'error'); return; }
   
   loading(true);
   try {
     const r = await api({
-      action:'saveSafeZone', memberId:ME.id,
-      name: name, latitude: currentLocation.latitude, longitude: currentLocation.longitude,
-      radiusMeters: 500
+      action: 'saveSafeZone',
+      memberId: memberId,
+      name: name,
+      postalCode: postal,
+      radiusMeters: selectedRadius
     });
     if (r.ok) {
       $('safe-zone-name').value = '';
-      toast('Safe zone added: ' + name, 'success');
+      $('safe-zone-postal').value = '';
+      toast('✅ ' + (t.zone_added || 'Safe zone added') + ': ' + name + ' (' + (selectedRadius >= 1000 ? (selectedRadius/1000) + 'km' : selectedRadius + 'm') + ')', 'success');
       await loadSafeZones();
+    } else {
+      toast(r.error || 'Error saving zone', 'error');
     }
   } catch(e) { toast('Error saving safe zone', 'error'); }
   finally { loading(false); }
@@ -3509,25 +3582,64 @@ async function saveSafeZone() {
 
 async function loadSafeZones() {
   try {
-    const r = await api({ action:'getSafeZones', memberId:ME.id });
-    if (r.ok) {
-      safeZones = r.zones || [];
-      renderSafeZones();
+    // Load zones for all tracked members
+    if (!window._trackedMembers) return;
+    let allZones = [];
+    for (const m of window._trackedMembers) {
+      const r = await api({ action:'getSafeZones', memberId: m.memberId });
+      if (r.ok && r.zones) {
+        r.zones.forEach(z => { z.memberName = m.name; });
+        allZones = allZones.concat(r.zones);
+      }
     }
+    safeZones = allZones;
+    renderSafeZones();
+    renderSafeZonesOnMap();
   } catch(e) {}
 }
 
 function renderSafeZones() {
-  const html = safeZones.map(z => `
-    <div class="safe-zone-card zone-active">
-      <div>
-        <strong>${esc(z.name)}</strong>
-        <p class="text-sm text-muted">${Number(z.latitude).toFixed(4)}, ${Number(z.longitude).toFixed(4)} · ${z.radiusMeters || 500}m</p>
+  const t = LANG[currentLang] || LANG.en;
+  const html = safeZones.map(z => {
+    const radiusLabel = Number(z.radiusMeters) >= 1000 ? (Number(z.radiusMeters)/1000) + ' km' : (z.radiusMeters || 500) + 'm';
+    const addr = z.address || z.postalCode || '';
+    return `
+      <div class="safe-zone-card">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:16px">📍</span>
+            <strong>${esc(z.name)}</strong>
+          </div>
+          <p class="text-sm text-muted" style="margin-top:2px">${esc(z.memberName || '')} · ${esc(addr)} · ${radiusLabel}</p>
+        </div>
+        <button onclick="removeSafeZone('${z.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:600">${t.remove || 'Remove'}</button>
       </div>
-      <button onclick="removeSafeZone('${z.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px">Remove</button>
-    </div>
-  `).join('');
-  if ($('safe-zones-list')) $('safe-zones-list').innerHTML = html || '<p class="text-sm text-muted">No safe zones yet</p>';
+    `;
+  }).join('');
+  if ($('safe-zones-list')) $('safe-zones-list').innerHTML = html || '<p class="text-sm text-muted">' + (t.no_safe_zones || 'No safe zones yet') + '</p>';
+}
+
+let safeZoneCircles = [];
+function renderSafeZonesOnMap() {
+  // Clear old circles
+  safeZoneCircles.forEach(c => { try { caregiverMap.removeLayer(c); } catch(e) {} });
+  safeZoneCircles = [];
+  
+  if (!caregiverMap || !safeZones.length) return;
+  
+  safeZones.forEach(z => {
+    if (!z.latitude || !z.longitude) return;
+    const circle = L.circle([Number(z.latitude), Number(z.longitude)], {
+      radius: Number(z.radiusMeters) || 1000,
+      color: '#E07A52',
+      fillColor: '#E07A52',
+      fillOpacity: 0.1,
+      weight: 2,
+      dashArray: '6 4'
+    }).addTo(caregiverMap);
+    circle.bindPopup('<strong>📍 ' + esc(z.name) + '</strong><br>' + ((Number(z.radiusMeters) >= 1000 ? (Number(z.radiusMeters)/1000) + ' km' : z.radiusMeters + 'm') + ' radius'));
+    safeZoneCircles.push(circle);
+  });
 }
 
 async function removeSafeZone(zoneId) {
@@ -3614,6 +3726,11 @@ async function renderTrackedMembersList() {
       if ($('tracked-members-list')) $('tracked-members-list').innerHTML = '<p class="text-sm text-muted">No tracked members found</p>';
       return;
     }
+    
+    // Store for safe zone member selector
+    window._trackedMembers = r.members;
+    populateSafeZoneMemberSelect();
+    
     const t = LANG[currentLang] || LANG.en;
     const html = r.members.map(m => {
       const online = m.isOnline ? 'status-online' : 'status-offline';
