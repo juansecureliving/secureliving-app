@@ -3778,8 +3778,8 @@ async function renderRouteHistory() {
         const routeLink = `https://www.google.com/maps/dir/?api=1&origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&travelmode=driving`;
         
         allHtml += `
-          <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)">
-            <div id="${mapId}" style="width:100%;height:160px;background:#e8e8e8"></div>
+          <div style="border:1px solid var(--border);border-radius:12px;background:var(--card)">
+            <div id="${mapId}" style="width:100%;height:160px;background:#e8e8e8;border-radius:12px 12px 0 0;overflow:hidden"></div>
             <div style="padding:10px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
                 <strong style="font-size:13px">${esc(m.name)}</strong>
@@ -3790,7 +3790,7 @@ async function renderRouteHistory() {
                   <span style="color:var(--success);font-weight:700;font-size:14px">●</span>
                   <div>
                     <span style="color:var(--muted)">${startTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                    <span id="${fromId}" style="margin-left:4px;color:var(--text)">${start.address || Number(start.latitude).toFixed(4) + ', ' + Number(start.longitude).toFixed(4)}</span>
+                    <span id="rfrom-${routeCount}" style="margin-left:4px;color:var(--text)">${start.address || Number(start.latitude).toFixed(4) + ', ' + Number(start.longitude).toFixed(4)}</span>
                   </div>
                 </div>
                 <div style="border-left:2px dashed var(--border);margin-left:5px;padding-left:14px;margin-bottom:3px">
@@ -3800,7 +3800,7 @@ async function renderRouteHistory() {
                   <span style="color:var(--danger);font-weight:700;font-size:14px">●</span>
                   <div>
                     <span style="color:var(--muted)">${endTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                    <span id="${toId}" style="margin-left:4px;color:var(--text)">${end.address || Number(end.latitude).toFixed(4) + ', ' + Number(end.longitude).toFixed(4)}</span>
+                    <span id="rto-${routeCount}" style="margin-left:4px;color:var(--text)">${end.address || Number(end.latitude).toFixed(4) + ', ' + Number(end.longitude).toFixed(4)}</span>
                   </div>
                 </div>
               </div>
