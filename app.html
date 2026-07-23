@@ -754,10 +754,18 @@ button{cursor:pointer;border:none;background:none}
       <div id="tracked-members-list" style="display:grid;gap:10px"></div>
     </div>
 
-    <!-- Live Map with Route -->
+    <!-- Live Map -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="live_map">Live Map</h3>
       <div id="tracking-map" style="width:100%;height:400px;border-radius:12px;background:#e8e8e8;z-index:1"></div>
+    </div>
+
+    <!-- Location History (Route Sessions) -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="location_history">Location History</h3>
+      <div id="route-history-list" style="display:flex;flex-direction:column;gap:12px">
+        <p class="text-sm text-muted">No routes recorded yet</p>
+      </div>
     </div>
 
     <!-- SOS Alerts (Caregiver/Admin) -->
@@ -3161,6 +3169,7 @@ function renderHistoryTab() {
     show('history-member-view');
     hide('history-self-view');
     renderTrackedMembersList();
+    renderRouteHistory();
     loadSOSAlerts();
     setTimeout(() => { if (caregiverMap) caregiverMap.invalidateSize(); }, 400);
   } else {
@@ -3649,14 +3658,13 @@ async function renderTrackedMembersList() {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(caregiverMap);
         setTimeout(() => caregiverMap.invalidateSize(), 300);
       }
-      // Clear old markers and routes
+      // Clear old markers
       caregiverMarkers.forEach(m => caregiverMap.removeLayer(m));
       caregiverMarkers = [];
       
-      // Add current location markers
+      // Add current location markers only
       const bounds = [];
       membersWithLoc.forEach(m => {
-        // Custom icon for current location (colored circle)
         const icon = L.divIcon({
           className: '',
           html: `<div style="width:32px;height:32px;background:var(--pri);border:3px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700">${esc(m.name.charAt(0))}</div>`,
@@ -3671,47 +3679,6 @@ async function renderTrackedMembersList() {
         reverseGeocode(m.latitude, m.longitude, popupId);
       });
       
-      // Draw route polylines for each member from location history
-      for (const m of membersWithLoc) {
-        const memberId = m.memberId || m.id || '';
-        try {
-          const hist = await api({ action:'getLocationHistory', memberId });
-          if (hist.ok && hist.locations && hist.locations.length > 1) {
-            // Sort by timestamp
-            const sorted = hist.locations
-              .filter(l => l.latitude && l.longitude)
-              .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-            
-            if (sorted.length > 1) {
-              // Create polyline route
-              const routePoints = sorted.map(l => [Number(l.latitude), Number(l.longitude)]);
-              const polyline = L.polyline(routePoints, {
-                color: '#1A7A6D',
-                weight: 4,
-                opacity: 0.8,
-                smoothFactor: 1,
-                dashArray: null
-              }).addTo(caregiverMap);
-              caregiverMarkers.push(polyline);
-              
-              // Add start point marker (small gray dot)
-              const startIcon = L.divIcon({
-                className: '',
-                html: '<div style="width:10px;height:10px;background:#888;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>',
-                iconSize: [10, 10],
-                iconAnchor: [5, 5]
-              });
-              const startMarker = L.marker(routePoints[0], { icon: startIcon }).addTo(caregiverMap)
-                .bindPopup('<span class="text-sm">Start point</span>');
-              caregiverMarkers.push(startMarker);
-              
-              // Include route in bounds
-              routePoints.forEach(p => bounds.push(p));
-            }
-          }
-        } catch(e) { /* skip if history fails */ }
-      }
-      
       if (bounds.length > 1) caregiverMap.fitBounds(bounds, { padding: [30, 30] });
       else if (bounds.length === 1) caregiverMap.setView(bounds[0], 15);
     }
@@ -3720,77 +3687,188 @@ async function renderTrackedMembersList() {
   }
 }
 
-async function renderLocationHistory() {
-  const t = LANG[currentLang] || LANG.en;
-  if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">' + (t.loading || 'Loading...') + '</p>';
+// Route history mini maps
+let routeMiniMaps = [];
+
+async function renderRouteHistory() {
+  const el = $('route-history-list');
+  if (!el) return;
   
   try {
-    // Get tracked members
     const tracked = await api({ action:'getTrackedMembers', caregiverId:ME.id });
     if (!tracked.ok || !tracked.members || !tracked.members.length) {
-      if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">No tracked members</p>';
+      el.innerHTML = '<p class="text-sm text-muted">No tracked members</p>';
       return;
     }
     
-    // Build movement timeline for all members
+    // Clean up old mini maps
+    routeMiniMaps.forEach(m => { try { m.remove(); } catch(e) {} });
+    routeMiniMaps = [];
+    
     let allHtml = '';
+    let routeCount = 0;
+    
     for (const m of tracked.members.slice(0, 5)) {
-      const r = await api({ action:'getLocationHistory', memberId: m.memberId });
+      const memberId = m.memberId || m.id || '';
+      const r = await api({ action:'getLocationHistory', memberId });
       if (!r.ok || !r.locations || r.locations.length < 2) continue;
       
-      allHtml += `<div style="margin-bottom:20px">
-        <p class="text-sm" style="font-weight:600;margin-bottom:8px;color:var(--pri)">${esc(m.name)}</p>`;
+      // Sort by timestamp
+      const locations = r.locations
+        .filter(l => l.latitude && l.longitude)
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
       
-      // Process movements: when member moves from one location to another
-      const locations = r.locations.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      // Group into sessions (gap > 5 min = new session)
+      const sessions = [];
+      let currentSession = [locations[0]];
       
       for (let i = 1; i < locations.length; i++) {
-        const from = locations[i - 1];
-        const to = locations[i];
+        const gap = new Date(locations[i].timestamp) - new Date(locations[i-1].timestamp);
+        if (gap > 5 * 60 * 1000) { // 5 min gap = new session
+          if (currentSession.length >= 2) sessions.push(currentSession);
+          currentSession = [locations[i]];
+        } else {
+          currentSession.push(locations[i]);
+        }
+      }
+      if (currentSession.length >= 2) sessions.push(currentSession);
+      
+      // Render each session as a route card
+      for (let s = sessions.length - 1; s >= 0 && routeCount < 10; s--) {
+        const session = sessions[s];
+        const start = session[0];
+        const end = session[session.length - 1];
+        const startTime = new Date(start.timestamp);
+        const endTime = new Date(end.timestamp);
+        const duration = Math.round((endTime - startTime) / 60000);
         
-        // Calculate distance moved (simple haversine)
-        const distance = calculateDistance(
-          from.latitude, from.longitude,
-          to.latitude, to.longitude
-        );
+        // Calculate total distance
+        let totalDist = 0;
+        for (let i = 1; i < session.length; i++) {
+          totalDist += calculateDistance(
+            session[i-1].latitude, session[i-1].longitude,
+            session[i].latitude, session[i].longitude
+          );
+        }
         
-        // Only show significant movements (>50 meters)
-        if (distance < 0.05) continue;
-        
-        const fromTime = new Date(from.timestamp);
-        const toTime = new Date(to.timestamp);
-        const duration = Math.round((toTime - fromTime) / 60000); // minutes
-        const speed = (distance / (duration || 1)).toFixed(2); // km per minute
+        const mapId = `route-map-${routeCount}`;
+        const fromId = `route-from-${routeCount}`;
+        const toId = `route-to-${routeCount}`;
         
         allHtml += `
-          <div style="padding:10px;background:rgba(26,122,109,0.05);border-left:3px solid var(--pri);border-radius:6px;margin-bottom:6px">
-            <div style="display:flex;justify-content:space-between;align-items:start;font-size:12px">
-              <div>
-                <p style="margin:0;color:var(--text)"><strong>From:</strong> <span id="from-${i}">${Number(from.latitude).toFixed(4)}, ${Number(from.longitude).toFixed(4)}</span></p>
-                <p style="margin:4px 0;color:var(--muted);font-size:11px">${fromTime.toLocaleTimeString('en-SG')}</p>
+          <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)">
+            <div id="${mapId}" style="width:100%;height:180px;background:#e8e8e8"></div>
+            <div style="padding:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <strong style="font-size:14px;color:var(--pri)">${esc(m.name)}</strong>
+                <span style="background:var(--pri);color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">${totalDist.toFixed(2)} km</span>
               </div>
-              <span style="background:var(--pri);color:#fff;padding:2px 6px;border-radius:4px;font-weight:600">${distance.toFixed(2)} km</span>
-            </div>
-            <div style="margin:6px 0;text-align:center">→ Traveled for ${duration} min at ${speed} km/min</div>
-            <div>
-              <p style="margin:4px 0;color:var(--text)"><strong>To:</strong> <span id="to-${i}">${Number(to.latitude).toFixed(4)}, ${Number(to.longitude).toFixed(4)}</span></p>
-              <p style="margin:4px 0;color:var(--muted);font-size:11px">${toTime.toLocaleTimeString('en-SG')} · 🔋 ${to.batteryPercent || '-'}%</p>
+              <div style="display:flex;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px">
+                <span>⏱ ${duration} min</span>
+                <span>🔋 ${end.batteryPercent || '-'}%</span>
+                <span>${startTime.toLocaleDateString('en-SG', {day:'numeric',month:'short'})}</span>
+              </div>
+              <div style="font-size:12px">
+                <div style="display:flex;gap:6px;align-items:start;margin-bottom:4px">
+                  <span style="color:var(--success);font-weight:700">●</span>
+                  <div>
+                    <span style="color:var(--muted)">${startTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
+                    <span id="${fromId}" style="margin-left:4px">Loading...</span>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px;align-items:start">
+                  <span style="color:var(--danger);font-weight:700">●</span>
+                  <div>
+                    <span style="color:var(--muted)">${endTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
+                    <span id="${toId}" style="margin-left:4px">Loading...</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         `;
         
-        // Reverse geocode both addresses
-        reverseGeocode(from.latitude, from.longitude, `from-${i}`);
-        reverseGeocode(to.latitude, to.longitude, `to-${i}`);
+        routeCount++;
       }
-      
-      allHtml += '</div>';
     }
     
-    if ($('location-history-list')) $('location-history-list').innerHTML = allHtml || '<p class="text-sm text-muted">No movements recorded yet</p>';
+    el.innerHTML = allHtml || '<p class="text-sm text-muted">No routes recorded yet</p>';
+    
+    // Render mini maps with polylines after DOM is updated
+    routeCount = 0;
+    for (const m of tracked.members.slice(0, 5)) {
+      const memberId = m.memberId || m.id || '';
+      const r = await api({ action:'getLocationHistory', memberId });
+      if (!r.ok || !r.locations || r.locations.length < 2) continue;
+      
+      const locations = r.locations
+        .filter(l => l.latitude && l.longitude)
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      
+      const sessions = [];
+      let currentSession = [locations[0]];
+      for (let i = 1; i < locations.length; i++) {
+        const gap = new Date(locations[i].timestamp) - new Date(locations[i-1].timestamp);
+        if (gap > 5 * 60 * 1000) {
+          if (currentSession.length >= 2) sessions.push(currentSession);
+          currentSession = [locations[i]];
+        } else {
+          currentSession.push(locations[i]);
+        }
+      }
+      if (currentSession.length >= 2) sessions.push(currentSession);
+      
+      for (let s = sessions.length - 1; s >= 0 && routeCount < 10; s--) {
+        const session = sessions[s];
+        const mapId = `route-map-${routeCount}`;
+        const fromId = `route-from-${routeCount}`;
+        const toId = `route-to-${routeCount}`;
+        const mapEl = $(mapId);
+        
+        if (mapEl) {
+          const points = session.map(l => [Number(l.latitude), Number(l.longitude)]);
+          const miniMap = L.map(mapId, {
+            zoomControl: false,
+            attributionControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false
+          });
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(miniMap);
+          
+          // Draw route
+          L.polyline(points, { color: '#1A7A6D', weight: 4, opacity: 0.9 }).addTo(miniMap);
+          
+          // Start marker (green)
+          const startIcon = L.divIcon({
+            className: '',
+            html: '<div style="width:12px;height:12px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>',
+            iconSize: [12, 12], iconAnchor: [6, 6]
+          });
+          L.marker(points[0], { icon: startIcon }).addTo(miniMap);
+          
+          // End marker (red)
+          const endIcon = L.divIcon({
+            className: '',
+            html: '<div style="width:12px;height:12px;background:#ef4444;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>',
+            iconSize: [12, 12], iconAnchor: [6, 6]
+          });
+          L.marker(points[points.length - 1], { icon: endIcon }).addTo(miniMap);
+          
+          miniMap.fitBounds(points, { padding: [20, 20] });
+          routeMiniMaps.push(miniMap);
+          
+          // Reverse geocode from/to
+          reverseGeocode(session[0].latitude, session[0].longitude, fromId);
+          reverseGeocode(session[session.length-1].latitude, session[session.length-1].longitude, toId);
+        }
+        routeCount++;
+      }
+    }
   } catch(e) {
-    console.log('History error:', e);
-    if ($('location-history-list')) $('location-history-list').innerHTML = '<p class="text-sm text-muted">Error loading history</p>';
+    console.log('Route history error:', e);
+    el.innerHTML = '<p class="text-sm text-muted">Error loading routes</p>';
   }
 }
 
