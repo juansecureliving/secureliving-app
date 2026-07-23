@@ -3627,7 +3627,7 @@ async function renderTrackedMembersList() {
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div>
               <strong style="font-size:15px">${esc(m.name)}</strong>
-              <p class="text-sm text-muted" id="addr-${memberId}" style="margin-top:4px">${m.latitude ? Number(m.latitude).toFixed(4) + ', ' + Number(m.longitude).toFixed(4) : 'No location'}</p>
+              <p class="text-sm text-muted" id="addr-${memberId}" style="margin-top:4px">${m.address || (m.latitude ? Number(m.latitude).toFixed(4) + ', ' + Number(m.longitude).toFixed(4) : 'No location')}</p>
             </div>
             <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${statusColor};flex-shrink:0;margin-top:6px"></span>
           </div>
@@ -3799,7 +3799,7 @@ async function renderRouteHistory() {
                   <span style="color:var(--success);font-weight:700;font-size:14px">●</span>
                   <div>
                     <span style="color:var(--muted)">${startTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                    <span id="${fromId}" style="margin-left:4px;color:var(--text)">${Number(start.latitude).toFixed(4)}, ${Number(start.longitude).toFixed(4)}</span>
+                    <span id="${fromId}" style="margin-left:4px;color:var(--text)">${start.address || Number(start.latitude).toFixed(4) + ', ' + Number(start.longitude).toFixed(4)}</span>
                   </div>
                 </div>
                 <div style="border-left:2px dashed var(--border);margin-left:5px;padding-left:14px;margin-bottom:3px">
@@ -3809,7 +3809,7 @@ async function renderRouteHistory() {
                   <span style="color:var(--danger);font-weight:700;font-size:14px">●</span>
                   <div>
                     <span style="color:var(--muted)">${endTime.toLocaleTimeString('en-SG', {hour:'2-digit',minute:'2-digit'})}</span>
-                    <span id="${toId}" style="margin-left:4px;color:var(--text)">${Number(end.latitude).toFixed(4)}, ${Number(end.longitude).toFixed(4)}</span>
+                    <span id="${toId}" style="margin-left:4px;color:var(--text)">${end.address || Number(end.latitude).toFixed(4) + ', ' + Number(end.longitude).toFixed(4)}</span>
                   </div>
                 </div>
               </div>
@@ -3818,7 +3818,7 @@ async function renderRouteHistory() {
           </div>
         `;
         
-        allSessions.push({ trip, mapId, fromId, toId });
+        allSessions.push({ trip, mapId });
         routeCount++;
       }
     }
@@ -3855,11 +3855,11 @@ async function renderRouteHistory() {
           routeMiniMaps.push(miniMap);
         } catch(e) {}
         
-        // Geocode via backend (staggered)
-        const start = item.trip[0];
-        const end = item.trip[item.trip.length - 1];
-        setTimeout(() => reverseGeocode(start.latitude, start.longitude, item.fromId), idx * 1500);
-        setTimeout(() => reverseGeocode(end.latitude, end.longitude, item.toId), idx * 1500 + 750);
+        // Geocode addresses via backend queue
+        const startPt = item.trip[0];
+        const endPt = item.trip[item.trip.length - 1];
+        reverseGeocode(startPt.latitude, startPt.longitude, item.fromId);
+        reverseGeocode(endPt.latitude, endPt.longitude, item.toId);
       });
     }, 300);
     
@@ -3889,32 +3889,61 @@ function esc(s) {
   return d.innerHTML;
 }
 
-// Reverse geocode using backend (no CORS issues)
-const geocodeCache = {};
-async function reverseGeocode(lat, lng, elementId) {
+// Reverse geocode using backend (no CORS) with localStorage cache
+const geocodeCache = JSON.parse(localStorage.getItem('al_geocache') || '{}');
+let geocodeQueue = [];
+let geocodeRunning = false;
+
+function reverseGeocode(lat, lng, elementId) {
   const key = `${Number(lat).toFixed(4)},${Number(lng).toFixed(4)}`;
-  const fallback = `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
   
+  // Check cache first
   if (geocodeCache[key]) {
     const el = $(elementId);
     if (el) el.textContent = geocodeCache[key];
     return;
   }
   
-  try {
-    const r = await api({ action: 'reverseGeocode', lat: lat, lng: lng });
-    if (r.ok && r.address && r.address !== 'Unknown') {
-      geocodeCache[key] = r.address;
-      const el = $(elementId);
-      if (el) el.textContent = r.address;
-    } else {
-      const el = $(elementId);
-      if (el) el.textContent = fallback;
+  // Add to queue (sequential processing to avoid rate limits)
+  geocodeQueue.push({ lat, lng, elementId, key });
+  processGeocodeQueue();
+}
+
+async function processGeocodeQueue() {
+  if (geocodeRunning || geocodeQueue.length === 0) return;
+  geocodeRunning = true;
+  
+  while (geocodeQueue.length > 0) {
+    const item = geocodeQueue.shift();
+    
+    // Skip if already cached by a previous call
+    if (geocodeCache[item.key]) {
+      const el = $(item.elementId);
+      if (el) el.textContent = geocodeCache[item.key];
+      continue;
     }
-  } catch(e) {
-    const el = $(elementId);
-    if (el) el.textContent = fallback;
+    
+    try {
+      const r = await api({ action: 'reverseGeocode', lat: item.lat, lng: item.lng });
+      if (r.ok && r.address && r.address !== 'Unknown') {
+        geocodeCache[item.key] = r.address;
+        localStorage.setItem('al_geocache', JSON.stringify(geocodeCache));
+        const el = $(item.elementId);
+        if (el) el.textContent = r.address;
+      } else {
+        const el = $(item.elementId);
+        if (el) el.textContent = `${Number(item.lat).toFixed(4)}, ${Number(item.lng).toFixed(4)}`;
+      }
+    } catch(e) {
+      const el = $(item.elementId);
+      if (el) el.textContent = `${Number(item.lat).toFixed(4)}, ${Number(item.lng).toFixed(4)}`;
+    }
+    
+    // Wait 800ms between calls to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 800));
   }
+  
+  geocodeRunning = false;
 }
 
 /* ── Init ─────────────────────────────────── */
