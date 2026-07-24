@@ -3438,10 +3438,10 @@ async function loadSOSAlerts() {
     }).join('');
     if ($('sos-alerts-list')) $('sos-alerts-list').innerHTML = html;
     
-    // Geocode SOS alert locations (staggered)
+    // Geocode SOS alert locations via queue
     r.alerts.slice(0, 10).forEach((a, idx) => {
       if (a.latitude && a.longitude) {
-        setTimeout(() => geocodeElement(a.latitude, a.longitude, 'sos-addr-' + idx), idx * 1500 + 500);
+        geocodeElement(a.latitude, a.longitude, 'sos-addr-' + idx);
       }
     });
   } catch(e) {
@@ -3870,11 +3870,11 @@ async function renderTrackedMembersList() {
     }).join('');
     if ($('tracked-members-list')) $('tracked-members-list').innerHTML = html;
     
-    // Geocode addresses for members (staggered)
-    r.members.forEach((m, idx) => {
-      if (m.latitude && m.longitude && !m.address) {
+    // Geocode addresses via queue
+    r.members.forEach(m => {
+      if (m.latitude && m.longitude) {
         const memberId = m.memberId || m.id || '';
-        setTimeout(() => geocodeElement(m.latitude, m.longitude, 'addr-' + memberId), idx * 1500);
+        geocodeElement(m.latitude, m.longitude, 'addr-' + memberId);
       }
     });
     
@@ -4085,13 +4085,12 @@ async function renderRouteHistory() {
         } catch(e) {}
       });
       
-      // Geocode route addresses AFTER tracked members + SOS are done (start at 10s)
-      allSessions.forEach((item, i) => {
+      // Geocode route addresses via queue
+      allSessions.forEach((item) => {
         const startPt = item.trip[0];
         const endPt = item.trip[item.trip.length - 1];
-        const baseDelay = 10000 + i * 2000;
-        if (!startPt.address) setTimeout(() => geocodeElement(startPt.latitude, startPt.longitude, 'rfrom-' + item.idx), baseDelay);
-        if (!endPt.address) setTimeout(() => geocodeElement(endPt.latitude, endPt.longitude, 'rto-' + item.idx), baseDelay + 1000);
+        geocodeElement(startPt.latitude, startPt.longitude, 'rfrom-' + item.idx);
+        geocodeElement(endPt.latitude, endPt.longitude, 'rto-' + item.idx);
       });
     }, 300);
     
@@ -4121,10 +4120,12 @@ function esc(s) {
   return d.innerHTML;
 }
 
-// Geocode via free APIs - tries multiple sources for best Singapore address
+// Sequential geocode queue - processes one at a time, 1.5s apart
 const geocodeCache = {};
+const geocodeQueue = [];
+let geocodeRunning = false;
 
-async function geocodeElement(lat, lng, elementId) {
+function geocodeElement(lat, lng, elementId) {
   const key = `${parseFloat(lat).toFixed(4)},${parseFloat(lng).toFixed(4)}`;
   
   // Check memory cache
@@ -4137,7 +4138,7 @@ async function geocodeElement(lat, lng, elementId) {
   // Check localStorage cache
   try {
     const stored = JSON.parse(localStorage.getItem('al_geocache') || '{}');
-    if (stored[key] && stored[key] !== 'South West' && stored[key].length > 5) {
+    if (stored[key] && stored[key] !== 'South West' && stored[key].length > 3) {
       geocodeCache[key] = stored[key];
       const el = $(elementId);
       if (el) el.textContent = stored[key];
@@ -4145,72 +4146,65 @@ async function geocodeElement(lat, lng, elementId) {
     }
   } catch(e) {}
   
-  try {
-    // Use Nominatim (most detailed for Singapore)
-    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`, {
-      headers: { 'User-Agent': 'JuAnSecureLivingApp/1.0' }
-    });
-    
-    if (resp.ok) {
-      const data = await resp.json();
-      if (data && data.address) {
-        const a = data.address;
-        let parts = [];
-        if (a.building) parts.push(a.building);
-        else if (a.amenity) parts.push(a.amenity);
-        if (a.house_number) parts.push(a.house_number);
-        if (a.road) parts.push(a.road);
-        if (parts.length === 0 && a.neighbourhood) parts.push(a.neighbourhood);
-        if (parts.length === 0 && a.suburb) parts.push(a.suburb);
-        if (parts.length === 0 && data.display_name) {
-          parts = data.display_name.split(',').slice(0, 2).map(s => s.trim());
-        }
-        
-        const addr = parts.join(', ');
-        if (addr && addr.length > 3) {
-          geocodeCache[key] = addr;
-          try {
-            const stored = JSON.parse(localStorage.getItem('al_geocache') || '{}');
-            stored[key] = addr;
-            localStorage.setItem('al_geocache', JSON.stringify(stored));
-          } catch(e) {}
-          const el = $(elementId);
-          if (el) el.textContent = addr;
-          return;
-        }
-      }
-    }
-  } catch(e) {}
+  // Add to queue
+  geocodeQueue.push({ lat, lng, elementId, key });
+  processGeocodeQueue();
+}
+
+async function processGeocodeQueue() {
+  if (geocodeRunning || geocodeQueue.length === 0) return;
+  geocodeRunning = true;
   
-  // Fallback: BigDataCloud for basic area name
-  try {
-    const resp2 = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
-    const data2 = await resp2.json();
-    if (data2) {
-      const admins = (data2.localityInfo && data2.localityInfo.administrative) || [];
-      // Find most specific level for Singapore
-      let best = '';
-      for (let order = 10; order >= 6; order--) {
-        const match = admins.find(a => a.order === order);
-        if (match && match.name && match.name !== 'Singapore') {
-          best = match.name;
-          break;
+  while (geocodeQueue.length > 0) {
+    const item = geocodeQueue.shift();
+    
+    // Skip if already cached by earlier call
+    if (geocodeCache[item.key]) {
+      const el = $(item.elementId);
+      if (el) el.textContent = geocodeCache[item.key];
+      continue;
+    }
+    
+    try {
+      const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${item.lat}&lon=${item.lng}&zoom=18&addressdetails=1&accept-language=en`, {
+        headers: { 'User-Agent': 'JuAnSecureLivingApp/1.0' }
+      });
+      
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data && data.address) {
+          const a = data.address;
+          let parts = [];
+          if (a.building) parts.push(a.building);
+          else if (a.amenity) parts.push(a.amenity);
+          if (a.house_number) parts.push(a.house_number);
+          if (a.road) parts.push(a.road);
+          if (parts.length === 0 && a.neighbourhood) parts.push(a.neighbourhood);
+          if (parts.length === 0 && a.suburb) parts.push(a.suburb);
+          if (parts.length === 0 && data.display_name) {
+            parts = data.display_name.split(',').slice(0, 2).map(s => s.trim());
+          }
+          
+          const addr = parts.join(', ');
+          if (addr && addr.length > 3) {
+            geocodeCache[item.key] = addr;
+            try {
+              const stored = JSON.parse(localStorage.getItem('al_geocache') || '{}');
+              stored[item.key] = addr;
+              localStorage.setItem('al_geocache', JSON.stringify(stored));
+            } catch(e) {}
+            const el = $(item.elementId);
+            if (el) el.textContent = addr;
+          }
         }
       }
-      if (!best && data2.locality) best = data2.locality;
-      
-      if (best && best !== 'South West' && best !== 'Singapore') {
-        geocodeCache[key] = best;
-        try {
-          const stored = JSON.parse(localStorage.getItem('al_geocache') || '{}');
-          stored[key] = best;
-          localStorage.setItem('al_geocache', JSON.stringify(stored));
-        } catch(e) {}
-        const el = $(elementId);
-        if (el) el.textContent = best;
-      }
-    }
-  } catch(e) {}
+    } catch(e) {}
+    
+    // Wait 1.5s before next call (Nominatim rate limit: 1/sec)
+    await new Promise(r => setTimeout(r, 1500));
+  }
+  
+  geocodeRunning = false;
 }
 
 /* ── Init ─────────────────────────────────── */
