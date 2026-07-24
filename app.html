@@ -346,11 +346,11 @@ button{cursor:pointer;border:none;background:none}
     <h2 data-i18n="welcome_back">Welcome Back</h2>
     <div class="form-group">
       <label data-i18n="phone_number">Phone Number</label>
-      <input type="tel" id="login-phone" placeholder="e.g. 91234567">
+      <input type="tel" id="login-phone" data-i18n-placeholder="phone_placeholder" placeholder="e.g. 91234567">
     </div>
     <div class="form-group">
       <label data-i18n="password">Password</label>
-      <input type="password" id="login-pw" placeholder="Enter password">
+      <input type="password" id="login-pw" data-i18n-placeholder="password_placeholder" placeholder="Enter password">
     </div>
     <button class="btn btn-pri" onclick="doLogin()" data-i18n="sign_in">Sign In</button>
     <div class="auth-switch">
@@ -452,7 +452,7 @@ button{cursor:pointer;border:none;background:none}
     
     <div class="form-group">
       <label data-i18n="email">Email (Optional)</label>
-      <input type="email" id="reg-email" placeholder="your@email.com">
+      <input type="email" id="reg-email" data-i18n-placeholder="email_placeholder" placeholder="your@email.com">
     </div>
     <div class="form-group">
       <label data-i18n="gender">Gender *</label>
@@ -718,7 +718,7 @@ button{cursor:pointer;border:none;background:none}
       </div>
       <div class="form-group">
         <label data-i18n="notes_requirements">Notes / Special Requirements</label>
-        <textarea id="appt-notes" placeholder="Describe your needs or concerns..."></textarea>
+        <textarea id="appt-notes" data-i18n-placeholder="notes_placeholder" placeholder="Describe your needs or concerns..."></textarea>
       </div>
       <button class="btn btn-pri" onclick="bookAppt()" data-i18n="confirm_booking">Confirm Booking</button>
     </div>
@@ -864,8 +864,8 @@ button{cursor:pointer;border:none;background:none}
     <div class="card" id="add-caregiver-section">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="add_caregiver">Add Caregiver</h3>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <input type="text" id="caregiver-name" placeholder="Name" data-i18n="placeholder" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
-        <input type="tel" id="caregiver-phone" placeholder="Phone" data-i18n="placeholder" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+        <input type="text" id="caregiver-name" data-i18n-placeholder="caregiver_name" placeholder="Caregiver Name" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+        <input type="tel" id="caregiver-phone" data-i18n-placeholder="caregiver_phone" placeholder="Caregiver Phone" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px">
         <button class="btn btn-sm btn-pri" onclick="addCaregiver()" data-i18n="add_caregiver">Add Caregiver</button>
       </div>
       <div id="caregivers-list" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
@@ -889,17 +889,17 @@ button{cursor:pointer;border:none;background:none}
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="systolic">Systolic (top)</label>
-        <input type="number" id="bp-sys" placeholder="e.g. 120" min="60" max="250">
+        <input type="number" id="bp-sys" data-i18n-placeholder="bp_sys_placeholder" placeholder="e.g. 120" min="60" max="250">
       </div>
       <div class="form-group">
         <label data-i18n="diastolic">Diastolic (btm)</label>
-        <input type="number" id="bp-dia" placeholder="e.g. 80" min="30" max="150">
+        <input type="number" id="bp-dia" data-i18n-placeholder="bp_dia_placeholder" placeholder="e.g. 80" min="30" max="150">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="heart_rate">Heart Rate (bpm)</label>
-        <input type="number" id="bp-hr" placeholder="e.g. 72" min="30" max="220">
+        <input type="number" id="bp-hr" data-i18n-placeholder="bp_hr_placeholder" placeholder="e.g. 72" min="30" max="220">
       </div>
       <div class="form-group">
         <label data-i18n="date">Date</label>
@@ -908,7 +908,7 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <div class="form-group">
       <label data-i18n="notes">Notes</label>
-      <input type="text" id="bp-notes" placeholder="e.g. After exercise, morning reading">
+      <input type="text" id="bp-notes" data-i18n-placeholder="bp_notes_placeholder" placeholder="e.g. After exercise, morning reading">
     </div>
     <button class="btn btn-pri" onclick="addBP()" data-i18n="save_reading">Save Reading</button>
   </div>
@@ -937,7 +937,7 @@ button{cursor:pointer;border:none;background:none}
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="glucose_value">Glucose (mg/dL)</label>
-        <input type="number" id="glucose-value" placeholder="e.g. 100" min="40" max="400">
+        <input type="number" id="glucose-value" data-i18n-placeholder="glucose_placeholder" placeholder="e.g. 100" min="40" max="400">
       </div>
       <div class="form-group">
         <label data-i18n="glucose_time">Time of Day</label>
@@ -956,7 +956,7 @@ button{cursor:pointer;border:none;background:none}
       </div>
       <div class="form-group">
         <label data-i18n="notes">Notes</label>
-        <input type="text" id="glucose-notes" placeholder="e.g. After breakfast">
+        <input type="text" id="glucose-notes" data-i18n-placeholder="glucose_notes_placeholder" placeholder="e.g. After breakfast">
       </div>
     </div>
     <button class="btn btn-pri" onclick="addGlucose()" data-i18n="save_reading">Save Reading</button>
@@ -977,17 +977,17 @@ button{cursor:pointer;border:none;background:none}
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="total_cholesterol">Total Cholesterol (mg/dL)</label>
-        <input type="number" id="chol-total" placeholder="e.g. 200" min="0" max="500">
+        <input type="number" id="chol-total" data-i18n-placeholder="chol_total_placeholder" placeholder="e.g. 200" min="0" max="500">
       </div>
       <div class="form-group">
         <label data-i18n="ldl">LDL (mg/dL)</label>
-        <input type="number" id="chol-ldl" placeholder="e.g. 100" min="0" max="300">
+        <input type="number" id="chol-ldl" data-i18n-placeholder="chol_ldl_placeholder" placeholder="e.g. 100" min="0" max="300">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label data-i18n="hdl">HDL (mg/dL)</label>
-        <input type="number" id="chol-hdl" placeholder="e.g. 50" min="0" max="150">
+        <input type="number" id="chol-hdl" data-i18n-placeholder="chol_hdl_placeholder" placeholder="e.g. 50" min="0" max="150">
       </div>
       <div class="form-group">
         <label data-i18n="date">Date</label>
@@ -996,7 +996,7 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <div class="form-group">
       <label data-i18n="notes">Notes</label>
-      <input type="text" id="chol-notes" placeholder="e.g. Fasting test">
+      <input type="text" id="chol-notes" data-i18n-placeholder="chol_notes_placeholder" placeholder="e.g. Fasting test">
     </div>
     <button class="btn btn-pri" onclick="addCholesterol()" data-i18n="save_reading">Save Reading</button>
   </div>
@@ -1113,11 +1113,11 @@ button{cursor:pointer;border:none;background:none}
   <div class="form-row">
     <div class="form-group">
       <label data-i18n="height_cm">Height (cm)</label>
-      <input type="number" id="hp-height" placeholder="e.g. 170">
+      <input type="number" id="hp-height" data-i18n-placeholder="height_placeholder" placeholder="e.g. 170">
     </div>
     <div class="form-group">
       <label data-i18n="weight_kg">Weight (kg)</label>
-      <input type="number" id="hp-weight" placeholder="e.g. 65">
+      <input type="number" id="hp-weight" data-i18n-placeholder="weight_placeholder" placeholder="e.g. 65">
     </div>
   </div>
   <div class="form-group">
@@ -1130,19 +1130,19 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div class="form-group">
     <label data-i18n="allergies">Allergies</label>
-    <textarea id="hp-allergies" placeholder="List known allergies"></textarea>
+    <textarea id="hp-allergies" data-i18n-placeholder="allergies_placeholder" placeholder="List known allergies"></textarea>
   </div>
   <div class="form-group">
     <label data-i18n="conditions">Medical Conditions</label>
-    <textarea id="hp-conditions" placeholder="e.g. Diabetes, Hypertension"></textarea>
+    <textarea id="hp-conditions" data-i18n-placeholder="conditions_placeholder" placeholder="e.g. Diabetes, Hypertension"></textarea>
   </div>
   <div class="form-group">
     <label data-i18n="medications">Current Medications</label>
-    <textarea id="hp-medications" placeholder="List medications and dosages"></textarea>
+    <textarea id="hp-medications" data-i18n-placeholder="medications_placeholder" placeholder="List medications and dosages"></textarea>
   </div>
   <div class="form-group">
     <label data-i18n="additional_notes">Additional Notes</label>
-    <textarea id="hp-notes" placeholder="Any other health information"></textarea>
+    <textarea id="hp-notes" data-i18n-placeholder="health_notes_placeholder" placeholder="Any other health information"></textarea>
   </div>
   <button class="btn btn-pri" onclick="saveHealth()" data-i18n="save_health">Save Health Profile</button>
 </div>
@@ -1194,7 +1194,7 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div class="form-group">
     <label>New Password (leave blank to keep)</label>
-    <input type="password" id="acct-newpw" placeholder="New password">
+    <input type="password" id="acct-newpw" data-i18n-placeholder="new_password" placeholder="New password">
   </div>
   <button class="btn btn-pri" onclick="saveAccount()" data-i18n="save_changes">Save Changes</button>
 </div>
@@ -1238,7 +1238,7 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div class="form-group">
     <label data-i18n="notes">Notes</label>
-    <textarea id="order-notes" placeholder="Delivery address, special requests..."></textarea>
+    <textarea id="order-notes" data-i18n-placeholder="delivery_notes" placeholder="Delivery address, special requests..."></textarea>
   </div>
   <input type="hidden" id="order-product-id">
   <input type="hidden" id="order-sale-price">
@@ -1413,7 +1413,17 @@ const LANG = {
     sign_in_register:'Sign In / Register',
     guest_appt_msg:'Create an account or sign in to book appointments and consultations.',
     guest_reports_msg:'Create an account or sign in to log blood pressure readings and track your health.',
-    guest_profile_msg:'Create an account or sign in to manage your health profile and account details.'
+    guest_profile_msg:'Create an account or sign in to manage your health profile and account details.',
+    phone_placeholder:'e.g. 91234567', password_placeholder:'Enter password', email_placeholder:'your@email.com',
+    notes_placeholder:'Describe your needs or concerns...',
+    bp_sys_placeholder:'e.g. 120', bp_dia_placeholder:'e.g. 80', bp_hr_placeholder:'e.g. 72',
+    bp_notes_placeholder:'e.g. After exercise, morning reading',
+    glucose_placeholder:'e.g. 100', glucose_notes_placeholder:'e.g. After breakfast',
+    chol_total_placeholder:'e.g. 200', chol_ldl_placeholder:'e.g. 100', chol_hdl_placeholder:'e.g. 50',
+    chol_notes_placeholder:'e.g. Fasting test',
+    height_placeholder:'e.g. 170', weight_placeholder:'e.g. 65',
+    allergies_placeholder:'List known allergies', conditions_placeholder:'e.g. Diabetes, Hypertension',
+    waiting_location:'Waiting for location...', medications_placeholder:'List medications and dosages', health_notes_placeholder:'Any other health information'
   },
   zh: {
     hero_desc:'您的独立生活伙伴。我们提供设备、咨询和持续支持，让您随时做好准备。',
@@ -1508,6 +1518,16 @@ const LANG = {
     guest_appt_msg:'创建账户或登录以预约咨询服务。',
     guest_reports_msg:'创建账户或登录以记录血压读数并追踪健康状况。',
     guest_profile_msg:'创建账户或登录以管理您的健康档案和账户信息。',
+    phone_placeholder:'例：91234567', password_placeholder:'输入密码', email_placeholder:'your@email.com',
+    notes_placeholder:'描述您的需求或问题...',
+    bp_sys_placeholder:'例：120', bp_dia_placeholder:'例：80', bp_hr_placeholder:'例：72',
+    bp_notes_placeholder:'例：运动后、早晨读数',
+    glucose_placeholder:'例：100', glucose_notes_placeholder:'例：早餐后',
+    chol_total_placeholder:'例：200', chol_ldl_placeholder:'例：100', chol_hdl_placeholder:'例：50',
+    chol_notes_placeholder:'例：空腹检测',
+    height_placeholder:'例：170', weight_placeholder:'例：65',
+    allergies_placeholder:'列出已知过敏', conditions_placeholder:'例：糖尿病、高血压',
+    waiting_location:'等待定位...', medications_placeholder:'列出药物和剂量', health_notes_placeholder:'其他健康信息',
     guest_tracking_msg:'创建账户或登录以访问追踪功能。',
   },
   ms: {
@@ -1602,7 +1622,17 @@ const LANG = {
     sign_in_register:'Log Masuk / Daftar',
     guest_appt_msg:'Daftar akaun atau log masuk untuk menempah temu janji dan perundingan.',
     guest_reports_msg:'Daftar akaun atau log masuk untuk merekod bacaan tekanan darah dan menjejak kesihatan.',
-    guest_profile_msg:'Daftar akaun atau log masuk untuk mengurus profil kesihatan dan butiran akaun.'
+    guest_profile_msg:'Daftar akaun atau log masuk untuk mengurus profil kesihatan dan butiran akaun.',
+    phone_placeholder:'cth: 91234567', password_placeholder:'Masukkan kata laluan', email_placeholder:'anda@email.com',
+    notes_placeholder:'Jelaskan keperluan atau kebimbangan anda...',
+    bp_sys_placeholder:'cth: 120', bp_dia_placeholder:'cth: 80', bp_hr_placeholder:'cth: 72',
+    bp_notes_placeholder:'cth: Selepas bersenam, bacaan pagi',
+    glucose_placeholder:'cth: 100', glucose_notes_placeholder:'cth: Selepas sarapan',
+    chol_total_placeholder:'cth: 200', chol_ldl_placeholder:'cth: 100', chol_hdl_placeholder:'cth: 50',
+    chol_notes_placeholder:'cth: Ujian berpuasa',
+    height_placeholder:'cth: 170', weight_placeholder:'cth: 65',
+    allergies_placeholder:'Senarai alahan', conditions_placeholder:'cth: Diabetes, Hipertensi',
+    waiting_location:'Menunggu lokasi...', medications_placeholder:'Senarai ubat dan dos', health_notes_placeholder:'Maklumat kesihatan lain'
   },
   ta: {
     hero_desc:'சுதந்திரமான வாழ்க்கையில் உங்கள் துணை. உபகரணங்கள், ஆலோசனை, தொடர்ச்சியான ஆதரவை நாங்கள் வழங்குகிறோம்.',
@@ -1696,7 +1726,17 @@ const LANG = {
     sign_in_register:'உள்நுழை / பதிவு',
     guest_appt_msg:'சந்திப்புகள் மற்றும் ஆலோசனைகளை முன்பதிவு செய்ய கணக்கு உருவாக்கவும் அல்லது உள்நுழையவும்.',
     guest_reports_msg:'இரத்த அழுத்த வாசிப்புகளை பதிவு செய்ய கணக்கு உருவாக்கவும் அல்லது உள்நுழையவும்.',
-    guest_profile_msg:'சுகாதார விவரம் மற்றும் கணக்கு விவரங்களை நிர்வகிக்க கணக்கு உருவாக்கவும்.'
+    guest_profile_msg:'சுகாதார விவரம் மற்றும் கணக்கு விவரங்களை நிர்வகிக்க கணக்கு உருவாக்கவும்.',
+    phone_placeholder:'எ.கா: 91234567', password_placeholder:'கடவுச்சொல்லை உள்ளிடவும்', email_placeholder:'your@email.com',
+    notes_placeholder:'உங்கள் தேவைகளை விவரிக்கவும்...',
+    bp_sys_placeholder:'எ.கா: 120', bp_dia_placeholder:'எ.கா: 80', bp_hr_placeholder:'எ.கா: 72',
+    bp_notes_placeholder:'எ.கா: உடற்பயிற்சிக்குப் பிறகு',
+    glucose_placeholder:'எ.கா: 100', glucose_notes_placeholder:'எ.கா: காலை உணவுக்குப் பிறகு',
+    chol_total_placeholder:'எ.கா: 200', chol_ldl_placeholder:'எ.கா: 100', chol_hdl_placeholder:'எ.கா: 50',
+    chol_notes_placeholder:'எ.கா: உண்ணாவிரத பரிசோதனை',
+    height_placeholder:'எ.கா: 170', weight_placeholder:'எ.கா: 65',
+    allergies_placeholder:'அலர்ஜிகளை பட்டியலிடவும்', conditions_placeholder:'எ.கா: நீரிழிவு, உயர் இரத்த அழுத்தம்',
+    waiting_location:'இருப்பிடத்திற்காக காத்திருக்கிறது...', medications_placeholder:'மருந்துகள் பட்டியல்', health_notes_placeholder:'பிற சுகாதார தகவல்'
   },
   tl: {
     hero_desc:'Ang iyong kasama sa independiyenteng pamumuhay. Nagbibigay kami ng kagamitan, konsultasyon, at tuloy-tuloy na suporta para lagi kang handa.',
@@ -1794,7 +1834,17 @@ const LANG = {
     sign_in_register:'Mag-sign In / Magrehistro',
     guest_appt_msg:'Gumawa ng account o mag-sign in para mag-book ng appointment.',
     guest_reports_msg:'Gumawa ng account o mag-sign in para mag-log ng blood pressure readings.',
-    guest_profile_msg:'Gumawa ng account o mag-sign in para pamahalaan ang iyong health profile.'
+    guest_profile_msg:'Gumawa ng account o mag-sign in para pamahalaan ang iyong health profile.',
+    phone_placeholder:'hal. 91234567', password_placeholder:'Ilagay ang password', email_placeholder:'your@email.com',
+    notes_placeholder:'Ilarawan ang iyong mga pangangailangan...',
+    bp_sys_placeholder:'hal. 120', bp_dia_placeholder:'hal. 80', bp_hr_placeholder:'hal. 72',
+    bp_notes_placeholder:'hal. Pagkatapos mag-ehersisyo',
+    glucose_placeholder:'hal. 100', glucose_notes_placeholder:'hal. Pagkatapos ng almusal',
+    chol_total_placeholder:'hal. 200', chol_ldl_placeholder:'hal. 100', chol_hdl_placeholder:'hal. 50',
+    chol_notes_placeholder:'hal. Fasting test',
+    height_placeholder:'hal. 170', weight_placeholder:'hal. 65',
+    allergies_placeholder:'Ilista ang mga allergy', conditions_placeholder:'hal. Diabetes, Hypertension',
+    waiting_location:'Hinihintay ang lokasyon...', medications_placeholder:'Ilista ang mga gamot', health_notes_placeholder:'Iba pang impormasyon sa kalusugan'
   },
   my: {
     hero_desc:'သင့်ရဲ့ လွတ်လပ်စွာ နေထိုင်ရေး အဖော်အဖက်။ ကျွန်ုပ်တို့သည် ကိရိယာများ၊ အကြံပြုချက်များနှင့် စဉ်ဆက်မပြတ် ပံ့ပိုးမှုများ ပေးနေပါသည်။',
@@ -1892,7 +1942,17 @@ const LANG = {
     sign_in_register:'ဝင်ရောက် / စာရင်းသွင်း',
     guest_appt_msg:'ချိန်းဆိုမှု ယူရန် အကောင့် ဖန်တီးပါ သို့ ဝင်ရောက်ပါ။',
     guest_reports_msg:'သွေးပေါင်ချိန် reading မှတ်တမ်းတင်ရန် အကောင့် ဖန်တီးပါ။',
-    guest_profile_msg:'ကျန်းမာရေး ပရိုဖိုင် စီမံရန် အကောင့် ဖန်တီးပါ။'
+    guest_profile_msg:'ကျန်းမာရေး ပရိုဖိုင် စီမံရန် အကောင့် ဖန်တီးပါ။',
+    phone_placeholder:'ဥပမာ- 91234567', password_placeholder:'စကားဝှက် ထည့်ပါ', email_placeholder:'your@email.com',
+    notes_placeholder:'သင့်လိုအပ်ချက်များကို ဖော်ပြပါ...',
+    bp_sys_placeholder:'ဥပမာ- 120', bp_dia_placeholder:'ဥပမာ- 80', bp_hr_placeholder:'ဥပမာ- 72',
+    bp_notes_placeholder:'ဥပမာ- ကိုယ်လက်လှုပ်ရှားမှု ပြီးနောက်',
+    glucose_placeholder:'ဥပမာ- 100', glucose_notes_placeholder:'ဥပမာ- နံနက်စာ စားပြီးနောက်',
+    chol_total_placeholder:'ဥပမာ- 200', chol_ldl_placeholder:'ဥပမာ- 100', chol_hdl_placeholder:'ဥပမာ- 50',
+    chol_notes_placeholder:'ဥပမာ- အစာရှောင် စစ်ဆေးခြင်း',
+    height_placeholder:'ဥပမာ- 170', weight_placeholder:'ဥပမာ- 65',
+    allergies_placeholder:'ဓာတ်မတည့်မှုများ စာရင်း', conditions_placeholder:'ဥပမာ- ဆီးချို၊ သွေးတိုး',
+    waiting_location:'တည်နေရာ ရှာနေသည်...', medications_placeholder:'ဆေးဝါး စာရင်း', health_notes_placeholder:'အခြား ကျန်းမာရေး အချက်အလက်'
   }
 };
 
@@ -3625,8 +3685,9 @@ function updateTrackingUI() {
     // Update info text below map
     if ($('current-location-display')) {
       $('current-location-display').innerHTML = `
-        📍 ${lat.toFixed(4)}, ${lng.toFixed(4)} · Accuracy: ${acc}m · Updated: ${new Date(currentLocation.timestamp).toLocaleTimeString('en-SG')}
+        📍 <span id="self-addr">${lat.toFixed(4)}, ${lng.toFixed(4)}</span> · ${t.last_seen}: ${new Date(currentLocation.timestamp).toLocaleTimeString('en-SG')}
       `;
+      geocodeElement(lat, lng, 'self-addr');
     }
     
     // Init or update map
