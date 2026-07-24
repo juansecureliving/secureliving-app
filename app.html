@@ -315,7 +315,7 @@ button{cursor:pointer;border:none;background:none}
 <body>
 
 <!-- Loading -->
-<div id="loading-overlay" class="hidden"><div class="spinner"></div><div class="spinner-label">Loading...</div></div>
+<div id="loading-overlay" class="hidden"><div class="spinner"></div><div class="spinner-label" data-i18n="loading">Loading...</div></div>
 
 <!-- Toast -->
 <div id="toast"></div>
@@ -340,7 +340,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="auth-logo">
     <div class="logo-icon">🏠</div>
     <h1>Ju An SecureLiving</h1>
-    <p>Supporting Independent Living</p>
+    <p data-i18n="supporting_independent">Supporting Independent Living</p>
   </div>
   <div class="auth-card">
     <h2 data-i18n="welcome_back">Welcome Back</h2>
@@ -367,7 +367,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="auth-logo">
     <div class="logo-icon">🏠</div>
     <h1>Ju An SecureLiving</h1>
-    <p>Create Your Account</p>
+    <p data-i18n="create_your_account">Create Your Account</p>
   </div>
   <div class="auth-card">
     <h2 data-i18n="register">Register</h2>
@@ -551,7 +551,7 @@ button{cursor:pointer;border:none;background:none}
     <div class="weather-header">
       <div class="time-display">
         <div class="time-main" id="current-time">00:00</div>
-        <div class="time-date" id="current-date">Today</div>
+        <div class="time-date" id="current-date" data-i18n="today">Today</div>
         <div class="weather-temp" style="margin-top:4px">
           <span class="temp-val" id="current-temp">--</span>
           <span class="temp-unit">°C</span>
@@ -770,7 +770,7 @@ button{cursor:pointer;border:none;background:none}
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px" data-i18n="location_history">Location History</h3>
       <div id="route-history-list" style="display:flex;flex-direction:column;gap:12px;max-height:540px;overflow-y:auto">
-        <p class="text-sm text-muted">No routes recorded yet</p>
+        <p class="text-sm text-muted" data-i18n="no_routes">No routes recorded yet</p>
       </div>
     </div>
 
@@ -778,7 +778,7 @@ button{cursor:pointer;border:none;background:none}
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px;color:var(--danger)">🚨 SOS Alerts</h3>
       <div id="sos-alerts-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto">
-        <p class="text-sm text-muted">No alerts</p>
+        <p class="text-sm text-muted" data-i18n="no_alerts">No alerts</p>
       </div>
     </div>
 
@@ -1163,7 +1163,7 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div class="form-row">
     <div class="form-group">
-      <label>Date of Birth</label>
+      <label data-i18n="date_of_birth">Date of Birth</label>
       <input type="date" id="acct-dob">
     </div>
     <div class="form-group">
@@ -1184,16 +1184,16 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <div class="form-row">
     <div class="form-group">
-      <label>Emergency Contact</label>
+      <label data-i18n="emergency_contact_name">Emergency Contact</label>
       <input type="text" id="acct-ename">
     </div>
     <div class="form-group">
-      <label>Emergency Phone</label>
+      <label data-i18n="emergency_phone">Emergency Phone</label>
       <input type="tel" id="acct-ephone">
     </div>
   </div>
   <div class="form-group">
-    <label>New Password (leave blank to keep)</label>
+    <label data-i18n="new_password">New Password (leave blank to keep)</label>
     <input type="password" id="acct-newpw" data-i18n-placeholder="new_password" placeholder="New password">
   </div>
   <button class="btn btn-pri" onclick="saveAccount()" data-i18n="save_changes">Save Changes</button>
@@ -1204,11 +1204,11 @@ button{cursor:pointer;border:none;background:none}
 <div id="order-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('order-modal')">
 <div class="modal" style="position:relative">
   <button class="modal-close" onclick="closeModal('order-modal')">✕</button>
-  <h3 id="order-modal-title">Order</h3>
+  <h3 id="order-modal-title" data-i18n="place_order">Order</h3>
   <p id="order-product-name" style="font-weight:600;margin-bottom:12px"></p>
   <div class="order-type-toggle">
-    <button class="active" onclick="setOrderType('buy',this)">Purchase</button>
-    <button onclick="setOrderType('rent',this)">Rent</button>
+    <button class="active" onclick="setOrderType('buy',this)" data-i18n="purchase">Purchase</button>
+    <button onclick="setOrderType('rent',this)" data-i18n="rent">Rent</button>
   </div>
   <div id="order-buy-fields">
     <div class="form-group">
@@ -1216,23 +1216,23 @@ button{cursor:pointer;border:none;background:none}
       <input type="number" id="order-qty" value="1" min="1">
     </div>
     <div class="form-group">
-      <label>Price</label>
+      <label data-i18n="price">Price</label>
       <p id="order-price-display" style="font-size:20px;font-weight:700;color:var(--pri)"></p>
     </div>
   </div>
   <div id="order-rent-fields" class="hidden">
     <div class="form-row">
       <div class="form-group">
-        <label>Start Date</label>
+        <label data-i18n="start_date">Start Date</label>
         <input type="date" id="order-rent-start">
       </div>
       <div class="form-group">
-        <label>End Date</label>
+        <label data-i18n="end_date">End Date</label>
         <input type="date" id="order-rent-end">
       </div>
     </div>
     <div class="form-group">
-      <label>Rental Rates</label>
+      <label data-i18n="rental_rates">Rental Rates</label>
       <div id="rental-rates" class="text-sm text-muted" style="line-height:1.8"></div>
     </div>
   </div>
@@ -1423,7 +1423,8 @@ const LANG = {
     chol_notes_placeholder:'e.g. Fasting test',
     height_placeholder:'e.g. 170', weight_placeholder:'e.g. 65',
     allergies_placeholder:'List known allergies', conditions_placeholder:'e.g. Diabetes, Hypertension',
-    waiting_location:'Waiting for location...', medications_placeholder:'List medications and dosages', health_notes_placeholder:'Any other health information'
+    waiting_location:'Waiting for location...', medications_placeholder:'List medications and dosages', health_notes_placeholder:'Any other health information',
+    supporting_independent:'Supporting Independent Living', create_your_account:'Create Your Account', no_updates:'No updates yet', no_products:'No products in this category', no_tracked_members:'No tracked members', no_routes:'No routes recorded yet', error_loading:'Error loading', today:'Today', no_alerts:'No alerts', weather_unavailable:'Weather unavailable', guest:'Guest', just_now:'Just now'
   },
   zh: {
     hero_desc:'您的独立生活伙伴。我们提供设备、咨询和持续支持，让您随时做好准备。',
@@ -1528,6 +1529,7 @@ const LANG = {
     height_placeholder:'例：170', weight_placeholder:'例：65',
     allergies_placeholder:'列出已知过敏', conditions_placeholder:'例：糖尿病、高血压',
     waiting_location:'等待定位...', medications_placeholder:'列出药物和剂量', health_notes_placeholder:'其他健康信息',
+    supporting_independent:'支持独立生活', create_your_account:'创建您的账户', no_updates:'暂无更新', no_products:'该类别无产品', no_tracked_members:'没有被追踪的成员', no_routes:'暂无路线记录', error_loading:'加载错误', today:'今天', no_alerts:'无警报', weather_unavailable:'天气不可用', guest:'访客', just_now:'刚刚',
     guest_tracking_msg:'创建账户或登录以访问追踪功能。',
   },
   ms: {
@@ -1632,7 +1634,8 @@ const LANG = {
     chol_notes_placeholder:'cth: Ujian berpuasa',
     height_placeholder:'cth: 170', weight_placeholder:'cth: 65',
     allergies_placeholder:'Senarai alahan', conditions_placeholder:'cth: Diabetes, Hipertensi',
-    waiting_location:'Menunggu lokasi...', medications_placeholder:'Senarai ubat dan dos', health_notes_placeholder:'Maklumat kesihatan lain'
+    waiting_location:'Menunggu lokasi...', medications_placeholder:'Senarai ubat dan dos', health_notes_placeholder:'Maklumat kesihatan lain',
+    supporting_independent:'Menyokong Kehidupan Bebas', create_your_account:'Cipta Akaun Anda', no_updates:'Tiada kemas kini', no_products:'Tiada produk dalam kategori ini', no_tracked_members:'Tiada ahli dijejaki', no_routes:'Tiada laluan direkodkan', error_loading:'Ralat memuatkan', today:'Hari ini', no_alerts:'Tiada amaran', weather_unavailable:'Cuaca tidak tersedia', guest:'Tetamu', just_now:'Baru sahaja'
   },
   ta: {
     hero_desc:'சுதந்திரமான வாழ்க்கையில் உங்கள் துணை. உபகரணங்கள், ஆலோசனை, தொடர்ச்சியான ஆதரவை நாங்கள் வழங்குகிறோம்.',
@@ -1736,7 +1739,8 @@ const LANG = {
     chol_notes_placeholder:'எ.கா: உண்ணாவிரத பரிசோதனை',
     height_placeholder:'எ.கா: 170', weight_placeholder:'எ.கா: 65',
     allergies_placeholder:'அலர்ஜிகளை பட்டியலிடவும்', conditions_placeholder:'எ.கா: நீரிழிவு, உயர் இரத்த அழுத்தம்',
-    waiting_location:'இருப்பிடத்திற்காக காத்திருக்கிறது...', medications_placeholder:'மருந்துகள் பட்டியல்', health_notes_placeholder:'பிற சுகாதார தகவல்'
+    waiting_location:'இருப்பிடத்திற்காக காத்திருக்கிறது...', medications_placeholder:'மருந்துகள் பட்டியல்', health_notes_placeholder:'பிற சுகாதார தகவல்',
+    supporting_independent:'சுதந்திர வாழ்க்கையை ஆதரிக்கிறது', create_your_account:'உங்கள் கணக்கை உருவாக்கவும்', no_updates:'புதுப்பிப்புகள் இல்லை', no_products:'இந்த வகையில் பொருள்கள் இல்லை', no_tracked_members:'கண்காணிக்கப்படும் உறுப்பினர்கள் இல்லை', no_routes:'பாதைகள் பதிவு செய்யப்படவில்லை', error_loading:'ஏற்றுவதில் பிழை', today:'இன்று', no_alerts:'எச்சரிக்கைகள் இல்லை', weather_unavailable:'வானிலை கிடைக்கவில்லை', guest:'விருந்தினர்', just_now:'இப்போதே'
   },
   tl: {
     hero_desc:'Ang iyong kasama sa independiyenteng pamumuhay. Nagbibigay kami ng kagamitan, konsultasyon, at tuloy-tuloy na suporta para lagi kang handa.',
@@ -1844,7 +1848,8 @@ const LANG = {
     chol_notes_placeholder:'hal. Fasting test',
     height_placeholder:'hal. 170', weight_placeholder:'hal. 65',
     allergies_placeholder:'Ilista ang mga allergy', conditions_placeholder:'hal. Diabetes, Hypertension',
-    waiting_location:'Hinihintay ang lokasyon...', medications_placeholder:'Ilista ang mga gamot', health_notes_placeholder:'Iba pang impormasyon sa kalusugan'
+    waiting_location:'Hinihintay ang lokasyon...', medications_placeholder:'Ilista ang mga gamot', health_notes_placeholder:'Iba pang impormasyon sa kalusugan',
+    supporting_independent:'Sumusuporta sa Independiyenteng Pamumuhay', create_your_account:'Gumawa ng Iyong Account', no_updates:'Wala pang update', no_products:'Walang produkto sa kategoryang ito', no_tracked_members:'Walang sinusubaybayan', no_routes:'Walang naitalang ruta', error_loading:'Error sa pag-load', today:'Ngayon', no_alerts:'Walang alerto', weather_unavailable:'Hindi available ang panahon', guest:'Bisita', just_now:'Ngayon lang'
   },
   my: {
     hero_desc:'သင့်ရဲ့ လွတ်လပ်စွာ နေထိုင်ရေး အဖော်အဖက်။ ကျွန်ုပ်တို့သည် ကိရိယာများ၊ အကြံပြုချက်များနှင့် စဉ်ဆက်မပြတ် ပံ့ပိုးမှုများ ပေးနေပါသည်။',
@@ -1952,7 +1957,8 @@ const LANG = {
     chol_notes_placeholder:'ဥပမာ- အစာရှောင် စစ်ဆေးခြင်း',
     height_placeholder:'ဥပမာ- 170', weight_placeholder:'ဥပမာ- 65',
     allergies_placeholder:'ဓာတ်မတည့်မှုများ စာရင်း', conditions_placeholder:'ဥပမာ- ဆီးချို၊ သွေးတိုး',
-    waiting_location:'တည်နေရာ ရှာနေသည်...', medications_placeholder:'ဆေးဝါး စာရင်း', health_notes_placeholder:'အခြား ကျန်းမာရေး အချက်အလက်'
+    waiting_location:'တည်နေရာ ရှာနေသည်...', medications_placeholder:'ဆေးဝါး စာရင်း', health_notes_placeholder:'အခြား ကျန်းမာရေး အချက်အလက်',
+    supporting_independent:'လွတ်လပ်စွာ နေထိုင်ရေး ပံ့ပိုး', create_your_account:'သင့် အကောင့် ဖန်တီးပါ', no_updates:'အပ်ဒိတ် မရှိသေးပါ', no_products:'ဤအမျိုးအစားတွင် ပစ္စည်း မရှိပါ', no_tracked_members:'ခြေရာခံ အဖွဲ့ဝင် မရှိပါ', no_routes:'လမ်းကြောင်း မှတ်တမ်း မရှိသေးပါ', error_loading:'ဖွင့်ရန် အမှား', today:'ဒီနေ့', no_alerts:'သတိပေးချက် မရှိပါ', weather_unavailable:'ရာသီဥတု မရနိုင်ပါ', guest:'ဧည့်သည်', just_now:'ယခုပင်'
   }
 };
 
@@ -2207,7 +2213,7 @@ async function fetchWeather() {
   } catch(e) {
     console.error('Weather error:', e);
     if ($('current-temp')) $('current-temp').textContent = '--';
-    if ($('weather-desc')) $('weather-desc').textContent = 'Weather unavailable';
+    if ($('weather-desc')) $('weather-desc').textContent = (LANG[currentLang]||LANG.en).weather_unavailable || 'Weather unavailable';
   }
 }
 
@@ -2338,7 +2344,7 @@ async function enterGuest() {
     
     // Set up top bar for guest
     $('top-avatar').textContent = '👤';
-    $('top-name').textContent = 'Guest';
+    $('top-name').textContent = (LANG[currentLang]||LANG.en).guest || 'Guest';
     
     const t = LANG[currentLang] || LANG.en;
     const hour = new Date().getHours();
@@ -2509,7 +2515,7 @@ async function loadUpdates() {
     if (!r.ok) return;
     const el = $('updates-list');
     if (!r.updates.length) {
-      el.innerHTML = '<div class="empty-state"><p>No updates yet</p></div>';
+      el.innerHTML = '<div class="empty-state"><p>' + (t.no_updates || 'No updates yet') + '</p></div>';
       return;
     }
     el.innerHTML = r.updates.map(u => {
@@ -3338,7 +3344,7 @@ function renderProducts(cat) {
   const inStockLabel = (langData && langData.in_stock) || 'in stock';
   
   if (!filtered.length) {
-    $('product-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>No products in this category</p></div>';
+    $('product-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>' + ((LANG[currentLang] || LANG.en).no_products || 'No products in this category') + '</p></div>';
     return;
   }
   $('product-list').innerHTML = filtered.map(p => {
@@ -3371,7 +3377,7 @@ function renderProducts(cat) {
 function openOrderModal(productId, type) {
   const p = products.find(x => x.id === productId);
   if (!p) return;
-  $('order-modal-title').textContent = type === 'rent' ? 'Rent Equipment' : 'Purchase Equipment';
+  const _t = LANG[currentLang]||LANG.en; $('order-modal-title').textContent = type === 'rent' ? (_t.rent_equipment||'Rent Equipment') : (_t.purchase_equipment||'Purchase Equipment');
   $('order-product-name').textContent = p.name;
   $('order-product-id').value = p.id;
   $('order-sale-price').value = p.salePrice;
@@ -3555,7 +3561,7 @@ function updateAppUsageDisplay() {
   if ($('last-active')) {
     const lastActivityMinutesAgo = Math.round((now - lastActivityTime) / 60000);
     if (lastActivityMinutesAgo === 0) {
-      $('last-active').textContent = 'Just now';
+      $('last-active').textContent = (LANG[currentLang]||LANG.en).just_now || 'Just now';
     } else if (lastActivityMinutesAgo === 1) {
       $('last-active').textContent = '1 min ago';
     } else {
@@ -3973,7 +3979,7 @@ function renderCaregivers() {
       </div>
       <div style="display:flex;gap:6px">
         ${!isPrimary ? `<button onclick="setPrimaryCaregiver('${c.id}')" style="background:var(--pri);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Set Primary</button>` : ''}
-        <button onclick="removeCaregiver('${c.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button>
+        <button onclick="removeCaregiver('${c.id}')" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">${t.remove || 'Remove'}</button>
       </div>
     </div>
   `}).join('');
@@ -4091,7 +4097,7 @@ async function renderRouteHistory() {
   try {
     const tracked = await api({ action:'getTrackedMembers', caregiverId:ME.id });
     if (!tracked.ok || !tracked.members || !tracked.members.length) {
-      el.innerHTML = '<p class="text-sm text-muted">No tracked members</p>';
+      el.innerHTML = '<p class="text-sm text-muted">' + ((LANG[currentLang]||LANG.en).no_tracked_members||'No tracked members') + '</p>';
       return;
     }
     
@@ -4217,7 +4223,7 @@ async function renderRouteHistory() {
       }
     }
     
-    el.innerHTML = allHtml || '<p class="text-sm text-muted">No significant movements recorded yet</p>';
+    el.innerHTML = allHtml || '<p class="text-sm text-muted">' + ((LANG[currentLang]||LANG.en).no_routes||'No routes recorded yet') + '</p>';
     
     // Render mini maps after DOM is ready
     setTimeout(() => {
@@ -4261,7 +4267,7 @@ async function renderRouteHistory() {
     
   } catch(e) {
     console.log('Route history error:', e);
-    el.innerHTML = '<p class="text-sm text-muted">Error loading routes</p>';
+    el.innerHTML = '<p class="text-sm text-muted">' + ((LANG[currentLang]||LANG.en).error_loading||'Error loading') + '</p>';
   }
 }
 
