@@ -3419,23 +3419,31 @@ async function loadSOSAlerts() {
       members.members.forEach(m => { memberMap[m.memberId] = m.name; });
     }
     
-    const html = r.alerts.slice(0, 10).map(a => {
+    const html = r.alerts.slice(0, 10).map((a, idx) => {
       const name = memberMap[a.memberId] || a.memberId;
       const time = new Date(a.timestamp).toLocaleString('en-SG');
-      const loc = a.latitude ? `${Number(a.latitude).toFixed(4)}, ${Number(a.longitude).toFixed(4)}` : 'No location';
+      const coords = a.latitude ? `${Number(a.latitude).toFixed(4)}, ${Number(a.longitude).toFixed(4)}` : 'No location';
       const mapLink = a.latitude ? `https://www.google.com/maps?q=${a.latitude},${a.longitude}` : '';
+      const addrId = `sos-addr-${idx}`;
       return `
         <div style="padding:10px;background:rgba(220,53,69,0.08);border-radius:8px;border-left:3px solid var(--danger)">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <strong style="color:var(--danger)">🚨 ${esc(name)}</strong>
             <span class="text-sm text-muted">${time}</span>
           </div>
-          <div class="text-sm text-muted" style="margin-top:4px">${loc}</div>
+          <div class="text-sm text-muted" style="margin-top:4px"><span id="${addrId}">${coords}</span></div>
           ${mapLink ? `<a href="${mapLink}" target="_blank" style="font-size:12px;color:var(--pri);margin-top:4px;display:inline-block">View on Map →</a>` : ''}
         </div>
       `;
     }).join('');
     if ($('sos-alerts-list')) $('sos-alerts-list').innerHTML = html;
+    
+    // Geocode SOS alert locations (staggered)
+    r.alerts.slice(0, 10).forEach((a, idx) => {
+      if (a.latitude && a.longitude) {
+        setTimeout(() => geocodeElement(a.latitude, a.longitude, 'sos-addr-' + idx), idx * 1500 + 500);
+      }
+    });
   } catch(e) {
     if ($('sos-alerts-list')) $('sos-alerts-list').innerHTML = '<p class="text-sm text-muted">Error loading alerts</p>';
   }
@@ -3862,11 +3870,11 @@ async function renderTrackedMembersList() {
     }).join('');
     if ($('tracked-members-list')) $('tracked-members-list').innerHTML = html;
     
-    // Geocode addresses for members that don't have one from backend
-    r.members.forEach(m => {
+    // Geocode addresses for members (staggered)
+    r.members.forEach((m, idx) => {
       if (m.latitude && m.longitude && !m.address) {
         const memberId = m.memberId || m.id || '';
-        geocodeElement(m.latitude, m.longitude, 'addr-' + memberId);
+        setTimeout(() => geocodeElement(m.latitude, m.longitude, 'addr-' + memberId), idx * 1500);
       }
     });
     
@@ -4076,11 +4084,12 @@ async function renderRouteHistory() {
           routeMiniMaps.push(miniMap);
         } catch(e) {}
         
-        // Geocode start/end addresses via frontend API
+        // Geocode start/end addresses (staggered to avoid rate limiting)
         const startPt = item.trip[0];
         const endPt = item.trip[item.trip.length - 1];
-        if (!startPt.address) geocodeElement(startPt.latitude, startPt.longitude, 'rfrom-' + item.idx);
-        if (!endPt.address) geocodeElement(endPt.latitude, endPt.longitude, 'rto-' + item.idx);
+        const delay = i * 2000 + 1000; // Start after 1s, then 2s apart
+        if (!startPt.address) setTimeout(() => geocodeElement(startPt.latitude, startPt.longitude, 'rfrom-' + item.idx), delay);
+        if (!endPt.address) setTimeout(() => geocodeElement(endPt.latitude, endPt.longitude, 'rto-' + item.idx), delay + 1000);
       });
     }, 300);
     
