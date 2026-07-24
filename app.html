@@ -1928,6 +1928,14 @@ function applyLanguage() {
     }
   });
   
+  // 1b. Update placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key] !== undefined) {
+      el.placeholder = dict[key];
+    }
+  });
+  
   // 2. Update tab bar labels (special handling for SVG icons)
   const tabLabels = ['tab_home','tab_appt','tab_products','tab_monitor','tab_readings','tab_profile'];
   const tabBtns = document.querySelectorAll('.tab-btn');
@@ -1983,6 +1991,10 @@ function applyLanguage() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (d[key] !== undefined) el.textContent = d[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (d[key] !== undefined) el.placeholder = d[key];
     });
   };
   setTimeout(resweep, 300);
@@ -2050,6 +2062,46 @@ const PROD_LANG = {
     cat_Mobility:'இயக்கம்', cat_HomeCare:'இல்ல பராமரிப்பு', cat_Bathroom:'குளியலறை',
     cat_HealthMonitoring:'சுகாதார கண்காணிப்பு', cat_Respiratory:'சுவாசம்',
     buy:'வாங்கு', rent:'வாடகை', per_day:'/நாள்', in_stock:'கையிருப்பு உள்ளது', all:'அனைத்தும்'
+  },
+  tl: {
+    p001:{name:'Standard na Wheelchair',desc:'Magaan na natutuping wheelchair na may adjustable footrest. Para sa pang-araw-araw na paggamit.'},
+    p002:{name:'Electric Wheelchair',desc:'Battery-powered na electric wheelchair na may joystick control. Hanggang 20km bawat charge.'},
+    p003:{name:'Manual Hospital Bed',desc:'Single-crank hospital bed na may side rails at IV pole holder.'},
+    p004:{name:'Electric Hospital Bed',desc:'Three-function electric hospital bed na may remote control.'},
+    p005:{name:'Adjustable Walking Stick',desc:'Aluminum na adjustable-height walking stick na may ergonomic rubber grip.'},
+    p006:{name:'Quad Cane',desc:'Four-point base walking cane para sa mas matatag na suporta.'},
+    p007:{name:'Rollator Walker',desc:'Four-wheel rollator na may upuan, sandalan, at basket.'},
+    p008:{name:'Commode Chair',desc:'Steel frame commode chair na may natatanggal na pail.'},
+    p009:{name:'Shower Chair',desc:'Magaan na aluminum shower chair na may drainage holes.'},
+    p010:{name:'Blood Pressure Monitor',desc:'Digital upper arm BP monitor na may 60-reading memory.'},
+    p011:{name:'Oxygen Concentrator (5L)',desc:'Portable 5-liter oxygen concentrator. Tahimik na operasyon.'},
+    p012:{name:'Nebulizer',desc:'Compressor nebulizer na may adult at child masks.'},
+    p013:{name:'Patient Hoist (Manual)',desc:'Hydraulic patient hoist na may sling. 150kg capacity.'},
+    p014:{name:'Bed Rail (Adjustable)',desc:'Naitutuping bed safety rail. Madaling i-install.'},
+    p015:{name:'Overbed Table',desc:'Adjustable-height overbed table na may tilting surface.'},
+    cat_Mobility:'Mobility', cat_HomeCare:'Home Care', cat_Bathroom:'Banyo',
+    cat_HealthMonitoring:'Health Monitoring', cat_Respiratory:'Respiratory',
+    buy:'Bili', rent:'Upa', per_day:'/araw', in_stock:'May stock', all:'Lahat'
+  },
+  my: {
+    p001:{name:'စံ ဘီးတပ်ကုလားထိုင်',desc:'ပေါ့ပါးသော ခေါက်နိုင်သည့် ဘီးတပ်ကုလားထိုင်။ နေ့စဉ် အသုံးပြုရန်။'},
+    p002:{name:'လျှပ်စစ် ဘီးတပ်ကုလားထိုင်',desc:'ဘက်ထရီ မောင်းနှင်သော လျှပ်စစ် ဘီးတပ်ကုလားထိုင်။'},
+    p003:{name:'လက်ဖြင့် ဆေးရုံကုတင်',desc:'ဘေးကာ နှင့် IV တိုင်ပါ ဆေးရုံကုတင်။'},
+    p004:{name:'လျှပ်စစ် ဆေးရုံကုတင်',desc:'အဝေးထိန်း သုံးမျိုးသုံးစား လျှပ်စစ် ဆေးရုံကုတင်။'},
+    p005:{name:'ချိန်ညှိနိုင်သော လမ်းလျှောက်တုတ်',desc:'အလူမီနီယမ် ချိန်ညှိနိုင်သော လမ်းလျှောက်တုတ်။'},
+    p006:{name:'ခြေလေးချောင်း တုတ်',desc:'ပိုမိုတည်ငြိမ်သော ခြေလေးချောင်း အခြေခံ တုတ်။'},
+    p007:{name:'Rollator Walker',desc:'ထိုင်ခုံ၊ ကျောမှီ နှင့် ခြင်းပါ ဘီးလေးလုံး walker။'},
+    p008:{name:'အိမ်သာ ကုလားထိုင်',desc:'သံဘောင် အိမ်သာ ကုလားထိုင်။'},
+    p009:{name:'ရေချိုးခန်း ကုလားထိုင်',desc:'ပေါ့ပါးသော အလူမီနီယမ် ရေချိုးခန်း ကုလားထိုင်။'},
+    p010:{name:'သွေးပေါင်ချိန် စက်',desc:'ဒစ်ဂျစ်တယ် လက်မောင်း BP စောင့်ကြည့်ကိရိယာ။'},
+    p011:{name:'အောက်ဆီဂျင် စက် (5L)',desc:'သယ်ဆောင်ရလွယ်သော 5 လီတာ အောက်ဆီဂျင် စက်။'},
+    p012:{name:'Nebulizer',desc:'ကလေး နှင့် လူကြီး မျက်နှာဖုံးပါ Nebulizer။'},
+    p013:{name:'လူနာ ချီစက်',desc:'ဟိုက်ဒရော်လစ် လူနာ ချီစက်။ ၁၅၀ ကီလို ဝန်ချိန်။'},
+    p014:{name:'ကုတင် ဘေးကာ',desc:'ခေါက်နိုင်သော ကုတင် ဘေးကာ။'},
+    p015:{name:'ကုတင်ပေါ် စားပွဲ',desc:'ချိန်ညှိနိုင်သော ကုတင်ပေါ် စားပွဲ။'},
+    cat_Mobility:'လှုပ်ရှားမှု', cat_HomeCare:'အိမ်တွင်း စောင့်ရှောက်မှု', cat_Bathroom:'ရေချိုးခန်း',
+    cat_HealthMonitoring:'ကျန်းမာရေး စောင့်ကြည့်', cat_Respiratory:'အသက်ရှူ',
+    buy:'ဝယ်ရန်', rent:'ငှားရန်', per_day:'/ရက်', in_stock:'လက်ကျန် ရှိ', all:'အားလုံး'
   }
 };
 
@@ -2479,6 +2531,18 @@ const UPDATE_LANG = {
     'Welcome to Juan SecureLiving': { title:'Juan SecureLiving-க்கு வரவேற்கிறோம்', content:'சுதந்திர வாழ்க்கையை ஆதரிக்க நாங்கள் இங்கே இருக்கிறோம். எங்கள் உபகரணங்களை பார்வையிடுங்கள், ஆலோசனை முன்பதிவு செய்யுங்கள், அல்லது உங்கள் ஆரோக்கியத்தை கண்காணியுங்கள்.' },
     'Free Home Assessment': { title:'இலவச வீட்டு மதிப்பீடு', content:'இந்த மாதம் இலவச வீட்டு பாதுகாப்பு மதிப்பீடு முன்பதிவு செய்யுங்கள். எங்கள் ஆலோசகர்கள் உங்கள் வீட்டை மதிப்பீடு செய்து பாதுகாப்பான வாழ்க்கைக்கான மாற்றங்களை பரிந்துரைப்பார்கள்.' },
     'New: Health Tracking': { title:'புதிய: சுகாதார கண்காணிப்பு', content:'இப்போது உங்கள் இரத்த அழுத்த வாசிப்புகளை பதிவு செய்து சுகாதார அளவீடுகளை கண்காணிக்கலாம். உங்கள் ஆரோக்கியத்தை கவனியுங்கள்.' }
+  },
+  tl: {
+    'Welcome to AssistLiving': { title:'Maligayang pagdating sa Juan SecureLiving', content:'Nandito kami para suportahan ang iyong independiyenteng pamumuhay. Tingnan ang aming kagamitan, mag-book ng konsultasyon, o i-track ang iyong kalusugan.' },
+    'Welcome to Juan SecureLiving': { title:'Maligayang pagdating sa Juan SecureLiving', content:'Nandito kami para suportahan ang iyong independiyenteng pamumuhay. Tingnan ang aming kagamitan, mag-book ng konsultasyon, o i-track ang iyong kalusugan.' },
+    'Free Home Assessment': { title:'Libreng Home Assessment', content:'Mag-book ng libreng home safety assessment ngayong buwan. Susuriin ng aming mga consultant ang iyong tahanan at magrerekomenda ng mga pagbabago.' },
+    'New: Health Tracking': { title:'Bago: Health Tracking', content:'Maaari mo nang i-log ang iyong blood pressure readings at i-track ang mga health metrics. Alagaan ang iyong kalusugan.' }
+  },
+  my: {
+    'Welcome to AssistLiving': { title:'Juan SecureLiving မှ ကြိုဆိုပါသည်', content:'သင့်လွတ်လပ်စွာ နေထိုင်ရေးကို ပံ့ပိုးရန် ကျွန်ုပ်တို့ ရှိပါသည်။ ကိရိယာများ ကြည့်ရှုပါ၊ တိုင်ပင်မှု ယူပါ၊ သို့ ကျန်းမာရေး ခြေရာခံပါ။' },
+    'Welcome to Juan SecureLiving': { title:'Juan SecureLiving မှ ကြိုဆိုပါသည်', content:'သင့်လွတ်လပ်စွာ နေထိုင်ရေးကို ပံ့ပိုးရန် ကျွန်ုပ်တို့ ရှိပါသည်။ ကိရိယာများ ကြည့်ရှုပါ၊ တိုင်ပင်မှု ယူပါ၊ သို့ ကျန်းမာရေး ခြေရာခံပါ။' },
+    'Free Home Assessment': { title:'အခမဲ့ အိမ် အကဲဖြတ်မှု', content:'ဤလတွင် အခမဲ့ အိမ် ဘေးကင်းရေး အကဲဖြတ်မှု ယူပါ။ ကျွန်ုပ်တို့၏ အကြံပေးများက သင့်အိမ်ကို စစ်ဆေးပြီး ပိုမို ဘေးကင်းသော နေထိုင်မှုအတွက် အကြံပြုမည်။' },
+    'New: Health Tracking': { title:'အသစ်- ကျန်းမာရေး ခြေရာခံ', content:'ယခု သင့်သွေးပေါင်ချိန် reading များကို မှတ်တမ်းတင်နိုင်ပြီ ဖြစ်သည်။ သင့်ကျန်းမာရေးကို ဂရုစိုက်ပါ။' }
   }
 };
 
