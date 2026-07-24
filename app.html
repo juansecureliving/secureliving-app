@@ -4083,13 +4083,15 @@ async function renderRouteHistory() {
           miniMap.fitBounds(points, { padding: [20, 20] });
           routeMiniMaps.push(miniMap);
         } catch(e) {}
-        
-        // Geocode start/end addresses (staggered to avoid rate limiting)
+      });
+      
+      // Geocode route addresses AFTER tracked members + SOS are done (start at 10s)
+      allSessions.forEach((item, i) => {
         const startPt = item.trip[0];
         const endPt = item.trip[item.trip.length - 1];
-        const delay = i * 2000 + 1000; // Start after 1s, then 2s apart
-        if (!startPt.address) setTimeout(() => geocodeElement(startPt.latitude, startPt.longitude, 'rfrom-' + item.idx), delay);
-        if (!endPt.address) setTimeout(() => geocodeElement(endPt.latitude, endPt.longitude, 'rto-' + item.idx), delay + 1000);
+        const baseDelay = 10000 + i * 2000;
+        if (!startPt.address) setTimeout(() => geocodeElement(startPt.latitude, startPt.longitude, 'rfrom-' + item.idx), baseDelay);
+        if (!endPt.address) setTimeout(() => geocodeElement(endPt.latitude, endPt.longitude, 'rto-' + item.idx), baseDelay + 1000);
       });
     }, 300);
     
