@@ -2002,14 +2002,16 @@ function applyLanguage() {
     }
   });
   
-  // 3. Update greeting (preserve HTML structure)
+  // 3. Update greeting (preserve HTML structure with both spans)
   const hour = new Date().getHours();
   const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
   const greet = dict[greetKey] || 'Welcome';
   if (ME) {
     if ($('greeting-text')) $('greeting-text').textContent = `${greet}, ${ME.name.split(' ')[0]}`;
+    if ($('greeting-initials')) $('greeting-initials').textContent = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   } else if (isGuest) {
     if ($('greeting-text')) $('greeting-text').textContent = greet;
+    if ($('greeting-initials')) $('greeting-initials').textContent = 'GU';
   }
   
   // 4. Update lang selector
@@ -2048,15 +2050,16 @@ function applyLanguage() {
   // 7. Re-apply data-i18n after async re-renders
   const resweep = () => {
     const d = LANG[currentLang] || LANG.en;
+    // Re-apply all data-i18n translations
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (d[key] !== undefined) el.textContent = d[key];
     });
-    // Also re-apply placeholders after async re-renders
+    // Re-apply all data-i18n-placeholder translations
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (d[key] !== undefined) {
-        el.setAttribute('placeholder', dict[key]);
+        el.setAttribute('placeholder', d[key]);
       }
     });
   };
@@ -2424,7 +2427,8 @@ async function enterApp() {
 
     const firstName = name.split(' ')[0];
     const hour = new Date().getHours();
-    // Greeting will be set by applyLanguage() after language is loaded
+    const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+    if ($('greeting-text')) $('greeting-text').textContent = greet + ', ' + firstName;
     if ($('greeting-initials')) $('greeting-initials').textContent = initials;
 
     // Set default dates
