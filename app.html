@@ -774,7 +774,7 @@ button{cursor:pointer;border:none;background:none}
   
   <!-- Loading Indicator Card -->
   <div id="processing-indicator" class="card" style="display:none;text-align:center;padding:40px 20px">
-    <div style="color:var(--text-muted);margin-bottom:20px;font-size:14px" data-i18n="camera_processing">Processing image...</div>
+    <div style="color:var(--muted);margin-bottom:20px;font-size:14px" data-i18n="camera_processing">Processing image...</div>
     <div style="width:40px;height:40px;border:3px solid rgba(26,122,109,0.2);border-top-color:var(--pri);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
   </div>
   
@@ -783,13 +783,13 @@ button{cursor:pointer;border:none;background:none}
     <!-- Detected Text -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 12px 0;font-weight:600" data-i18n="camera_detected">Detected Text</h3>
-      <div id="detected-text" style="font-size:13px;line-height:1.6;color:var(--text-muted);max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)"></div>
+      <div id="detected-text" style="font-size:13px;line-height:1.6;color:var(--text);max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)"></div>
     </div>
     
     <!-- Translation Section -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 16px 0;font-weight:600" data-i18n="camera_translation">Translation</h3>
-      <select id="translate-to-lang" style="width:100%;padding:10px 12px;margin-bottom:16px;background:var(--input);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px">
+      <select id="translate-to-lang" style="width:100%;padding:10px 12px;margin-bottom:16px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
         <option value="en">English</option>
         <option value="zh">中文 (Chinese)</option>
         <option value="ms">Bahasa Melayu</option>
@@ -798,7 +798,7 @@ button{cursor:pointer;border:none;background:none}
         <option value="my">မြန်မာ (Myanmar)</option>
       </select>
       <button class="btn btn-primary" style="width:100%;margin-bottom:16px" onclick="translateText()" data-i18n="camera_translate_btn">Translate</button>
-      <div id="translated-text" style="font-size:13px;line-height:1.6;color:var(--text-muted);display:none;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--pri);border-left:4px solid var(--pri)"></div>
+      <div id="translated-text" style="font-size:14px;line-height:1.7;color:var(--text);display:none;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
     </div>
     
     <!-- Scan Again Button -->
@@ -4446,8 +4446,22 @@ let capturedImageData = null;
 
 async function startCamera() {
   try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    $('camera-video').srcObject = cameraStream;
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+        focusMode: { ideal: 'continuous' }
+      }
+    });
+    const video = $('camera-video');
+    video.srcObject = cameraStream;
+    // Try to enable continuous autofocus
+    const track = cameraStream.getVideoTracks()[0];
+    const caps = track.getCapabilities ? track.getCapabilities() : {};
+    if (caps.focusMode && caps.focusMode.includes('continuous')) {
+      await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+    }
     $('upload-container').style.display = 'none';
     $('camera-container').style.display = 'block';
   } catch (err) {
@@ -4507,34 +4521,33 @@ async function extractText() {
   if (!capturedImageData) return;
   
   $('processing-indicator').style.display = 'block';
+  $('image-preview-container').style.display = 'none';
   
   try {
-    // Use Tesseract.js for OCR (lightweight)
-    // For now, we'll use a placeholder message
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
-    script.onload = async () => {
-      try {
-        const { createWorker } = Tesseract;
-        const worker = await createWorker();
-        const { data: { text } } = await worker.recognize(capturedImageData);
-        await worker.terminate();
-        
-        $('detected-text').textContent = text || 'No text detected. Please try another image.';
-        $('processing-indicator').style.display = 'none';
-        $('text-results-container').style.display = 'block';
-      } catch (err) {
-        console.error('OCR error:', err);
-        $('detected-text').textContent = 'Error processing image. Please try again.';
-        $('processing-indicator').style.display = 'none';
-        $('text-results-container').style.display = 'block';
-      }
-    };
-    document.head.appendChild(script);
-  } catch (err) {
-    console.error('Error:', err);
-    toast('Error processing image','error');
+    // Load Tesseract.js if not already loaded
+    if (typeof Tesseract === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Failed to load OCR library'));
+        document.head.appendChild(script);
+      });
+    }
+    
+    const worker = await Tesseract.createWorker('eng');
+    const { data: { text } } = await worker.recognize(capturedImageData);
+    await worker.terminate();
+    
+    const t = LANG[currentLang] || LANG.en;
+    $('detected-text').textContent = text.trim() || (t.camera_no_text || 'No text detected. Please try another image.');
     $('processing-indicator').style.display = 'none';
+    $('text-results-container').style.display = 'block';
+  } catch (err) {
+    console.error('OCR error:', err);
+    $('detected-text').textContent = 'Error processing image. Please try again.';
+    $('processing-indicator').style.display = 'none';
+    $('text-results-container').style.display = 'block';
   }
 }
 
