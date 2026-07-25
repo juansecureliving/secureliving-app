@@ -2393,11 +2393,8 @@ async function enterGuest() {
     $('top-avatar').textContent = '👤';
     $('top-name').textContent = (LANG[currentLang]||LANG.en).guest || 'Guest';
     
-    const t = LANG[currentLang] || LANG.en;
-    const hour = new Date().getHours();
-    const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
-    if ($('greeting-text')) $('greeting-text').textContent = (t[greetKey] || 'Welcome') + ',';
-    if ($('greeting-initials')) $('greeting-initials').textContent = 'GU';
+    // Greeting will be set by applyLanguage() with proper translations
+    // No need to set it here
     
     // Set default dates
     const today = new Date().toISOString().split('T')[0];
@@ -2408,6 +2405,7 @@ async function enterGuest() {
     // Restore saved language
     const savedLang = localStorage.getItem('al_lang');
     if (savedLang) currentLang = savedLang;
+    applyLanguage();  // ← MUST apply language after restoring it
     
     switchTab('home');
     
@@ -2454,12 +2452,9 @@ async function enterApp() {
     $('top-avatar').textContent = initials;
     $('top-name').textContent = name.split(' ')[0];
 
-    const firstName = name.split(' ')[0];
-    const hour = new Date().getHours();
-    const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-    if ($('greeting-text')) $('greeting-text').textContent = greet + ', ' + firstName;
-    if ($('greeting-initials')) $('greeting-initials').textContent = initials;
-
+    // Greeting will be set by applyLanguage() with proper translations
+    // No need to set it here with hardcoded English text
+    
     // Set default dates
     const today = new Date().toISOString().split('T')[0];
     if ($('appt-date')) $('appt-date').value = today;
