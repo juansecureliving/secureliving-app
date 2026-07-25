@@ -1459,6 +1459,7 @@ const LANG = {
     camera_capture:'Capture', camera_stop:'Stop', camera_upload:'📁 Upload from Gallery', camera_open:'📷 Take Photo',
     camera_clear:'Clear', camera_extract:'Extract Text', camera_processing:'Processing image...',
     camera_detected:'Detected Text', camera_translation:'Translation', camera_translate_btn:'Translate', camera_again:'Scan Again',
+    camera_no_text:'No text detected. Please try another image.', camera_load_error:'Could not load image. Please try a JPEG or PNG photo.',
     // Readings
     readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
@@ -1575,6 +1576,7 @@ const LANG = {
     camera_capture:'拍摄', camera_stop:'停止', camera_upload:'📁 从相册选择', camera_open:'📷 拍照',
     camera_clear:'清除', camera_extract:'提取文字', camera_processing:'处理图像中...',
     camera_detected:'检测到的文字', camera_translation:'翻译', camera_translate_btn:'翻译', camera_again:'再次扫描',
+    camera_no_text:'未检测到文字，请尝试其他图片。', camera_load_error:'无法加载图片，请尝试JPEG或PNG格式。',
     readings:'读数', log_glucose:'记录血糖', glucose_value:'血糖(毫克/分升)',
     glucose_time:'时间段', fasting:'空腹', before_meal:'进餐前', after_meal:'进餐后', bedtime:'睡前',
     glucose_history:'血糖历史', log_cholesterol:'记录胆固醇', total_cholesterol:'总胆固醇',
@@ -4507,34 +4509,123 @@ function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   
-  // Convert any image format (HEIC, PNG, WebP, etc.) to JPEG via Canvas
-  // This ensures Tesseract.js can process it on all devices including iPhone
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    // Limit size for performance on mobile (max 2048px on longest side)
-    const maxDim = 2048;
-    let w = img.naturalWidth, h = img.naturalHeight;
-    if (w > maxDim || h > maxDim) {
-      if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-      else { w = Math.round(w * maxDim / h); h = maxDim; }
+  const t = LANG[currentLang] || LANG.en;
+  // Show processing state while converting
+  $('upload-container').style.display = 'none';
+  $('processing-indicator').style.display = 'block';
+  
+  convertToJpeg(file)
+    .then(jpegDataUrl => {
+      capturedImageData = jpegDataUrl;
+      $('captured-image').src = capturedImageData;
+      $('processing-indicator').style.display = 'none';
+      $('image-preview-container').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Image load error:', err);
+      toast(t.camera_load_error || 'Could not load image. Please try a JPEG or PNG photo.', 'error');
+      $('processing-indicator').style.display = 'none';
+      $('upload-container').style.display = 'block';
+    });
+}
+
+// Convert any image file to JPEG via Canvas, with HEIC fallback
+async function convertToJpeg(file) {
+  const name = (file.name || '').toLowerCase();
+  const type = (file.type || '').toLowerCase();
+  const isHeic = name.endsWith('.heic') || name.endsWith('.heif') ||
+                 type === 'image/heic' || type === 'image/heif';
+
+  // Method 1: Try native browser decoding (works for JPEG, PNG, WebP, and HEIC on iOS Safari)
+  try {
+    const dataUrl = await loadImageViaObjectURL(file);
+    return dataUrl;
+  } catch(e) {
+    console.log('Native decode failed, trying fallback...', e);
+  }
+
+  // Method 2: For HEIC files, use heic2any JS library to convert to JPEG
+  if (isHeic) {
+    try {
+      if (typeof heic2any === 'undefined') {
+        await loadScript('https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js');
+      }
+      const jpegBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+      const blob = Array.isArray(jpegBlob) ? jpegBlob[0] : jpegBlob;
+      const dataUrl = await loadImageViaObjectURL(blob);
+      return dataUrl;
+    } catch(e) {
+      console.error('HEIC conversion failed:', e);
     }
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, w, h);
-    capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
-    $('captured-image').src = capturedImageData;
-    $('upload-container').style.display = 'none';
-    $('image-preview-container').style.display = 'block';
-    URL.revokeObjectURL(img.src);
-  };
-  img.onerror = () => {
-    toast('Could not load image. Try a different photo.', 'error');
-    URL.revokeObjectURL(img.src);
-  };
-  // Use object URL — lets the browser decode HEIC/WebP/etc. natively
-  img.src = URL.createObjectURL(file);
+  }
+
+  // Method 3: Last resort — try FileReader (works for standard formats)
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const dataUrl = await drawToCanvas(e.target.result);
+        resolve(dataUrl);
+      } catch(err) { reject(err); }
+    };
+    reader.onerror = () => reject(new Error('FileReader failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// Load image via Object URL, draw to Canvas, return JPEG data URL
+function loadImageViaObjectURL(fileOrBlob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(fileOrBlob);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const result = canvasConvert(img);
+        URL.revokeObjectURL(url);
+        resolve(result);
+      } catch(e) { URL.revokeObjectURL(url); reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image decode failed')); };
+    img.src = url;
+  });
+}
+
+// Draw a data URL string into Canvas, return JPEG
+function drawToCanvas(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => { try { resolve(canvasConvert(img)); } catch(e) { reject(e); } };
+    img.onerror = () => reject(new Error('Image decode failed'));
+    img.src = dataUrl;
+  });
+}
+
+// Shared Canvas conversion: scale + export as JPEG
+function canvasConvert(img) {
+  const canvas = document.createElement('canvas');
+  const maxDim = 2048;
+  let w = img.naturalWidth, h = img.naturalHeight;
+  if (w > maxDim || h > maxDim) {
+    if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+    else       { w = Math.round(w * maxDim / h); h = maxDim; }
+  }
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL('image/jpeg', 0.9);
+}
+
+// Helper to load a script and wait for it
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Script load failed: ' + src));
+    document.head.appendChild(s);
+  });
 }
 
 function clearImage() {
