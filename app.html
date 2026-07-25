@@ -747,49 +747,49 @@ button{cursor:pointer;border:none;background:none}
   <h2 class="section-title" data-i18n="camera_title">Medicine Label Translator</h2>
   <p class="text-sm text-muted mb-16" data-i18n="camera_desc">Take a photo of medicine labels or text to translate them instantly.</p>
   
-  <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:20px">
-    <!-- Camera Preview -->
-    <div id="camera-container" style="display:none">
-      <video id="camera-video" style="width:100%;border-radius:12px;margin-bottom:12px;background:#000" autoplay playsinline></video>
-      <div style="display:flex;gap:12px">
-        <button class="btn btn-primary" style="flex:1" onclick="capturePhoto()" data-i18n="camera_capture">Capture</button>
-        <button class="btn btn-outline" style="flex:1" onclick="stopCamera()" data-i18n="camera_stop">Stop</button>
-      </div>
-    </div>
-    
-    <!-- File Upload Option -->
-    <div id="upload-container">
-      <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none">
-      <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="document.getElementById('photo-input').click()" data-i18n="camera_upload">📸 Upload Photo</button>
-      <button class="btn btn-outline" style="width:100%" onclick="startCamera()" data-i18n="camera_open">📷 Open Camera</button>
+  <!-- Camera Preview Card -->
+  <div id="camera-container" class="card" style="display:none">
+    <video id="camera-video" style="width:100%;border-radius:12px;margin-bottom:16px;background:#000;max-height:400px;object-fit:cover" autoplay playsinline></video>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-primary" style="flex:1" onclick="capturePhoto()" data-i18n="camera_capture">Capture</button>
+      <button class="btn btn-outline" style="flex:1" onclick="stopCamera()" data-i18n="camera_stop">Stop</button>
     </div>
   </div>
   
-  <!-- Captured Image Preview -->
-  <div id="image-preview-container" style="display:none;margin-bottom:20px">
-    <img id="captured-image" style="width:100%;border-radius:12px;margin-bottom:12px">
+  <!-- File Upload Card -->
+  <div id="upload-container" class="card">
+    <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none">
+    <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="document.getElementById('photo-input').click()" data-i18n="camera_upload">📸 Upload Photo</button>
+    <button class="btn btn-outline" style="width:100%" onclick="startCamera()" data-i18n="camera_open">📷 Open Camera</button>
+  </div>
+  
+  <!-- Captured Image Preview Card -->
+  <div id="image-preview-container" class="card" style="display:none;margin-bottom:20px">
+    <img id="captured-image" style="width:100%;border-radius:12px;margin-bottom:16px;max-height:400px;object-fit:cover">
     <div style="display:flex;gap:12px">
       <button class="btn btn-secondary" style="flex:1" onclick="clearImage()" data-i18n="camera_clear">Clear</button>
       <button class="btn btn-primary" style="flex:1" onclick="extractText()" data-i18n="camera_extract">Extract Text</button>
     </div>
   </div>
   
-  <!-- Loading Indicator -->
-  <div id="processing-indicator" style="display:none;text-align:center;padding:20px">
-    <div style="color:#888;margin-bottom:12px" data-i18n="camera_processing">Processing image...</div>
-    <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--pri);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
+  <!-- Loading Indicator Card -->
+  <div id="processing-indicator" class="card" style="display:none;text-align:center;padding:40px 20px">
+    <div style="color:var(--text-muted);margin-bottom:20px;font-size:14px" data-i18n="camera_processing">Processing image...</div>
+    <div style="width:40px;height:40px;border:3px solid rgba(26,122,109,0.2);border-top-color:var(--pri);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
   </div>
   
-  <!-- Extracted Text -->
+  <!-- Extracted Text Card -->
   <div id="text-results-container" style="display:none">
-    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:20px">
-      <h3 style="margin:0 0 12px 0;font-size:14px;font-weight:600" data-i18n="camera_detected">Detected Text</h3>
-      <div id="detected-text" style="font-size:13px;line-height:1.6;color:#aaa;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace"></div>
+    <!-- Detected Text -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 12px 0;font-weight:600" data-i18n="camera_detected">Detected Text</h3>
+      <div id="detected-text" style="font-size:13px;line-height:1.6;color:var(--text-muted);max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;font-family:monospace;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)"></div>
     </div>
     
-    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:16px;margin-bottom:20px">
-      <h3 style="margin:0 0 12px 0;font-size:14px;font-weight:600" data-i18n="camera_translation">Translation</h3>
-      <select id="translate-to-lang" style="width:100%;padding:8px;margin-bottom:12px;background:rgba(26,122,109,0.2);color:#fff;border:1px solid rgba(26,122,109,0.4);border-radius:8px">
+    <!-- Translation Section -->
+    <div class="card">
+      <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 16px 0;font-weight:600" data-i18n="camera_translation">Translation</h3>
+      <select id="translate-to-lang" style="width:100%;padding:10px 12px;margin-bottom:16px;background:var(--input);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px">
         <option value="en">English</option>
         <option value="zh">中文 (Chinese)</option>
         <option value="ms">Bahasa Melayu</option>
@@ -797,10 +797,11 @@ button{cursor:pointer;border:none;background:none}
         <option value="tl">Tagalog</option>
         <option value="my">မြန်မာ (Myanmar)</option>
       </select>
-      <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="translateText()" data-i18n="camera_translate_btn">Translate</button>
-      <div id="translated-text" style="font-size:13px;line-height:1.6;color:#aaa;display:none;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word"></div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:16px" onclick="translateText()" data-i18n="camera_translate_btn">Translate</button>
+      <div id="translated-text" style="font-size:13px;line-height:1.6;color:var(--text-muted);display:none;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--pri);border-left:4px solid var(--pri)"></div>
     </div>
     
+    <!-- Scan Again Button -->
     <button class="btn btn-secondary" style="width:100%" onclick="resetCamera()" data-i18n="camera_again">Scan Again</button>
   </div>
 </div>
@@ -2087,7 +2088,7 @@ function applyLanguage() {
   }
   
   // 2. Update tab bar labels (special handling for SVG icons)
-  const tabLabels = ['tab_home','tab_appt','tab_products','tab_monitor','tab_readings','tab_profile'];
+  const tabLabels = ['tab_home','tab_appt','tab_products','tab_camera','tab_monitor','tab_readings','tab_profile'];
   const tabBtns = document.querySelectorAll('.tab-btn');
   tabBtns.forEach((btn, i) => {
     if (tabLabels[i] && dict[tabLabels[i]]) {
