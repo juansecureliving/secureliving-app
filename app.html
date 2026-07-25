@@ -758,7 +758,7 @@ button{cursor:pointer;border:none;background:none}
   
   <!-- File Upload Card -->
   <div id="upload-container" class="card">
-    <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoUpload(event)" style="display:none">
+    <input type="file" id="photo-input" accept="image/*,.heic,.heif" capture="environment" onchange="handlePhotoUpload(event)" style="display:none">
     <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="document.getElementById('photo-input').click()" data-i18n="camera_upload">📸 Upload Photo</button>
     <button class="btn btn-outline" style="width:100%" onclick="startCamera()" data-i18n="camera_open">📷 Open Camera</button>
   </div>
@@ -4482,12 +4482,19 @@ function stopCamera() {
 function capturePhoto() {
   const video = $('camera-video');
   const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  // Limit capture size for mobile performance
+  const maxDim = 2048;
+  let w = video.videoWidth, h = video.videoHeight;
+  if (w > maxDim || h > maxDim) {
+    if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+    else { w = Math.round(w * maxDim / h); h = maxDim; }
+  }
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0);
+  ctx.drawImage(video, 0, 0, w, h);
   
-  capturedImageData = canvas.toDataURL('image/jpeg');
+  capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
   $('captured-image').src = capturedImageData;
   $('camera-container').style.display = 'none';
   $('image-preview-container').style.display = 'block';
@@ -4499,14 +4506,34 @@ function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    capturedImageData = e.target.result;
+  // Convert any image format (HEIC, PNG, WebP, etc.) to JPEG via Canvas
+  // This ensures Tesseract.js can process it on all devices including iPhone
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    // Limit size for performance on mobile (max 2048px on longest side)
+    const maxDim = 2048;
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if (w > maxDim || h > maxDim) {
+      if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+      else { w = Math.round(w * maxDim / h); h = maxDim; }
+    }
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
     $('captured-image').src = capturedImageData;
     $('upload-container').style.display = 'none';
     $('image-preview-container').style.display = 'block';
+    URL.revokeObjectURL(img.src);
   };
-  reader.readAsDataURL(file);
+  img.onerror = () => {
+    toast('Could not load image. Try a different photo.', 'error');
+    URL.revokeObjectURL(img.src);
+  };
+  // Use object URL — lets the browser decode HEIC/WebP/etc. natively
+  img.src = URL.createObjectURL(file);
 }
 
 function clearImage() {
