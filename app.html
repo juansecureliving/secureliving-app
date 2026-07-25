@@ -758,9 +758,10 @@ button{cursor:pointer;border:none;background:none}
   
   <!-- File Upload Card -->
   <div id="upload-container" class="card">
-    <input type="file" id="photo-input" accept="image/*,.heic,.heif" capture="environment" onchange="handlePhotoUpload(event)" style="display:none">
-    <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="document.getElementById('photo-input').click()" data-i18n="camera_upload">📸 Upload Photo</button>
-    <button class="btn btn-outline" style="width:100%" onclick="startCamera()" data-i18n="camera_open">📷 Open Camera</button>
+    <input type="file" id="photo-input" accept="image/*,.heic,.heif" onchange="handlePhotoUpload(event)" style="display:none">
+    <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhotoUpload(event)" style="display:none">
+    <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="document.getElementById('camera-input').click()" data-i18n="camera_open">📷 Take Photo</button>
+    <button class="btn btn-outline" style="width:100%" onclick="document.getElementById('photo-input').click()" data-i18n="camera_upload">📁 Upload from Gallery</button>
   </div>
   
   <!-- Captured Image Preview Card -->
@@ -1455,7 +1456,7 @@ const LANG = {
     tab_camera:'Translate', tab_monitor:'Monitor', tab_readings:'Readings', tab_profile:'Profile',
     // Camera
     camera_title:'Medicine Label Translator', camera_desc:'Take a photo of medicine labels or text to translate them instantly.',
-    camera_capture:'Capture', camera_stop:'Stop', camera_upload:'📸 Upload Photo', camera_open:'📷 Open Camera',
+    camera_capture:'Capture', camera_stop:'Stop', camera_upload:'📁 Upload from Gallery', camera_open:'📷 Take Photo',
     camera_clear:'Clear', camera_extract:'Extract Text', camera_processing:'Processing image...',
     camera_detected:'Detected Text', camera_translation:'Translation', camera_translate_btn:'Translate', camera_again:'Scan Again',
     // Readings
@@ -1571,7 +1572,7 @@ const LANG = {
     tab_home:'首页', tab_appt:'预约', tab_products:'设备',
     tab_camera:'翻译', tab_monitor:'监控', tab_readings:'读数', tab_profile:'档案',
     camera_title:'药品标签翻译器', camera_desc:'拍摄药品标签或文字照片进行即时翻译。',
-    camera_capture:'拍摄', camera_stop:'停止', camera_upload:'📸 上传照片', camera_open:'📷 打开相机',
+    camera_capture:'拍摄', camera_stop:'停止', camera_upload:'📁 从相册选择', camera_open:'📷 拍照',
     camera_clear:'清除', camera_extract:'提取文字', camera_processing:'处理图像中...',
     camera_detected:'检测到的文字', camera_translation:'翻译', camera_translate_btn:'翻译', camera_again:'再次扫描',
     readings:'读数', log_glucose:'记录血糖', glucose_value:'血糖(毫克/分升)',
@@ -4542,6 +4543,79 @@ function clearImage() {
   $('upload-container').style.display = 'block';
   $('text-results-container').style.display = 'none';
   document.getElementById('photo-input').value = '';
+  document.getElementById('camera-input').value = '';
+}
+
+// Preprocess image for better OCR: grayscale + contrast + sharpen
+function preprocessForOCR(imageDataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      // Scale up small images for better OCR (min 1500px wide)
+      let w = img.naturalWidth, h = img.naturalHeight;
+      const minW = 1500;
+      if (w < minW) {
+        const scale = minW / w;
+        w = minW;
+        h = Math.round(h * scale);
+      }
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Get pixel data
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const d = imageData.data;
+
+      // Step 1: Convert to grayscale
+      for (let i = 0; i < d.length; i += 4) {
+        const gray = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+        d[i] = d[i+1] = d[i+2] = gray;
+      }
+
+      // Step 2: Increase contrast (stretch histogram)
+      let min = 255, max = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i] < min) min = d[i];
+        if (d[i] > max) max = d[i];
+      }
+      const range = max - min || 1;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = Math.round(((d[i] - min) / range) * 255);
+        d[i] = d[i+1] = d[i+2] = v;
+      }
+
+      // Step 3: Binarize with adaptive threshold (Otsu-like)
+      // Calculate histogram
+      const hist = new Array(256).fill(0);
+      for (let i = 0; i < d.length; i += 4) hist[d[i]]++;
+      const total = w * h;
+      let sum = 0;
+      for (let i = 0; i < 256; i++) sum += i * hist[i];
+      let sumB = 0, wB = 0, wF = 0, maxVar = 0, threshold = 128;
+      for (let i = 0; i < 256; i++) {
+        wB += hist[i];
+        if (wB === 0) continue;
+        wF = total - wB;
+        if (wF === 0) break;
+        sumB += i * hist[i];
+        const mB = sumB / wB;
+        const mF = (sum - sumB) / wF;
+        const between = wB * wF * (mB - mF) * (mB - mF);
+        if (between > maxVar) { maxVar = between; threshold = i; }
+      }
+      for (let i = 0; i < d.length; i += 4) {
+        const v = d[i] > threshold ? 255 : 0;
+        d[i] = d[i+1] = d[i+2] = v;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.src = imageDataUrl;
+  });
 }
 
 async function extractText() {
@@ -4562,8 +4636,11 @@ async function extractText() {
       });
     }
     
+    // Preprocess image for better accuracy
+    const processedImage = await preprocessForOCR(capturedImageData);
+    
     const worker = await Tesseract.createWorker('eng');
-    const { data: { text } } = await worker.recognize(capturedImageData);
+    const { data: { text } } = await worker.recognize(processedImage);
     await worker.terminate();
     
     const t = LANG[currentLang] || LANG.en;
