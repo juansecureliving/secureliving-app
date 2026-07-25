@@ -2002,14 +2002,14 @@ function applyLanguage() {
     }
   });
   
-  // 3. Update greeting
+  // 3. Update greeting (preserve HTML structure)
   const hour = new Date().getHours();
   const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
   const greet = dict[greetKey] || 'Welcome';
   if (ME) {
-    $('greeting').textContent = `${greet}, ${ME.name.split(' ')[0]}`;
+    if ($('greeting-text')) $('greeting-text').textContent = `${greet}, ${ME.name.split(' ')[0]}`;
   } else if (isGuest) {
-    $('greeting').textContent = greet;
+    if ($('greeting-text')) $('greeting-text').textContent = greet;
   }
   
   // 4. Update lang selector
@@ -2037,12 +2037,27 @@ function applyLanguage() {
     loadOrders();
   }
   
+  // 6a. Update ALL data-i18n-placeholder elements (input placeholders)
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key] !== undefined) {
+      el.setAttribute('placeholder', dict[key]);
+    }
+  });
+  
   // 7. Re-apply data-i18n after async re-renders
   const resweep = () => {
     const d = LANG[currentLang] || LANG.en;
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (d[key] !== undefined) el.textContent = d[key];
+    });
+    // Also re-apply placeholders after async re-renders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (d[key] !== undefined) {
+        el.setAttribute('placeholder', dict[key]);
+      }
     });
   };
   setTimeout(resweep, 300);
@@ -2409,8 +2424,7 @@ async function enterApp() {
 
     const firstName = name.split(' ')[0];
     const hour = new Date().getHours();
-    const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-    if ($('greeting-text')) $('greeting-text').textContent = greet + ', ' + firstName;
+    // Greeting will be set by applyLanguage() after language is loaded
     if ($('greeting-initials')) $('greeting-initials').textContent = initials;
 
     // Set default dates
