@@ -1993,12 +1993,23 @@ function applyLanguage() {
   const dict = LANG[currentLang] || LANG.en;
   
   // 1. Update ALL data-i18n elements throughout the entire document
+  const debugElements = [];
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (dict[key] !== undefined) {
       el.textContent = dict[key];
+      debugElements.push({key, tag: el.tagName, text: el.textContent.substring(0, 50)});
+    } else {
+      // Log missing translations
+      if (key === 'trend_title' || key === 'good_morning' || key === 'good_afternoon' || key === 'good_evening') {
+        console.warn(`Missing translation for key: ${key} in language: ${currentLang}`);
+      }
     }
   });
+  // Log on language change for debugging
+  if (currentLang !== 'en') {
+    console.log(`[Translation] Language: ${currentLang}, Updated ${debugElements.length} elements`, debugElements);
+  }
   
   // 2. Update tab bar labels (special handling for SVG icons)
   const tabLabels = ['tab_home','tab_appt','tab_products','tab_monitor','tab_readings','tab_profile'];
@@ -2014,16 +2025,22 @@ function applyLanguage() {
     }
   });
   
-  // 3. Update greeting (preserve HTML structure with both spans)
+  // 3. Update greeting (preserve HTML structure with both spans) - ALWAYS update
   const hour = new Date().getHours();
   const greetKey = hour < 12 ? 'good_morning' : hour < 18 ? 'good_afternoon' : 'good_evening';
   const greet = dict[greetKey] || 'Welcome';
-  if (ME) {
-    if ($('greeting-text')) $('greeting-text').textContent = `${greet}, ${ME.name.split(' ')[0]}`;
-    if ($('greeting-initials')) $('greeting-initials').textContent = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  } else if (isGuest) {
-    if ($('greeting-text')) $('greeting-text').textContent = greet;
-    if ($('greeting-initials')) $('greeting-initials').textContent = 'GU';
+  // Always update greeting text, regardless of ME/isGuest status
+  if ($('greeting-text')) {
+    const greetingName = ME ? ME.name.split(' ')[0] : 'Guest';
+    $('greeting-text').textContent = `${greet}, ${greetingName}`;
+  }
+  // Update greeting initials
+  if ($('greeting-initials')) {
+    if (ME) {
+      $('greeting-initials').textContent = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    } else {
+      $('greeting-initials').textContent = 'GU';
+    }
   }
   
   // 4. Update lang selector
