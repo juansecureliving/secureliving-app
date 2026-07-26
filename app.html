@@ -806,40 +806,18 @@ button{cursor:pointer;border:none;background:none}
   <!-- ══════ MODE: MEDICATION SCHEDULE ══════ -->
   <div id="camera-mode-schedule" style="display:none">
     <div class="card">
-      <h2 class="section-title" data-i18n="sched_title" style="margin-top:0">Prescription Scheduler</h2>
-      <p class="text-sm text-muted mb-16" data-i18n="sched_desc">Upload photos of your prescriptions. We'll read the medicines and build a daily reminder schedule.</p>
-      <input type="file" id="rx-photo-input" accept="image/*,.heic,.heif" multiple onchange="handleRxUpload(event)" style="display:none">
-      <button class="btn btn-primary" style="width:100%;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="document.getElementById('rx-photo-input').click()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span data-i18n="sched_upload">Upload Prescription Images</span>
-      </button>
-      <p class="text-sm" style="color:var(--muted);text-align:center" data-i18n="sched_formats">Any image format accepted. Add multiple images.</p>
+      <h2 class="section-title" data-i18n="sched_title" style="margin-top:0">Medication Scheduler</h2>
+      <p class="text-sm text-muted mb-16" data-i18n="sched_desc">Add your medicines and dosage. We'll build a daily reminder schedule.</p>
     </div>
 
-    <!-- Uploaded images grid -->
-    <div id="rx-images-container" class="card" style="display:none">
-      <h3 style="font-family:var(--font-display);font-size:14px;margin:0 0 12px 0;font-weight:600;color:var(--muted)"><span id="rx-image-count">0</span> <span data-i18n="sched_images_added">images added</span></h3>
-      <div id="rx-images-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"></div>
-      <button class="btn btn-primary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px" onclick="extractAllRx()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <span data-i18n="sched_analyze_all">Read All Prescriptions</span>
-      </button>
-    </div>
-
-    <!-- Processing -->
-    <div id="rx-processing" class="card" style="display:none;text-align:center;padding:30px 20px">
-      <div id="rx-status" style="color:var(--muted);margin-bottom:16px;font-size:14px" data-i18n="sched_reading">Reading prescription...</div>
-      <div style="width:40px;height:40px;border:3px solid rgba(26,122,109,0.2);border-top-color:var(--pri);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
-    </div>
-
-    <!-- Detected Medicines -->
-    <div id="rx-medicines-container" style="display:none">
+    <!-- Medicines list -->
+    <div id="rx-medicines-container">
       <div class="card">
-        <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 12px 0;font-weight:600" data-i18n="sched_medicines">Detected Medicines</h3>
+        <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 12px 0;font-weight:600" data-i18n="sched_medicines">Your Medicines</h3>
         <div id="rx-medicines-list"></div>
         <button class="btn btn-outline" style="width:100%;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="addManualMedicine()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span data-i18n="sched_add_manual">Add Medicine Manually</span>
+          <span data-i18n="sched_add_manual">Add Medicine</span>
         </button>
       </div>
 
@@ -855,20 +833,28 @@ button{cursor:pointer;border:none;background:none}
       <!-- Combine button -->
       <button class="btn btn-primary" style="width:100%;padding:14px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="buildSchedule(true)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span data-i18n="sched_combine">Combine & Create Schedule</span>
+        <span data-i18n="sched_combine">Create Schedule</span>
       </button>
 
       <!-- Generated Schedule -->
       <div id="rx-schedule-container" class="card" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
           <h3 style="font-family:var(--font-display);font-size:16px;margin:0;font-weight:600" data-i18n="sched_daily">Daily Schedule</h3>
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         </div>
         <div id="rx-schedule-list"></div>
-        <button class="btn btn-primary" style="width:100%;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="saveSchedule()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          <span data-i18n="sched_save">Save Schedule</span>
-        </button>
+
+        <!-- Reminder toggle -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding:14px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span style="font-size:14px;font-weight:600;color:var(--text)" data-i18n="sched_reminders">Reminders</span>
+          </div>
+          <label class="switch" style="position:relative;display:inline-block;width:48px;height:26px">
+            <input type="checkbox" id="rx-reminder-toggle" onchange="toggleReminders()" style="opacity:0;width:0;height:0">
+            <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:26px;transition:0.3s" id="rx-reminder-slider"></span>
+          </label>
+        </div>
+        <p id="rx-reminder-hint" style="font-size:12px;color:var(--muted);margin:10px 0 0 0;text-align:center" data-i18n="sched_reminder_hint">Turn on to get notified at each dose time (keep this app open).</p>
       </div>
     </div>
   </div>
@@ -1531,13 +1517,14 @@ const LANG = {
     camera_align:'Align text inside this area', camera_scan_again:'🔄 Scan Again',
     camera_done:'Translation ready. Tap Scan Again for new text.',
     mode_translate:'Translate', mode_schedule:'Med Schedule',
-    sched_title:'Prescription Scheduler', sched_desc:"Upload photos of your prescriptions. We'll read the medicines and build a daily reminder schedule.",
-    sched_upload:'Upload Prescription Images', sched_formats:'Any image format accepted. Add multiple images.',
-    sched_analyze:'Read Prescription', sched_analyze_all:'Read All Prescriptions', sched_reading:'Reading prescription...', sched_reading_n:'Reading image', sched_converting:'Loading images...',
-    sched_images_added:'images added', sched_medicines:'Detected Medicines', sched_add_manual:'Add Medicine Manually',
-    sched_start_time:'First dose time', sched_daily:'Daily Schedule', sched_save:'Save Schedule', sched_combine:'Combine & Create Schedule',
+    sched_title:'Medication Scheduler', sched_desc:"Add your medicines and dosage. We'll build a daily reminder schedule.",
+    sched_medicines:'Your Medicines', sched_add_manual:'Add Medicine',
+    sched_start_time:'First dose time', sched_daily:'Daily Schedule', sched_combine:'Create Schedule',
     sched_med_name:'Medicine name', sched_amount:'Amount', sched_unit:'Unit', sched_times:'Times/day', sched_interval:'Every (hrs)',
-    sched_saved:'Schedule saved!', sched_error:'Could not read prescription. Try adding manually.',
+    sched_reminders:'Reminders', sched_reminder_hint:'Turn on to get notified at each dose time (keep this app open).',
+    sched_reminders_on:'Reminders on', sched_reminders_off:'Reminders off',
+    sched_no_notif:'Notifications not supported on this device', sched_notif_denied:'Please allow notifications to enable reminders',
+    sched_notif_title:'Time for your medicine',
     // Readings
     readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
@@ -1659,13 +1646,14 @@ const LANG = {
     camera_align:'将文字对齐在此区域内', camera_scan_again:'🔄 再次扫描',
     camera_done:'翻译完成。点击再次扫描以翻译新文字。',
     mode_translate:'翻译', mode_schedule:'用药时间表',
-    sched_title:'处方时间表', sched_desc:'上传处方照片，我们将读取药物并生成每日提醒时间表。',
-    sched_upload:'上传处方图片', sched_formats:'接受任何图片格式，可添加多张图片。',
-    sched_analyze:'读取处方', sched_analyze_all:'读取所有处方', sched_reading:'正在读取处方...', sched_reading_n:'正在读取图片', sched_converting:'加载图片中...',
-    sched_images_added:'张图片已添加', sched_medicines:'检测到的药物', sched_add_manual:'手动添加药物',
-    sched_start_time:'首次服药时间', sched_daily:'每日时间表', sched_save:'保存时间表', sched_combine:'合并并创建时间表',
+    sched_title:'用药时间表', sched_desc:'添加您的药物和剂量，我们将生成每日提醒时间表。',
+    sched_medicines:'您的药物', sched_add_manual:'添加药物',
+    sched_start_time:'首次服药时间', sched_daily:'每日时间表', sched_combine:'创建时间表',
     sched_med_name:'药物名称', sched_amount:'剂量', sched_unit:'单位', sched_times:'每日次数', sched_interval:'间隔(小时)',
-    sched_saved:'时间表已保存！', sched_error:'无法读取处方，请尝试手动添加。',
+    sched_reminders:'提醒', sched_reminder_hint:'开启后将在每次服药时间通知您（请保持应用开启）。',
+    sched_reminders_on:'提醒已开启', sched_reminders_off:'提醒已关闭',
+    sched_no_notif:'此设备不支持通知', sched_notif_denied:'请允许通知以启用提醒',
+    sched_notif_title:'该服药了',
     readings:'读数', log_glucose:'记录血糖', glucose_value:'血糖(毫克/分升)',
     glucose_time:'时间段', fasting:'空腹', before_meal:'进餐前', after_meal:'进餐后', bedtime:'睡前',
     glucose_history:'血糖历史', log_cholesterol:'记录胆固醇', total_cholesterol:'总胆固醇',
@@ -4818,243 +4806,25 @@ function switchCameraMode(mode) {
     $('mode-schedule-btn').style.color = '#fff';
     $('mode-translate-btn').style.background = 'transparent';
     $('mode-translate-btn').style.color = 'var(--text)';
+    initScheduleMode();
   }
 }
 
-/* ═══════════ PRESCRIPTION SCHEDULER ═══════════ */
-let rxImageData = null;
+/* ═══════════ MEDICATION SCHEDULER (manual) ═══════════ */
 let rxMedicines = [];
+let reminderTimers = [];
 
-// Convert any image (incl HEIC) to JPEG via Canvas with fallbacks
-async function convertToJpeg(file) {
-  const name = (file.name || '').toLowerCase();
-  const type = (file.type || '').toLowerCase();
-  const isHeic = name.endsWith('.heic') || name.endsWith('.heif') || type === 'image/heic' || type === 'image/heif';
-
-  // Method 1: native decode via object URL
-  try {
-    return await loadImgToJpeg(file);
-  } catch(e) { console.log('native decode failed', e); }
-
-  // Method 2: HEIC library fallback
-  if (isHeic) {
-    try {
-      if (typeof heic2any === 'undefined') {
-        await new Promise((res, rej) => {
-          const s = document.createElement('script');
-          s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
-          s.onload = res; s.onerror = () => rej(new Error('heic lib fail'));
-          document.head.appendChild(s);
-        });
-      }
-      const jpegBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
-      const blob = Array.isArray(jpegBlob) ? jpegBlob[0] : jpegBlob;
-      return await loadImgToJpeg(blob);
-    } catch(e) { console.error('HEIC convert fail', e); }
-  }
-
-  // Method 3: FileReader fallback
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try { resolve(await dataUrlToJpeg(e.target.result)); }
-      catch(err) { reject(err); }
-    };
-    reader.onerror = () => reject(new Error('FileReader failed'));
-    reader.readAsDataURL(file);
-  });
-}
-
-function loadImgToJpeg(fileOrBlob) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(fileOrBlob);
-    const img = new Image();
-    img.onload = () => { try { const r = imgToJpeg(img); URL.revokeObjectURL(url); resolve(r); } catch(e){ URL.revokeObjectURL(url); reject(e); } };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode fail')); };
-    img.src = url;
-  });
-}
-
-function dataUrlToJpeg(dataUrl) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => { try { resolve(imgToJpeg(img)); } catch(e){ reject(e); } };
-    img.onerror = () => reject(new Error('decode fail'));
-    img.src = dataUrl;
-  });
-}
-
-function imgToJpeg(img) {
-  const canvas = document.createElement('canvas');
-  const maxDim = 2400;
-  let w = img.naturalWidth, h = img.naturalHeight;
-  if (w > maxDim || h > maxDim) {
-    if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-    else { w = Math.round(w * maxDim / h); h = maxDim; }
-  }
-  canvas.width = w; canvas.height = h;
-  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-  return canvas.toDataURL('image/jpeg', 0.92);
-}
-
-let rxImages = []; // array of jpeg data URLs
-
-function handleRxUpload(event) {
-  const files = Array.from(event.target.files);
-  if (!files.length) return;
-  const t = LANG[currentLang] || LANG.en;
-  
-  $('rx-processing').style.display = 'block';
-  $('rx-status').textContent = t.sched_converting || 'Loading images...';
-
-  Promise.all(files.map(f => convertToJpeg(f).catch(e => { console.error(e); return null; })))
-    .then(results => {
-      results.filter(Boolean).forEach(jpeg => rxImages.push(jpeg));
-      $('rx-processing').style.display = 'none';
-      renderRxImages();
-      // Reset input so same file can be re-added
-      event.target.value = '';
-    })
-    .catch(err => {
-      console.error('Rx upload error:', err);
-      toast(t.camera_load_error || 'Could not load images.', 'error');
-      $('rx-processing').style.display = 'none';
-    });
-}
-
-function renderRxImages() {
-  if (rxImages.length === 0) {
-    $('rx-images-container').style.display = 'none';
-    return;
-  }
-  $('rx-image-count').textContent = rxImages.length;
-  const html = rxImages.map((img, i) => `
-    <div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#000">
-      <img src="${img}" style="width:100%;height:100%;object-fit:cover">
-      <button onclick="removeRxImage(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-  `).join('');
-  $('rx-images-grid').innerHTML = html;
-  $('rx-images-container').style.display = 'block';
-}
-
-function removeRxImage(index) {
-  rxImages.splice(index, 1);
-  renderRxImages();
-}
-
-async function extractAllRx() {
-  if (rxImages.length === 0) return;
-  const t = LANG[currentLang] || LANG.en;
-  $('rx-images-container').style.display = 'none';
-  $('rx-processing').style.display = 'block';
-
-  try {
-    if (typeof Tesseract === 'undefined') {
-      $('rx-status').textContent = t.sched_reading || 'Loading OCR...';
-      await new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('Failed to load OCR'));
-        document.head.appendChild(s);
-      });
-    }
-    const worker = await Tesseract.createWorker('eng');
-    rxMedicines = [];
-    
-    // Process each image
-    for (let i = 0; i < rxImages.length; i++) {
-      $('rx-status').textContent = (t.sched_reading_n || 'Reading image') + ' ' + (i+1) + '/' + rxImages.length + '...';
-      const { data: { text } } = await worker.recognize(rxImages[i]);
-      const found = parseMedicines(text);
-      rxMedicines = rxMedicines.concat(found);
-    }
-    await worker.terminate();
-
-    $('rx-processing').style.display = 'none';
-    if (rxMedicines.length === 0) {
-      rxMedicines.push({ name:'', doseAmount:1, doseUnit:'pill', timesPerDay:3, intervalHrs:6 });
-    }
+// Initialize with one empty medicine row when schedule mode first opens
+function initScheduleMode() {
+  if (rxMedicines.length === 0) {
+    rxMedicines.push({ name:'', doseAmount:1, doseUnit:'pill', timesPerDay:3, intervalHrs:6 });
     renderMedicines();
-    $('rx-medicines-container').style.display = 'block';
-    applyLanguage(); // translate any new labels
-  } catch(err) {
-    console.error('Rx OCR error:', err);
-    toast(t.sched_error || 'Could not read prescriptions. Try adding manually.', 'error');
-    $('rx-processing').style.display = 'none';
-    rxMedicines = [{ name:'', doseAmount:1, doseUnit:'pill', timesPerDay:3, intervalHrs:6 }];
-    renderMedicines();
-    $('rx-medicines-container').style.display = 'block';
   }
-}
-
-// Parse medication instructions from OCR text
-function parseMedicines(text) {
-  const meds = [];
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
-  
-  for (const line of lines) {
-    const lower = line.toLowerCase();
-    // Look for a medicine name (word with 4+ letters, often capitalized)
-    const nameMatch = line.match(/[A-Za-z][A-Za-z\-]{3,}/);
-    if (!nameMatch) continue;
-    const name = nameMatch[0];
-    
-    // Skip common non-medicine words
-    if (/^(tablet|tablets|capsule|capsules|take|times|after|before|every|daily|hour|hours|meal|meals|dose|doses|instruction|instructions|prescription|patient|doctor|date|name|pharmacy|drops|spoon|spoonful)$/i.test(name)) continue;
-
-    // Dosage amount + unit: "1 tab", "2 tablets", "1 cap", "1 pill", "10ml", "5 mg", "2 drops", "1 spoonful"
-    let doseAmount = 1;
-    let doseUnit = 'pill';
-    // Match number followed by unit (ml/mg have no space sometimes)
-    const doseMatch = lower.match(/(\d+(?:\.\d+)?)\s*(ml|mg|mcg|g|tab|tabs|tablet|tablets|cap|caps|capsule|capsules|pill|pills|drop|drops|spoon|spoonful|tsp|tbsp|puff|puffs|unit|units|sachet)/);
-    if (doseMatch) {
-      doseAmount = parseFloat(doseMatch[1]);
-      const rawUnit = doseMatch[2];
-      // Normalize unit to a clean display form
-      const unitMap = {
-        tab:'tab', tabs:'tab', tablet:'tab', tablets:'tab',
-        cap:'cap', caps:'cap', capsule:'cap', capsules:'cap',
-        pill:'pill', pills:'pill',
-        ml:'ml', mg:'mg', mcg:'mcg', g:'g',
-        drop:'drop', drops:'drop',
-        spoon:'spoon', spoonful:'spoon', tsp:'tsp', tbsp:'tbsp',
-        puff:'puff', puffs:'puff',
-        unit:'unit', units:'unit', sachet:'sachet'
-      };
-      doseUnit = unitMap[rawUnit] || rawUnit;
-    }
-
-    // Times per day: "3 times a day", "twice daily", "four times"
-    let timesPerDay = 0;
-    const timesMatch = lower.match(/(\d+)\s*times?\s*(a|per)?\s*day/);
-    if (timesMatch) timesPerDay = parseInt(timesMatch[1]);
-    else if (/\bonce\b/.test(lower)) timesPerDay = 1;
-    else if (/\btwice\b/.test(lower)) timesPerDay = 2;
-    else if (/\bthrice|three times\b/.test(lower)) timesPerDay = 3;
-    else if (/\bfour times\b/.test(lower)) timesPerDay = 4;
-    else if (/\bfive times\b/.test(lower)) timesPerDay = 5;
-
-    // Interval: "every 6 hours", "every 4 hrs"
-    let intervalHrs = 0;
-    const intMatch = lower.match(/every\s*(\d+)\s*(hour|hr|h)/);
-    if (intMatch) intervalHrs = parseInt(intMatch[1]);
-
-    // Derive missing values
-    if (timesPerDay && !intervalHrs) intervalHrs = Math.round(24 / timesPerDay);
-    if (intervalHrs && !timesPerDay) timesPerDay = Math.round(24 / intervalHrs);
-    
-    // Only add if we found some dosing info
-    if (timesPerDay || intervalHrs) {
-      if (!timesPerDay) timesPerDay = 3;
-      if (!intervalHrs) intervalHrs = Math.round(24 / timesPerDay);
-      meds.push({ name, doseAmount, doseUnit, timesPerDay, intervalHrs });
-    }
+  // Set slider knob initial (off) appearance
+  const slider = $('rx-reminder-slider');
+  if (slider && !slider.innerHTML) {
+    slider.innerHTML = '<span style="position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s"></span>';
   }
-  return meds;
 }
 
 function renderMedicines() {
@@ -5165,21 +4935,95 @@ function buildSchedule(forceShow) {
 
   $('rx-schedule-list').innerHTML = html;
   $('rx-schedule-container').style.display = 'block';
+
+  // Store times for reminders (strip HTML, keep plain med text)
+  scheduleTimes = sortedTimes.map(mins => ({ mins, meds: slots[mins] }));
+  // If reminders are currently on, refresh them with new times
+  if ($('rx-reminder-toggle') && $('rx-reminder-toggle').checked) {
+    startReminders();
+  }
 }
 
-function saveSchedule() {
+// ═══ REMINDERS via browser notifications ═══
+let scheduleTimes = []; // array of {mins, meds:[...]}
+
+async function toggleReminders() {
+  const toggle = $('rx-reminder-toggle');
+  const slider = $('rx-reminder-slider');
   const t = LANG[currentLang] || LANG.en;
-  try {
-    localStorage.setItem('al_med_schedule', JSON.stringify({
-      medicines: rxMedicines,
-      startTime: $('rx-start-time').value,
-      savedAt: new Date().toISOString()
-    }));
-    toast(t.sched_saved || 'Schedule saved!', 'success');
-  } catch(e) {
-    console.error('Save error:', e);
-    toast('Could not save schedule', 'error');
+
+  if (toggle.checked) {
+    // Request notification permission
+    if (!('Notification' in window)) {
+      toast(t.sched_no_notif || 'Notifications not supported on this device', 'error');
+      toggle.checked = false;
+      return;
+    }
+    let perm = Notification.permission;
+    if (perm === 'default') {
+      perm = await Notification.requestPermission();
+    }
+    if (perm !== 'granted') {
+      toast(t.sched_notif_denied || 'Please allow notifications to enable reminders', 'error');
+      toggle.checked = false;
+      return;
+    }
+    // Turn slider ON (green)
+    slider.style.background = 'var(--pri)';
+    slider.innerHTML = '<span style="position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s;transform:translateX(22px)"></span>';
+    startReminders();
+    toast(t.sched_reminders_on || 'Reminders on', 'success');
+  } else {
+    slider.style.background = 'var(--border)';
+    slider.innerHTML = '<span style="position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.3s"></span>';
+    stopReminders();
+    toast(t.sched_reminders_off || 'Reminders off', 'success');
   }
+}
+
+function startReminders() {
+  stopReminders(); // clear any existing
+  const now = new Date();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+
+  scheduleTimes.forEach(slot => {
+    // Calculate ms until this dose time today (or tomorrow if passed)
+    let deltaMins = slot.mins - nowMins;
+    if (deltaMins < 0) deltaMins += 24 * 60; // next day
+    const ms = deltaMins * 60 * 1000;
+
+    // Schedule a repeating daily reminder
+    const timer = setTimeout(function fire() {
+      showMedNotification(slot);
+      // Reschedule for 24h later
+      const daily = setInterval(() => showMedNotification(slot), 24 * 60 * 60 * 1000);
+      reminderTimers.push(daily);
+    }, ms);
+    reminderTimers.push(timer);
+  });
+}
+
+function stopReminders() {
+  reminderTimers.forEach(t => { clearTimeout(t); clearInterval(t); });
+  reminderTimers = [];
+}
+
+function showMedNotification(slot) {
+  const t = LANG[currentLang] || LANG.en;
+  const h = Math.floor(slot.mins / 60);
+  const m = slot.mins % 60;
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  const timeStr = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+  const medList = slot.meds.join(', ');
+  try {
+    new Notification((t.sched_notif_title || 'Time for your medicine') + ' — ' + timeStr, {
+      body: medList,
+      icon: 'https://lh3.googleusercontent.com/d/1YpXxWMujS-eS4rDWxkG2NgdO80HmZVeB=w200',
+      tag: 'med-' + slot.mins,
+      requireInteraction: true
+    });
+  } catch(e) { console.error('Notification error:', e); }
 }
 
 async function processGeocodeQueue() {
