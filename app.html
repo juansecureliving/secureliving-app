@@ -744,50 +744,47 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- ── TAB: Camera Translation ──────────────────────── -->
 <div id="tab-camera" class="tab-content">
-  <h2 class="section-title" data-i18n="camera_title">Camera Translation</h2>
-  <p class="text-sm text-muted mb-16" data-i18n="camera_desc">Point your camera at medicine labels to translate text instantly. Nothing is saved.</p>
-  
   <!-- Start Screen -->
   <div id="camera-start-container" class="card" style="text-align:center">
-    <div style="font-size:48px;margin-bottom:16px">📷</div>
-    <button class="btn btn-primary" style="width:100%;padding:16px;font-size:16px" onclick="startLiveCamera()" data-i18n="camera_start_live">Start Live Translation</button>
-    <p class="text-sm" style="margin-top:16px;color:var(--muted)" data-i18n="camera_privacy">🔒 Your camera feed is processed on-device only. No photos are saved or uploaded.</p>
+    <h2 class="section-title" data-i18n="camera_title" style="margin-top:0">Camera Translation</h2>
+    <p class="text-sm text-muted mb-16" data-i18n="camera_desc">Point your camera at medicine labels to translate text instantly. Nothing is saved.</p>
+    <button class="btn btn-primary" style="width:100%;padding:16px;font-size:16px" onclick="startLiveCamera()" data-i18n="camera_start_live">📷 Start Live Translation</button>
+    <p class="text-sm" style="margin-top:16px;color:var(--muted)" data-i18n="camera_privacy">🔒 Processed on-device only. No photos saved.</p>
   </div>
   
   <!-- Live Camera View -->
   <div id="live-camera-container" style="display:none">
-    <!-- Video Feed with Viewfinder Overlay -->
-    <div style="position:relative;background:#111;border-radius:var(--radius);overflow:hidden;margin-bottom:8px">
-      <video id="live-camera-video" style="width:100%;display:block;min-height:200px;max-height:40vh;object-fit:cover" autoplay playsinline muted></video>
-      <!-- Viewfinder guide rectangle — small focused area -->
-      <div id="viewfinder" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:22%;border:2.5px solid rgba(26,122,109,0.85);border-radius:10px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,0.45)">
-        <div style="position:absolute;bottom:-28px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.8);text-shadow:0 1px 3px rgba(0,0,0,0.7)" data-i18n="camera_align">Align text inside this area</div>
+    <!-- Language selector + Stop on TOP -->
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+      <button class="btn btn-secondary" onclick="stopLiveCamera()" data-i18n="camera_stop" style="white-space:nowrap">⏹ Stop</button>
+      <select id="live-translate-lang" onchange="onLiveLangChange()" style="flex:1;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
+        <option value="en">English</option>
+        <option value="zh">中文 (Chinese)</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="ta">தமிழ் (Tamil)</option>
+        <option value="tl">Tagalog (Filipino)</option>
+        <option value="my">မြန်မာ (Myanmar)</option>
+      </select>
+    </div>
+    
+    <!-- Camera Video with Viewfinder (tap to focus) -->
+    <div style="position:relative;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:10px" onclick="tapToFocus(event)">
+      <video id="live-camera-video" style="width:100%;display:block;max-height:42vh;object-fit:contain" autoplay playsinline muted></video>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:78%;height:24%;border:2.5px solid rgba(26,122,109,0.9);border-radius:10px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,0.4)">
+        <div style="position:absolute;bottom:-24px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.85);text-shadow:0 1px 3px rgba(0,0,0,0.8)" data-i18n="camera_align">Align text inside this area</div>
       </div>
     </div>
     
-    <!-- Controls -->
+    <!-- Status -->
+    <div id="live-status" style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:10px" data-i18n="camera_initializing">Initializing OCR engine...</div>
+    
+    <!-- Translation result -->
     <div class="card" style="margin-top:0">
-      <div style="display:flex;gap:10px;align-items:center">
-        <button class="btn btn-secondary" onclick="stopLiveCamera()" data-i18n="camera_stop" style="white-space:nowrap">⏹ Stop</button>
-        <select id="live-translate-lang" onchange="onLiveLangChange()" style="flex:1;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
-          <option value="en">English</option>
-          <option value="zh">中文 (Chinese)</option>
-          <option value="ms">Bahasa Melayu</option>
-          <option value="ta">தமிழ் (Tamil)</option>
-          <option value="tl">Tagalog (Filipino)</option>
-          <option value="my">မြန်မာ (Myanmar)</option>
-        </select>
-      </div>
-      <div id="live-status" style="margin-top:10px;text-align:center;font-size:12px;color:var(--muted)" data-i18n="camera_initializing">Initializing OCR engine...</div>
-    </div>
-    
-    <!-- Translation Only -->
-    <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <h3 style="font-family:var(--font-display);font-size:14px;margin:0;font-weight:600;color:var(--muted)" data-i18n="camera_translation">Translation</h3>
         <span id="live-frozen-badge" style="display:none;font-size:11px;color:var(--pri);font-weight:600">✓ Ready</span>
       </div>
-      <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:60px;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
+      <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:50px;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
       <button id="scan-again-btn" class="btn btn-primary" style="width:100%;margin-top:14px;display:none" onclick="resumeScanning()" data-i18n="camera_scan_again">🔄 Scan Again</button>
     </div>
   </div>
@@ -4446,26 +4443,35 @@ let liveProcessing = false;
 let lastDetectedText = '';
 let translationCache = {};
 let liveFrozen = false;
+let scanAttempts = 0;
+let liveTrack = null;
 
 async function startLiveCamera() {
   try {
     liveStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: 'environment',
-        width: { ideal: 3840 },
-        height: { ideal: 2160 },
-        focusMode: { ideal: 'continuous' }
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
       }
     });
     const video = $('live-camera-video');
     video.srcObject = liveStream;
+    liveTrack = liveStream.getVideoTracks()[0];
+
+    // Try continuous autofocus
     try {
-      const track = liveStream.getVideoTracks()[0];
-      const caps = track.getCapabilities ? track.getCapabilities() : {};
-      if (caps.focusMode && caps.focusMode.includes('continuous')) {
-        await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
-      }
-    } catch(e) {}
+      const caps = liveTrack.getCapabilities ? liveTrack.getCapabilities() : {};
+      const adv = [];
+      if (caps.focusMode && caps.focusMode.includes('continuous')) adv.push({ focusMode: 'continuous' });
+      if (adv.length) await liveTrack.applyConstraints({ advanced: adv });
+    } catch(e) { console.log('focus constraint skip', e); }
+
+    // Wait for video to be ready before showing
+    await new Promise(res => {
+      if (video.readyState >= 2) res();
+      else video.onloadeddata = () => res();
+    });
 
     $('camera-start-container').style.display = 'none';
     $('live-camera-container').style.display = 'block';
@@ -4484,8 +4490,11 @@ async function startLiveCamera() {
     updateLiveStatus('camera_initializing', 'Initializing OCR engine...');
     liveWorker = await Tesseract.createWorker('eng');
     updateLiveStatus('camera_ready', 'Ready — align text in the box');
+
     liveFrozen = false;
-    liveInterval = setInterval(processLiveFrame, 1500);
+    liveProcessing = false;
+    scanAttempts = 0;
+    liveInterval = setInterval(processLiveFrame, 2000);
   } catch(err) {
     console.error('Live camera error:', err);
     toast('Could not start camera', 'error');
@@ -4493,10 +4502,30 @@ async function startLiveCamera() {
   }
 }
 
+// Tap to focus at a point
+async function tapToFocus(event) {
+  if (!liveTrack) return;
+  try {
+    const caps = liveTrack.getCapabilities ? liveTrack.getCapabilities() : {};
+    // Trigger single-shot autofocus if manual focus available
+    if (caps.focusMode && caps.focusMode.includes('single-shot')) {
+      await liveTrack.applyConstraints({ advanced: [{ focusMode: 'single-shot' }] });
+      setTimeout(async () => {
+        try {
+          if (caps.focusMode.includes('continuous')) {
+            await liveTrack.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+          }
+        } catch(e) {}
+      }, 1500);
+    }
+  } catch(e) { console.log('tap focus skip', e); }
+}
+
 function stopLiveCamera() {
   if (liveInterval) { clearInterval(liveInterval); liveInterval = null; }
   if (liveWorker) { liveWorker.terminate().catch(()=>{}); liveWorker = null; }
   if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
+  liveTrack = null;
   if ($('live-translated-text')) $('live-translated-text').textContent = '';
   if ($('scan-again-btn')) $('scan-again-btn').style.display = 'none';
   if ($('live-frozen-badge')) $('live-frozen-badge').style.display = 'none';
@@ -4504,6 +4533,7 @@ function stopLiveCamera() {
   translationCache = {};
   liveProcessing = false;
   liveFrozen = false;
+  scanAttempts = 0;
   $('live-camera-container').style.display = 'none';
   $('camera-start-container').style.display = 'block';
 }
@@ -4513,11 +4543,10 @@ function freezeScanning() {
   if (liveInterval) { clearInterval(liveInterval); liveInterval = null; }
   if ($('scan-again-btn')) $('scan-again-btn').style.display = 'block';
   if ($('live-frozen-badge')) $('live-frozen-badge').style.display = 'inline';
-  updateLiveStatus('camera_done', 'Translation ready. Tap Scan Again for new text.');
+  updateLiveStatus('camera_done', 'Done — tap Scan Again for new text');
 }
 
 function resumeScanning() {
-  // Force reset ALL state
   liveFrozen = false;
   liveProcessing = false;
   lastDetectedText = '';
@@ -4527,43 +4556,28 @@ function resumeScanning() {
   if ($('scan-again-btn')) $('scan-again-btn').style.display = 'none';
   if ($('live-frozen-badge')) $('live-frozen-badge').style.display = 'none';
   updateLiveStatus('camera_ready', 'Ready — align text in the box');
-  // Always clear old interval and start fresh
   if (liveInterval) { clearInterval(liveInterval); liveInterval = null; }
-  if (liveStream) {
-    if (!liveWorker) {
-      // Worker died — recreate
-      Tesseract.createWorker('eng').then(w => {
-        liveWorker = w;
-        liveInterval = setInterval(processLiveFrame, 1500);
-      }).catch(e => console.error('Worker restart failed:', e));
-    } else {
-      liveInterval = setInterval(processLiveFrame, 1500);
-    }
+  if (liveStream && liveWorker) {
+    liveInterval = setInterval(processLiveFrame, 2000);
   }
 }
 
+// Light cleanup — only remove obviously broken lines, keep numbers/dosages
 function cleanOCRText(text) {
   return text
     .split('\n')
-    .map(line => line.trim())
-    .filter(line => {
-      if (line.length < 2) return false;
-      // Count alphanumeric chars (letters + numbers — medicine labels have dosages)
-      const alnum = (line.match(/[a-zA-Z0-9]/g) || []).length;
-      const total = line.length;
-      // Keep line if at least 30% alphanumeric
-      if (alnum / total < 0.3) return false;
-      // Remove lines that are all same character
-      const unique = new Set(line.toLowerCase().replace(/\s/g, '')).size;
-      if (unique < 2) return false;
+    .map(l => l.trim())
+    .filter(l => {
+      if (l.length < 2) return false;
+      const alnum = (l.match(/[a-zA-Z0-9]/g) || []).length;
+      if (alnum < 2) return false;              // need at least 2 real chars
+      if (alnum / l.length < 0.25) return false; // at least 25% real chars
       return true;
     })
     .join(' ')
     .replace(/\s{2,}/g, ' ')
     .trim();
 }
-
-let scanAttempts = 0;
 
 async function processLiveFrame() {
   if (liveProcessing || !liveWorker || !liveStream || liveFrozen) return;
@@ -4577,54 +4591,40 @@ async function processLiveFrame() {
     scanAttempts++;
     updateLiveStatus(null, 'Scanning... (' + scanAttempts + ')');
 
-    // Crop to viewfinder region (center 75% width, 22% height)
-    const cropW = Math.round(vw * 0.75);
-    const cropH = Math.round(vh * 0.22);
+    // Crop to viewfinder region (center 78% wide, 24% tall)
+    const cropW = Math.round(vw * 0.78);
+    const cropH = Math.round(vh * 0.24);
     const cropX = Math.round((vw - cropW) / 2);
     const cropY = Math.round((vh - cropH) / 2);
 
-    let outW = cropW, outH = cropH;
-    if (outW < 1400) {
-      const scale = 1400 / outW;
-      outW = 1400;
-      outH = Math.round(outH * scale);
-    }
+    // Upscale for OCR (2x the crop, min 1000px)
+    let outW = Math.max(cropW * 2, 1000);
+    let outH = Math.round(cropH * (outW / cropW));
 
     const canvas = document.createElement('canvas');
     canvas.width = outW; canvas.height = outH;
     const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
 
-    // Simpler preprocessing: grayscale + contrast only (no binarization)
+    // MINIMAL preprocessing: grayscale + gentle contrast only
     const imageData = ctx.getImageData(0, 0, outW, outH);
     const d = imageData.data;
-
-    // Grayscale
     for (let i = 0; i < d.length; i += 4) {
       const g = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
-      d[i] = d[i+1] = d[i+2] = g;
-    }
-
-    // Contrast boost (stronger stretch)
-    let mn = 255, mx = 0;
-    for (let i = 0; i < d.length; i += 4) { if (d[i] < mn) mn = d[i]; if (d[i] > mx) mx = d[i]; }
-    const rng = mx - mn || 1;
-    for (let i = 0; i < d.length; i += 4) {
-      let v = ((d[i] - mn) / rng) * 255;
-      // Apply S-curve for stronger contrast
-      v = v / 255;
-      v = v < 0.5 ? 2 * v * v : 1 - 2 * (1 - v) * (1 - v);
-      v = Math.min(255, Math.max(0, Math.round(v * 255)));
-      d[i] = d[i+1] = d[i+2] = v;
+      // Gentle contrast: push toward black/white slightly
+      const c = Math.min(255, Math.max(0, (g - 128) * 1.3 + 128));
+      d[i] = d[i+1] = d[i+2] = c;
     }
     ctx.putImageData(imageData, 0, 0);
 
-    const processed = canvas.toDataURL('image/jpeg', 0.95);
+    const processed = canvas.toDataURL('image/png');
     const { data } = await liveWorker.recognize(processed);
     const rawText = (data.text || '').trim();
     const cleanText = cleanOCRText(rawText);
 
-    if (cleanText && cleanText.length > 3) {
+    if (cleanText && cleanText.length >= 3) {
       lastDetectedText = cleanText;
       await translateLiveText(cleanText);
       freezeScanning();
@@ -4651,13 +4651,16 @@ async function translateLiveText(text) {
     const to = langMap[targetLang] || targetLang;
     const resp = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.substring(0, 500)) + '&langpair=en|' + to);
     const json = await resp.json();
-    if (json.responseStatus === 200 && json.responseData && json.responseData.translatedText) {
+    if (json.responseData && json.responseData.translatedText) {
       const translated = json.responseData.translatedText;
       $('live-translated-text').textContent = translated;
       translationCache[cacheKey] = translated;
+    } else {
+      $('live-translated-text').textContent = text;
     }
   } catch(err) {
     console.error('Translation error:', err);
+    $('live-translated-text').textContent = text;
   }
 }
 
@@ -4668,7 +4671,7 @@ function onLiveLangChange() {
 
 function updateLiveStatus(key, fallback) {
   const t = LANG[currentLang] || LANG.en;
-  if ($('live-status')) $('live-status').textContent = t[key] || fallback;
+  if ($('live-status')) $('live-status').textContent = (key && t[key]) ? t[key] : fallback;
 }
 
 async function processGeocodeQueue() {
