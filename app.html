@@ -744,51 +744,47 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- ── TAB: Camera Translation ──────────────────────── -->
 <div id="tab-camera" class="tab-content">
-  <h2 class="section-title" data-i18n="camera_title">Camera Translation</h2>
-  <p class="text-sm text-muted mb-16" data-i18n="camera_desc">Point your camera at medicine labels to translate text instantly. Nothing is saved.</p>
-  
   <!-- Start Screen -->
   <div id="camera-start-container" class="card" style="text-align:center">
-    <div style="font-size:48px;margin-bottom:16px">📷</div>
-    <button class="btn btn-primary" style="width:100%;padding:16px;font-size:16px" onclick="startLiveCamera()" data-i18n="camera_start_live">Start Live Translation</button>
-    <p class="text-sm" style="margin-top:16px;color:var(--muted)" data-i18n="camera_privacy">🔒 Your camera feed is processed on-device only. No photos are saved or uploaded.</p>
+    <h2 class="section-title" data-i18n="camera_title" style="margin-top:0">Camera Translation</h2>
+    <p class="text-sm text-muted mb-16" data-i18n="camera_desc">Point your camera at medicine labels to translate text instantly. Nothing is saved.</p>
+    <button class="btn btn-primary" style="width:100%;padding:16px;font-size:16px" onclick="startLiveCamera()" data-i18n="camera_start_live">📷 Start Live Translation</button>
+    <p class="text-sm" style="margin-top:16px;color:var(--muted)" data-i18n="camera_privacy">🔒 Processed on-device only. No photos saved.</p>
   </div>
   
-  <!-- Live Camera View -->
+  <!-- Live Camera View — everything in one card -->
   <div id="live-camera-container" style="display:none">
-    <!-- Video Feed with Viewfinder Overlay -->
-    <div style="position:relative;background:#111;border-radius:var(--radius);overflow:hidden;margin-bottom:8px">
-      <video id="live-camera-video" style="width:100%;display:block;min-height:300px;max-height:60vh;object-fit:cover" autoplay playsinline muted></video>
-      <!-- Viewfinder guide rectangle — small focused area -->
-      <div id="viewfinder" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:22%;border:2.5px solid rgba(26,122,109,0.85);border-radius:10px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,0.45)">
-        <div style="position:absolute;bottom:-28px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.8);text-shadow:0 1px 3px rgba(0,0,0,0.7)" data-i18n="camera_align">Align text inside this area</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <!-- Video + Viewfinder -->
+      <div style="position:relative;background:#111">
+        <video id="live-camera-video" style="width:100%;display:block;max-height:45vh;object-fit:cover" autoplay playsinline muted></video>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75%;height:22%;border:2.5px solid rgba(26,122,109,0.85);border-radius:10px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,0.45)">
+          <div style="position:absolute;bottom:-24px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.8);text-shadow:0 1px 3px rgba(0,0,0,0.7)" data-i18n="camera_align">Align text inside this area</div>
+        </div>
+      </div>
+      
+      <!-- Translation result — directly below camera, no gap -->
+      <div style="padding:14px;border-top:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span id="live-status" style="font-size:12px;color:var(--muted)" data-i18n="camera_initializing">Initializing...</span>
+          <span id="live-frozen-badge" style="display:none;font-size:11px;color:var(--pri);font-weight:600">✓ Ready</span>
+        </div>
+        <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:40px;white-space:pre-wrap;word-break:break-word;padding:12px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
+        <button id="scan-again-btn" class="btn btn-primary" style="width:100%;margin-top:12px;display:none" onclick="resumeScanning()" data-i18n="camera_scan_again">🔄 Scan Again</button>
       </div>
     </div>
     
-    <!-- Controls -->
-    <div class="card" style="margin-top:0">
-      <div style="display:flex;gap:10px;align-items:center">
-        <button class="btn btn-secondary" onclick="stopLiveCamera()" data-i18n="camera_stop" style="white-space:nowrap">⏹ Stop</button>
-        <select id="live-translate-lang" onchange="onLiveLangChange()" style="flex:1;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
-          <option value="en">English</option>
-          <option value="zh">中文 (Chinese)</option>
-          <option value="ms">Bahasa Melayu</option>
-          <option value="ta">தமிழ் (Tamil)</option>
-          <option value="tl">Tagalog (Filipino)</option>
-          <option value="my">မြန်မာ (Myanmar)</option>
-        </select>
-      </div>
-      <div id="live-status" style="margin-top:10px;text-align:center;font-size:12px;color:var(--muted)" data-i18n="camera_initializing">Initializing OCR engine...</div>
-    </div>
-    
-    <!-- Translation Only -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <h3 style="font-family:var(--font-display);font-size:14px;margin:0;font-weight:600;color:var(--muted)" data-i18n="camera_translation">Translation</h3>
-        <span id="live-frozen-badge" style="display:none;font-size:11px;color:var(--pri);font-weight:600">✓ Ready</span>
-      </div>
-      <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:60px;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
-      <button id="scan-again-btn" class="btn btn-primary" style="width:100%;margin-top:14px;display:none" onclick="resumeScanning()" data-i18n="camera_scan_again">🔄 Scan Again</button>
+    <!-- Controls bar -->
+    <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+      <button class="btn btn-secondary" onclick="stopLiveCamera()" data-i18n="camera_stop" style="white-space:nowrap">⏹ Stop</button>
+      <select id="live-translate-lang" onchange="onLiveLangChange()" style="flex:1;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
+        <option value="en">English</option>
+        <option value="zh">中文 (Chinese)</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="ta">தமிழ் (Tamil)</option>
+        <option value="tl">Tagalog (Filipino)</option>
+        <option value="my">မြန်မာ (Myanmar)</option>
+      </select>
     </div>
   </div>
 </div>
@@ -4518,14 +4514,32 @@ function freezeScanning() {
 
 function resumeScanning() {
   liveFrozen = false;
+  liveProcessing = false;  // Force reset in case it got stuck
   lastDetectedText = '';
   scanAttempts = 0;
+  translationCache = {};
   if ($('live-translated-text')) $('live-translated-text').textContent = '';
   if ($('scan-again-btn')) $('scan-again-btn').style.display = 'none';
   if ($('live-frozen-badge')) $('live-frozen-badge').style.display = 'none';
   updateLiveStatus('camera_ready', 'Ready — align text in the box');
-  if (!liveInterval && liveWorker) {
+  
+  // Restart scanning interval
+  if (liveInterval) { clearInterval(liveInterval); liveInterval = null; }
+  if (liveWorker && liveStream) {
     liveInterval = setInterval(processLiveFrame, 1500);
+  } else if (liveStream && !liveWorker) {
+    // Worker was lost — recreate it
+    (async () => {
+      try {
+        updateLiveStatus('camera_initializing', 'Reinitializing...');
+        liveWorker = await Tesseract.createWorker('eng');
+        updateLiveStatus('camera_ready', 'Ready — align text in the box');
+        liveInterval = setInterval(processLiveFrame, 1500);
+      } catch(e) {
+        console.error('Worker recreate error:', e);
+        toast('Error restarting scanner', 'error');
+      }
+    })();
   }
 }
 
