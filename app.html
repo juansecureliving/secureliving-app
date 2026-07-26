@@ -767,12 +767,13 @@ button{cursor:pointer;border:none;background:none}
       </select>
     </div>
     
-    <!-- Camera Video with Viewfinder (tap to focus) -->
-    <div style="position:relative;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:10px" onclick="tapToFocus(event)">
-      <video id="live-camera-video" style="width:100%;display:block;max-height:42vh;object-fit:contain" autoplay playsinline muted></video>
-      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:78%;height:24%;border:2.5px solid rgba(26,122,109,0.9);border-radius:10px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,0.4)">
-        <div style="position:absolute;bottom:-24px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.85);text-shadow:0 1px 3px rgba(0,0,0,0.8)" data-i18n="camera_align">Align text inside this area</div>
-      </div>
+    <!-- Camera Video — cropped to show ONLY the scan strip (tap to focus) -->
+    <div style="position:relative;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:10px;height:130px" onclick="tapToFocus(event)">
+      <!-- Video scaled so its center strip fills this short window -->
+      <video id="live-camera-video" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;min-height:100%;object-fit:cover" autoplay playsinline muted></video>
+      <!-- Corner guides -->
+      <div style="position:absolute;inset:8px;border:2px solid rgba(26,122,109,0.9);border-radius:8px;pointer-events:none"></div>
+      <div style="position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.9);text-shadow:0 1px 3px rgba(0,0,0,0.9);pointer-events:none" data-i18n="camera_align">Align text inside this box</div>
     </div>
     
     <!-- Status -->
@@ -4591,9 +4592,9 @@ async function processLiveFrame() {
     scanAttempts++;
     updateLiveStatus(null, 'Scanning... (' + scanAttempts + ')');
 
-    // Crop to viewfinder region (center 78% wide, 24% tall)
-    const cropW = Math.round(vw * 0.78);
-    const cropH = Math.round(vh * 0.24);
+    // Crop to match the visible strip: full width, thin center band
+    const cropW = Math.round(vw * 0.94);
+    const cropH = Math.round(vh * 0.18);
     const cropX = Math.round((vw - cropW) / 2);
     const cropY = Math.round((vh - cropH) / 2);
 
