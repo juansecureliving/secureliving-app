@@ -4646,22 +4646,48 @@ async function translateLiveText(text) {
     $('live-translated-text').textContent = translationCache[cacheKey];
     return;
   }
+
+  const snippet = text.substring(0, 500);
+
+  // Primary: Google Translate free endpoint (high limit, good accuracy)
+  try {
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl='
+      + encodeURIComponent(targetLang) + '&dt=t&q=' + encodeURIComponent(snippet);
+    const resp = await fetch(url);
+    if (resp.ok) {
+      const json = await resp.json();
+      // Response format: [[["translated","original",...],...],...]
+      if (json && json[0]) {
+        const translated = json[0].map(seg => seg[0]).join('');
+        if (translated) {
+          $('live-translated-text').textContent = translated;
+          translationCache[cacheKey] = translated;
+          return;
+        }
+      }
+    }
+  } catch(err) {
+    console.log('Google translate failed, trying fallback...', err);
+  }
+
+  // Fallback: MyMemory
   try {
     const langMap = { zh: 'zh-CN', ms: 'ms', ta: 'ta', tl: 'tl', my: 'my', en: 'en' };
     const to = langMap[targetLang] || targetLang;
-    const resp = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.substring(0, 500)) + '&langpair=en|' + to);
+    const resp = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(snippet) + '&langpair=en|' + to);
     const json = await resp.json();
-    if (json.responseData && json.responseData.translatedText) {
+    if (json.responseData && json.responseData.translatedText && json.responseStatus === 200) {
       const translated = json.responseData.translatedText;
       $('live-translated-text').textContent = translated;
       translationCache[cacheKey] = translated;
-    } else {
-      $('live-translated-text').textContent = text;
+      return;
     }
   } catch(err) {
-    console.error('Translation error:', err);
-    $('live-translated-text').textContent = text;
+    console.error('MyMemory fallback failed:', err);
   }
+
+  // Both failed — show original text so user still sees something
+  $('live-translated-text').textContent = text;
 }
 
 function onLiveLangChange() {
