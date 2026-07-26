@@ -746,8 +746,14 @@ button{cursor:pointer;border:none;background:none}
 <div id="tab-camera" class="tab-content">
   <!-- Mode Toggle -->
   <div style="display:flex;gap:8px;margin-bottom:16px;background:var(--bg);padding:5px;border-radius:10px;border:1px solid var(--border)">
-    <button id="mode-translate-btn" class="btn" style="flex:1;padding:10px;background:var(--pri);color:#fff;border:none;font-size:13px" onclick="switchCameraMode('translate')" data-i18n="mode_translate">🔤 Translate</button>
-    <button id="mode-schedule-btn" class="btn" style="flex:1;padding:10px;background:transparent;color:var(--text);border:none;font-size:13px" onclick="switchCameraMode('schedule')" data-i18n="mode_schedule">💊 Med Schedule</button>
+    <button id="mode-translate-btn" class="btn" style="flex:1;padding:10px;background:var(--pri);color:#fff;border:none;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px" onclick="switchCameraMode('translate')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+      <span data-i18n="mode_translate">Translate</span>
+    </button>
+    <button id="mode-schedule-btn" class="btn" style="flex:1;padding:10px;background:transparent;color:var(--text);border:none;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px" onclick="switchCameraMode('schedule')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+      <span data-i18n="mode_schedule">Med Schedule</span>
+    </button>
   </div>
 
   <!-- ══════ MODE: LIVE TRANSLATE ══════ -->
@@ -801,16 +807,23 @@ button{cursor:pointer;border:none;background:none}
   <div id="camera-mode-schedule" style="display:none">
     <div class="card">
       <h2 class="section-title" data-i18n="sched_title" style="margin-top:0">Prescription Scheduler</h2>
-      <p class="text-sm text-muted mb-16" data-i18n="sched_desc">Upload a photo of your prescription. We'll read the medicines and build a daily reminder schedule.</p>
-      <input type="file" id="rx-photo-input" accept="image/*,.heic,.heif" onchange="handleRxUpload(event)" style="display:none">
-      <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="document.getElementById('rx-photo-input').click()" data-i18n="sched_upload">📁 Upload Prescription Image</button>
-      <p class="text-sm" style="color:var(--muted);text-align:center" data-i18n="sched_formats">Any image format accepted (JPEG, PNG, HEIC, etc.)</p>
+      <p class="text-sm text-muted mb-16" data-i18n="sched_desc">Upload photos of your prescriptions. We'll read the medicines and build a daily reminder schedule.</p>
+      <input type="file" id="rx-photo-input" accept="image/*,.heic,.heif" multiple onchange="handleRxUpload(event)" style="display:none">
+      <button class="btn btn-primary" style="width:100%;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="document.getElementById('rx-photo-input').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span data-i18n="sched_upload">Upload Prescription Images</span>
+      </button>
+      <p class="text-sm" style="color:var(--muted);text-align:center" data-i18n="sched_formats">Any image format accepted. Add multiple images.</p>
     </div>
 
-    <!-- Uploaded preview -->
-    <div id="rx-preview-container" class="card" style="display:none">
-      <img id="rx-preview-image" style="width:100%;border-radius:8px;max-height:300px;object-fit:contain;background:#000">
-      <button id="rx-extract-btn" class="btn btn-primary" style="width:100%;margin-top:12px" onclick="extractRxSchedule()" data-i18n="sched_analyze">🔍 Read Prescription</button>
+    <!-- Uploaded images grid -->
+    <div id="rx-images-container" class="card" style="display:none">
+      <h3 style="font-family:var(--font-display);font-size:14px;margin:0 0 12px 0;font-weight:600;color:var(--muted)"><span id="rx-image-count">0</span> <span data-i18n="sched_images_added">images added</span></h3>
+      <div id="rx-images-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"></div>
+      <button class="btn btn-primary" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px" onclick="extractAllRx()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span data-i18n="sched_analyze_all">Read All Prescriptions</span>
+      </button>
     </div>
 
     <!-- Processing -->
@@ -824,23 +837,38 @@ button{cursor:pointer;border:none;background:none}
       <div class="card">
         <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 12px 0;font-weight:600" data-i18n="sched_medicines">Detected Medicines</h3>
         <div id="rx-medicines-list"></div>
-        <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="addManualMedicine()" data-i18n="sched_add_manual">+ Add Medicine Manually</button>
+        <button class="btn btn-outline" style="width:100%;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="addManualMedicine()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span data-i18n="sched_add_manual">Add Medicine Manually</span>
+        </button>
       </div>
 
       <!-- Start time setting -->
       <div class="card">
-        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:8px" data-i18n="sched_start_time">First dose time</label>
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span data-i18n="sched_start_time">First dose time</span>
+        </label>
         <input type="time" id="rx-start-time" value="08:00" onchange="buildSchedule()" style="width:100%;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
       </div>
+
+      <!-- Combine button -->
+      <button class="btn btn-primary" style="width:100%;padding:14px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="buildSchedule(true)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span data-i18n="sched_combine">Combine & Create Schedule</span>
+      </button>
 
       <!-- Generated Schedule -->
       <div id="rx-schedule-container" class="card" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
           <h3 style="font-family:var(--font-display);font-size:16px;margin:0;font-weight:600" data-i18n="sched_daily">Daily Schedule</h3>
-          <span style="font-size:11px;color:var(--pri);font-weight:600">🔔</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         </div>
         <div id="rx-schedule-list"></div>
-        <button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="saveSchedule()" data-i18n="sched_save">💾 Save Schedule</button>
+        <button class="btn btn-primary" style="width:100%;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="saveSchedule()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span data-i18n="sched_save">Save Schedule</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1502,15 +1530,14 @@ const LANG = {
     camera_ready:'Ready — align text in the box', camera_scanning:'Scanning...', camera_pointing:'Point camera at text...',
     camera_align:'Align text inside this area', camera_scan_again:'🔄 Scan Again',
     camera_done:'Translation ready. Tap Scan Again for new text.',
-    mode_translate:'🔤 Translate', mode_schedule:'💊 Med Schedule',
-    sched_title:'Prescription Scheduler', sched_desc:"Upload a photo of your prescription. We'll read the medicines and build a daily reminder schedule.",
-    sched_upload:'📁 Upload Prescription Image', sched_formats:'Any image format accepted (JPEG, PNG, HEIC, etc.)',
-    sched_analyze:'🔍 Read Prescription', sched_reading:'Reading prescription...', sched_converting:'Loading image...',
-    sched_medicines:'Detected Medicines', sched_add_manual:'+ Add Medicine Manually',
-    sched_start_time:'First dose time', sched_daily:'Daily Schedule', sched_save:'💾 Save Schedule',
-    sched_med_name:'Medicine name', sched_pills:'Pills/dose', sched_times:'Times/day', sched_interval:'Every (hrs)',
-    sched_pill_unit:'pill', sched_pills_unit:'pills', sched_saved:'Schedule saved!',
-    sched_error:'Could not read prescription. Try adding manually.',
+    mode_translate:'Translate', mode_schedule:'Med Schedule',
+    sched_title:'Prescription Scheduler', sched_desc:"Upload photos of your prescriptions. We'll read the medicines and build a daily reminder schedule.",
+    sched_upload:'Upload Prescription Images', sched_formats:'Any image format accepted. Add multiple images.',
+    sched_analyze:'Read Prescription', sched_analyze_all:'Read All Prescriptions', sched_reading:'Reading prescription...', sched_reading_n:'Reading image', sched_converting:'Loading images...',
+    sched_images_added:'images added', sched_medicines:'Detected Medicines', sched_add_manual:'Add Medicine Manually',
+    sched_start_time:'First dose time', sched_daily:'Daily Schedule', sched_save:'Save Schedule', sched_combine:'Combine & Create Schedule',
+    sched_med_name:'Medicine name', sched_amount:'Amount', sched_unit:'Unit', sched_times:'Times/day', sched_interval:'Every (hrs)',
+    sched_saved:'Schedule saved!', sched_error:'Could not read prescription. Try adding manually.',
     // Readings
     readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
@@ -1631,15 +1658,14 @@ const LANG = {
     camera_ready:'就绪 — 将文字对准框内', camera_scanning:'扫描中...', camera_pointing:'将相机对准文字...',
     camera_align:'将文字对齐在此区域内', camera_scan_again:'🔄 再次扫描',
     camera_done:'翻译完成。点击再次扫描以翻译新文字。',
-    mode_translate:'🔤 翻译', mode_schedule:'💊 用药时间表',
+    mode_translate:'翻译', mode_schedule:'用药时间表',
     sched_title:'处方时间表', sched_desc:'上传处方照片，我们将读取药物并生成每日提醒时间表。',
-    sched_upload:'📁 上传处方图片', sched_formats:'接受任何图片格式（JPEG、PNG、HEIC等）',
-    sched_analyze:'🔍 读取处方', sched_reading:'正在读取处方...', sched_converting:'加载图片中...',
-    sched_medicines:'检测到的药物', sched_add_manual:'+ 手动添加药物',
-    sched_start_time:'首次服药时间', sched_daily:'每日时间表', sched_save:'💾 保存时间表',
-    sched_med_name:'药物名称', sched_pills:'每次药量', sched_times:'每日次数', sched_interval:'间隔(小时)',
-    sched_pill_unit:'粒', sched_pills_unit:'粒', sched_saved:'时间表已保存！',
-    sched_error:'无法读取处方，请尝试手动添加。',
+    sched_upload:'上传处方图片', sched_formats:'接受任何图片格式，可添加多张图片。',
+    sched_analyze:'读取处方', sched_analyze_all:'读取所有处方', sched_reading:'正在读取处方...', sched_reading_n:'正在读取图片', sched_converting:'加载图片中...',
+    sched_images_added:'张图片已添加', sched_medicines:'检测到的药物', sched_add_manual:'手动添加药物',
+    sched_start_time:'首次服药时间', sched_daily:'每日时间表', sched_save:'保存时间表', sched_combine:'合并并创建时间表',
+    sched_med_name:'药物名称', sched_amount:'剂量', sched_unit:'单位', sched_times:'每日次数', sched_interval:'间隔(小时)',
+    sched_saved:'时间表已保存！', sched_error:'无法读取处方，请尝试手动添加。',
     readings:'读数', log_glucose:'记录血糖', glucose_value:'血糖(毫克/分升)',
     glucose_time:'时间段', fasting:'空腹', before_meal:'进餐前', after_meal:'进餐后', bedtime:'睡前',
     glucose_history:'血糖历史', log_cholesterol:'记录胆固醇', total_cholesterol:'总胆固醇',
@@ -4871,38 +4897,63 @@ function imgToJpeg(img) {
   return canvas.toDataURL('image/jpeg', 0.92);
 }
 
-function handleRxUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const t = LANG[currentLang] || LANG.en;
-  $('rx-preview-container').style.display = 'none';
-  $('rx-medicines-container').style.display = 'none';
-  $('rx-processing').style.display = 'block';
-  $('rx-status').textContent = t.sched_converting || 'Loading image...';
+let rxImages = []; // array of jpeg data URLs
 
-  convertToJpeg(file)
-    .then(jpeg => {
-      rxImageData = jpeg;
-      $('rx-preview-image').src = jpeg;
+function handleRxUpload(event) {
+  const files = Array.from(event.target.files);
+  if (!files.length) return;
+  const t = LANG[currentLang] || LANG.en;
+  
+  $('rx-processing').style.display = 'block';
+  $('rx-status').textContent = t.sched_converting || 'Loading images...';
+
+  Promise.all(files.map(f => convertToJpeg(f).catch(e => { console.error(e); return null; })))
+    .then(results => {
+      results.filter(Boolean).forEach(jpeg => rxImages.push(jpeg));
       $('rx-processing').style.display = 'none';
-      $('rx-preview-container').style.display = 'block';
+      renderRxImages();
+      // Reset input so same file can be re-added
+      event.target.value = '';
     })
     .catch(err => {
-      console.error('Rx image error:', err);
-      toast(t.camera_load_error || 'Could not load image.', 'error');
+      console.error('Rx upload error:', err);
+      toast(t.camera_load_error || 'Could not load images.', 'error');
       $('rx-processing').style.display = 'none';
     });
 }
 
-async function extractRxSchedule() {
-  if (!rxImageData) return;
+function renderRxImages() {
+  if (rxImages.length === 0) {
+    $('rx-images-container').style.display = 'none';
+    return;
+  }
+  $('rx-image-count').textContent = rxImages.length;
+  const html = rxImages.map((img, i) => `
+    <div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#000">
+      <img src="${img}" style="width:100%;height:100%;object-fit:cover">
+      <button onclick="removeRxImage(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  `).join('');
+  $('rx-images-grid').innerHTML = html;
+  $('rx-images-container').style.display = 'block';
+}
+
+function removeRxImage(index) {
+  rxImages.splice(index, 1);
+  renderRxImages();
+}
+
+async function extractAllRx() {
+  if (rxImages.length === 0) return;
   const t = LANG[currentLang] || LANG.en;
-  $('rx-preview-container').style.display = 'none';
+  $('rx-images-container').style.display = 'none';
   $('rx-processing').style.display = 'block';
-  $('rx-status').textContent = t.sched_reading || 'Reading prescription...';
 
   try {
     if (typeof Tesseract === 'undefined') {
+      $('rx-status').textContent = t.sched_reading || 'Loading OCR...';
       await new Promise((resolve, reject) => {
         const s = document.createElement('script');
         s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
@@ -4912,25 +4963,29 @@ async function extractRxSchedule() {
       });
     }
     const worker = await Tesseract.createWorker('eng');
-    const { data: { text } } = await worker.recognize(rxImageData);
+    rxMedicines = [];
+    
+    // Process each image
+    for (let i = 0; i < rxImages.length; i++) {
+      $('rx-status').textContent = (t.sched_reading_n || 'Reading image') + ' ' + (i+1) + '/' + rxImages.length + '...';
+      const { data: { text } } = await worker.recognize(rxImages[i]);
+      const found = parseMedicines(text);
+      rxMedicines = rxMedicines.concat(found);
+    }
     await worker.terminate();
-
-    // Parse medicines from OCR text
-    rxMedicines = parseMedicines(text);
 
     $('rx-processing').style.display = 'none';
     if (rxMedicines.length === 0) {
-      // Add one empty row so user can fill manually
-      rxMedicines.push({ name:'', pills:1, timesPerDay:3, intervalHrs:6 });
+      rxMedicines.push({ name:'', doseAmount:1, doseUnit:'pill', timesPerDay:3, intervalHrs:6 });
     }
     renderMedicines();
     $('rx-medicines-container').style.display = 'block';
-    buildSchedule();
+    applyLanguage(); // translate any new labels
   } catch(err) {
     console.error('Rx OCR error:', err);
-    toast(t.sched_error || 'Could not read prescription. Try adding manually.', 'error');
+    toast(t.sched_error || 'Could not read prescriptions. Try adding manually.', 'error');
     $('rx-processing').style.display = 'none';
-    rxMedicines = [{ name:'', pills:1, timesPerDay:3, intervalHrs:6 }];
+    rxMedicines = [{ name:'', doseAmount:1, doseUnit:'pill', timesPerDay:3, intervalHrs:6 }];
     renderMedicines();
     $('rx-medicines-container').style.display = 'block';
   }
@@ -4949,12 +5004,29 @@ function parseMedicines(text) {
     const name = nameMatch[0];
     
     // Skip common non-medicine words
-    if (/^(tablet|capsule|take|times|after|before|every|daily|hour|hours|meal|meals|dose|doses|instruction|prescription|patient|doctor|date|name|pharmacy)$/i.test(name)) continue;
+    if (/^(tablet|tablets|capsule|capsules|take|times|after|before|every|daily|hour|hours|meal|meals|dose|doses|instruction|instructions|prescription|patient|doctor|date|name|pharmacy|drops|spoon|spoonful)$/i.test(name)) continue;
 
-    // Pills per dose: "2 pills", "1 capsule", "2 tablets"
-    let pills = 1;
-    const pillMatch = lower.match(/(\d+)\s*(pill|tablet|capsule|tab|cap)/);
-    if (pillMatch) pills = parseInt(pillMatch[1]);
+    // Dosage amount + unit: "1 tab", "2 tablets", "1 cap", "1 pill", "10ml", "5 mg", "2 drops", "1 spoonful"
+    let doseAmount = 1;
+    let doseUnit = 'pill';
+    // Match number followed by unit (ml/mg have no space sometimes)
+    const doseMatch = lower.match(/(\d+(?:\.\d+)?)\s*(ml|mg|mcg|g|tab|tabs|tablet|tablets|cap|caps|capsule|capsules|pill|pills|drop|drops|spoon|spoonful|tsp|tbsp|puff|puffs|unit|units|sachet)/);
+    if (doseMatch) {
+      doseAmount = parseFloat(doseMatch[1]);
+      const rawUnit = doseMatch[2];
+      // Normalize unit to a clean display form
+      const unitMap = {
+        tab:'tab', tabs:'tab', tablet:'tab', tablets:'tab',
+        cap:'cap', caps:'cap', capsule:'cap', capsules:'cap',
+        pill:'pill', pills:'pill',
+        ml:'ml', mg:'mg', mcg:'mcg', g:'g',
+        drop:'drop', drops:'drop',
+        spoon:'spoon', spoonful:'spoon', tsp:'tsp', tbsp:'tbsp',
+        puff:'puff', puffs:'puff',
+        unit:'unit', units:'unit', sachet:'sachet'
+      };
+      doseUnit = unitMap[rawUnit] || rawUnit;
+    }
 
     // Times per day: "3 times a day", "twice daily", "four times"
     let timesPerDay = 0;
@@ -4964,6 +5036,7 @@ function parseMedicines(text) {
     else if (/\btwice\b/.test(lower)) timesPerDay = 2;
     else if (/\bthrice|three times\b/.test(lower)) timesPerDay = 3;
     else if (/\bfour times\b/.test(lower)) timesPerDay = 4;
+    else if (/\bfive times\b/.test(lower)) timesPerDay = 5;
 
     // Interval: "every 6 hours", "every 4 hrs"
     let intervalHrs = 0;
@@ -4978,7 +5051,7 @@ function parseMedicines(text) {
     if (timesPerDay || intervalHrs) {
       if (!timesPerDay) timesPerDay = 3;
       if (!intervalHrs) intervalHrs = Math.round(24 / timesPerDay);
-      meds.push({ name, pills, timesPerDay, intervalHrs });
+      meds.push({ name, doseAmount, doseUnit, timesPerDay, intervalHrs });
     }
   }
   return meds;
@@ -4986,16 +5059,25 @@ function parseMedicines(text) {
 
 function renderMedicines() {
   const t = LANG[currentLang] || LANG.en;
-  const html = rxMedicines.map((m, i) => `
+  const units = ['pill','tab','cap','ml','mg','mcg','g','drop','spoon','tsp','tbsp','puff','unit','sachet'];
+  const html = rxMedicines.map((m, i) => {
+    const unitOpts = units.map(u => `<option value="${u}" ${m.doseUnit===u?'selected':''}>${u}</option>`).join('');
+    return `
     <div style="padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <input type="text" value="${esc(m.name)}" placeholder="${t.sched_med_name || 'Medicine name'}" onchange="updateMed(${i},'name',this.value)" style="flex:1;padding:8px 10px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:14px;font-weight:600">
-        <button onclick="removeMed(${i})" style="margin-left:8px;background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer">×</button>
+        <button onclick="removeMed(${i})" style="margin-left:8px;background:none;border:none;color:var(--danger);cursor:pointer;display:flex;align-items:center;padding:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="display:grid;grid-template-columns:0.8fr 1fr 1fr 1fr;gap:8px">
         <div>
-          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px" data-i18n="sched_pills">Pills/dose</label>
-          <input type="number" min="1" value="${m.pills}" onchange="updateMed(${i},'pills',this.value)" style="width:100%;padding:6px 8px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:13px">
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px" data-i18n="sched_amount">Amount</label>
+          <input type="number" min="0.5" step="0.5" value="${m.doseAmount}" onchange="updateMed(${i},'doseAmount',this.value)" style="width:100%;padding:6px 8px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px" data-i18n="sched_unit">Unit</label>
+          <select onchange="updateMed(${i},'doseUnit',this.value)" style="width:100%;padding:6px 4px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:13px">${unitOpts}</select>
         </div>
         <div>
           <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px" data-i18n="sched_times">Times/day</label>
@@ -5007,14 +5089,14 @@ function renderMedicines() {
         </div>
       </div>
     </div>
-  `).join('');
+  `;}).join('');
   $('rx-medicines-list').innerHTML = html;
 }
 
 function updateMed(index, field, value) {
-  if (field === 'name') rxMedicines[index].name = value;
+  if (field === 'name' || field === 'doseUnit') rxMedicines[index][field] = value;
+  else if (field === 'doseAmount') rxMedicines[index].doseAmount = parseFloat(value) || 1;
   else rxMedicines[index][field] = parseInt(value) || 1;
-  // If times changed, recalc interval
   if (field === 'timesPerDay') rxMedicines[index].intervalHrs = Math.round(24 / rxMedicines[index].timesPerDay);
   if (field === 'intervalHrs') rxMedicines[index].timesPerDay = Math.round(24 / rxMedicines[index].intervalHrs);
   buildSchedule();
@@ -5027,13 +5109,17 @@ function removeMed(index) {
 }
 
 function addManualMedicine() {
-  rxMedicines.push({ name:'', pills:1, timesPerDay:3, intervalHrs:6 });
+  rxMedicines.push({ name:'', doseAmount:1, doseUnit:'pill', timesPerDay:3, intervalHrs:6 });
   renderMedicines();
 }
 
 // Build combined daily schedule from all medicines
-function buildSchedule() {
+function buildSchedule(forceShow) {
   const t = LANG[currentLang] || LANG.en;
+  // Only build if schedule already visible OR user clicked combine
+  const alreadyVisible = $('rx-schedule-container') && $('rx-schedule-container').style.display === 'block';
+  if (!forceShow && !alreadyVisible) return;
+  
   const startTime = $('rx-start-time') ? $('rx-start-time').value : '08:00';
   const [startH, startM] = startTime.split(':').map(Number);
   const startMinutes = startH * 60 + startM;
@@ -5046,11 +5132,12 @@ function buildSchedule() {
     for (let dose = 0; dose < med.timesPerDay; dose++) {
       let mins = startMinutes + dose * med.intervalHrs * 60;
       mins = mins % (24 * 60); // wrap around 24h
-      // Round to nearest 5 min
       mins = Math.round(mins / 5) * 5;
       if (!slots[mins]) slots[mins] = [];
-      const pillText = med.pills > 1 ? `${med.pills} ${t.sched_pills_unit || 'pills'}` : `1 ${t.sched_pill_unit || 'pill'}`;
-      slots[mins].push(`${med.name} (${pillText})`);
+      // Format dose: "2 tab", "10 ml", "1 pill"
+      const amt = med.doseAmount % 1 === 0 ? med.doseAmount : med.doseAmount;
+      const doseText = `${amt} ${med.doseUnit}${(amt > 1 && !['ml','mg','mcg','g'].includes(med.doseUnit)) ? 's' : ''}`;
+      slots[mins].push(`${med.name} (${doseText})`);
     }
   });
 
@@ -5067,7 +5154,7 @@ function buildSchedule() {
     const ampm = h < 12 ? 'AM' : 'PM';
     const h12 = h % 12 === 0 ? 12 : h % 12;
     const timeStr = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
-    const medsHtml = slots[mins].map(med => `<div style="font-size:13px;color:var(--text);padding:2px 0">💊 ${esc(med)}</div>`).join('');
+    const medsHtml = slots[mins].map(med => `<div style="font-size:13px;color:var(--text);padding:3px 0;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>${esc(med)}</div>`).join('');
     return `
       <div style="display:flex;gap:14px;padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--pri);margin-bottom:10px">
         <div style="font-weight:700;font-size:15px;color:var(--pri);min-width:75px">${timeStr}</div>
@@ -5088,7 +5175,7 @@ function saveSchedule() {
       startTime: $('rx-start-time').value,
       savedAt: new Date().toISOString()
     }));
-    toast(t.sched_saved || 'Schedule saved! 💊', 'success');
+    toast(t.sched_saved || 'Schedule saved!', 'success');
   } catch(e) {
     console.error('Save error:', e);
     toast('Could not save schedule', 'error');
