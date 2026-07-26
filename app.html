@@ -756,13 +756,19 @@ button{cursor:pointer;border:none;background:none}
   
   <!-- Live Camera View -->
   <div id="live-camera-container" style="display:none">
-    <!-- Video Feed -->
-    <div class="card" style="padding:0;overflow:hidden;margin-bottom:0">
-      <video id="live-camera-video" style="width:100%;display:block;max-height:55vh;object-fit:cover;background:#111" autoplay playsinline muted></video>
+    <!-- Video Feed with Viewfinder Overlay -->
+    <div style="position:relative;background:#111;border-radius:var(--radius);overflow:hidden;margin-bottom:8px">
+      <video id="live-camera-video" style="width:100%;display:block;min-height:300px;max-height:60vh;object-fit:cover" autoplay playsinline muted></video>
+      <!-- Viewfinder guide rectangle -->
+      <div id="viewfinder" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:85%;height:40%;border:2.5px solid rgba(26,122,109,0.85);border-radius:10px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,0.35)">
+        <div style="position:absolute;bottom:-28px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.8);text-shadow:0 1px 3px rgba(0,0,0,0.7)" data-i18n="camera_align">Align text inside this area</div>
+      </div>
+      <!-- Torch toggle -->
+      <button id="torch-btn" onclick="toggleTorch()" style="display:none;position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:#fff;font-size:20px;cursor:pointer;backdrop-filter:blur(4px)">🔦</button>
     </div>
     
     <!-- Controls -->
-    <div class="card" style="margin-top:8px">
+    <div class="card" style="margin-top:0">
       <div style="display:flex;gap:10px;align-items:center">
         <button class="btn btn-secondary" onclick="stopLiveCamera()" data-i18n="camera_stop" style="white-space:nowrap">⏹ Stop</button>
         <select id="live-translate-lang" onchange="onLiveLangChange()" style="flex:1;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
@@ -777,19 +783,10 @@ button{cursor:pointer;border:none;background:none}
       <div id="live-status" style="margin-top:10px;text-align:center;font-size:12px;color:var(--muted)" data-i18n="camera_initializing">Initializing OCR engine...</div>
     </div>
     
-    <!-- Detected Text -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <h3 style="font-family:var(--font-display);font-size:14px;margin:0;font-weight:600;color:var(--muted)" data-i18n="camera_detected">Detected Text</h3>
-        <span id="live-confidence" style="font-size:11px;color:var(--muted)"></span>
-      </div>
-      <div id="live-detected-text" style="font-size:14px;line-height:1.7;color:var(--text);min-height:50px;white-space:pre-wrap;word-break:break-word;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)"></div>
-    </div>
-    
-    <!-- Translation -->
+    <!-- Translation Only -->
     <div class="card">
       <h3 style="font-family:var(--font-display);font-size:14px;margin:0 0 10px 0;font-weight:600;color:var(--muted)" data-i18n="camera_translation">Translation</h3>
-      <div id="live-translated-text" style="font-size:14px;line-height:1.7;color:var(--text);min-height:50px;white-space:pre-wrap;word-break:break-word;padding:12px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
+      <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:60px;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
     </div>
   </div>
 </div>
@@ -1447,7 +1444,8 @@ const LANG = {
     camera_privacy:'🔒 Your camera feed is processed on-device only. No photos are saved or uploaded.',
     camera_detected:'Detected Text', camera_translation:'Translation', camera_processing:'Processing...',
     camera_initializing:'Initializing OCR engine...', camera_loading_ocr:'Loading OCR engine...',
-    camera_ready:'Ready — point camera at text', camera_scanning:'Scanning...', camera_pointing:'Point camera at text...',
+    camera_ready:'Ready — align text in the box', camera_scanning:'Scanning...', camera_pointing:'Point camera at text...',
+    camera_align:'Align text inside this area',
     // Readings
     readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
@@ -1565,7 +1563,8 @@ const LANG = {
     camera_privacy:'🔒 相机画面仅在您的设备上处理，不会保存或上传任何照片。',
     camera_detected:'检测到的文字', camera_translation:'翻译', camera_processing:'处理中...',
     camera_initializing:'正在初始化OCR引擎...', camera_loading_ocr:'正在加载OCR引擎...',
-    camera_ready:'就绪 — 将相机对准文字', camera_scanning:'扫描中...', camera_pointing:'将相机对准文字...',
+    camera_ready:'就绪 — 将文字对准框内', camera_scanning:'扫描中...', camera_pointing:'将相机对准文字...',
+    camera_align:'将文字对齐在此区域内',
     readings:'读数', log_glucose:'记录血糖', glucose_value:'血糖(毫克/分升)',
     glucose_time:'时间段', fasting:'空腹', before_meal:'进餐前', after_meal:'进餐后', bedtime:'睡前',
     glucose_history:'血糖历史', log_cholesterol:'记录胆固醇', total_cholesterol:'总胆固醇',
@@ -4442,30 +4441,39 @@ let liveInterval = null;
 let liveProcessing = false;
 let lastDetectedText = '';
 let translationCache = {};
+let torchOn = false;
 
 async function startLiveCamera() {
   try {
-    // 1. Open camera
+    // Request highest possible resolution for better OCR
     liveStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode:'environment', width:{ideal:1280}, height:{ideal:720}, focusMode:{ideal:'continuous'} }
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 3840 },
+        height: { ideal: 2160 },
+        focusMode: { ideal: 'continuous' }
+      }
     });
     const video = $('live-camera-video');
     video.srcObject = liveStream;
 
-    // Try continuous autofocus
+    // Enable continuous autofocus + check torch support
+    const track = liveStream.getVideoTracks()[0];
     try {
-      const track = liveStream.getVideoTracks()[0];
       const caps = track.getCapabilities ? track.getCapabilities() : {};
       if (caps.focusMode && caps.focusMode.includes('continuous')) {
-        await track.applyConstraints({ advanced:[{focusMode:'continuous'}] });
+        await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+      }
+      // Show torch button if supported
+      if (caps.torch) {
+        $('torch-btn').style.display = 'block';
       }
     } catch(e) {}
 
-    // Show live view, hide start button
     $('camera-start-container').style.display = 'none';
     $('live-camera-container').style.display = 'block';
 
-    // 2. Load Tesseract if needed
+    // Load Tesseract
     if (typeof Tesseract === 'undefined') {
       updateLiveStatus('camera_loading_ocr', 'Loading OCR engine...');
       await new Promise((resolve, reject) => {
@@ -4477,45 +4485,46 @@ async function startLiveCamera() {
       });
     }
 
-    // 3. Create persistent worker (reused across frames)
+    // Create persistent worker
     updateLiveStatus('camera_initializing', 'Initializing OCR engine...');
     liveWorker = await Tesseract.createWorker('eng');
-    updateLiveStatus('camera_ready', 'Ready — point camera at text');
+    updateLiveStatus('camera_ready', 'Ready — align text in the box');
 
-    // 4. Start frame processing loop (every 1.5s)
+    // Start frame loop
     liveInterval = setInterval(processLiveFrame, 1500);
 
   } catch(err) {
     console.error('Live camera error:', err);
-    toast('Could not start camera','error');
+    toast('Could not start camera', 'error');
     stopLiveCamera();
   }
 }
 
 function stopLiveCamera() {
-  // Stop frame processing
   if (liveInterval) { clearInterval(liveInterval); liveInterval = null; }
-
-  // Terminate OCR worker
   if (liveWorker) { liveWorker.terminate().catch(()=>{}); liveWorker = null; }
-
-  // Stop camera stream
   if (liveStream) {
     liveStream.getTracks().forEach(t => t.stop());
     liveStream = null;
   }
-
-  // Clear results
-  if ($('live-detected-text')) $('live-detected-text').textContent = '';
   if ($('live-translated-text')) $('live-translated-text').textContent = '';
-  if ($('live-confidence')) $('live-confidence').textContent = '';
+  if ($('torch-btn')) $('torch-btn').style.display = 'none';
   lastDetectedText = '';
   translationCache = {};
   liveProcessing = false;
-
-  // Show start button, hide live view
+  torchOn = false;
   $('live-camera-container').style.display = 'none';
   $('camera-start-container').style.display = 'block';
+}
+
+async function toggleTorch() {
+  if (!liveStream) return;
+  torchOn = !torchOn;
+  try {
+    const track = liveStream.getVideoTracks()[0];
+    await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+    $('torch-btn').textContent = torchOn ? '💡' : '🔦';
+  } catch(e) { console.error('Torch error:', e); }
 }
 
 async function processLiveFrame() {
@@ -4526,42 +4535,57 @@ async function processLiveFrame() {
     const video = $('live-camera-video');
     if (!video || video.readyState < 2) { liveProcessing = false; return; }
 
-    // Capture frame to canvas
+    // Get full resolution frame
+    const vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw || !vh) { liveProcessing = false; return; }
+
+    // Crop to viewfinder region (center 85% width, 40% height) for focused OCR
+    const cropW = Math.round(vw * 0.85);
+    const cropH = Math.round(vh * 0.40);
+    const cropX = Math.round((vw - cropW) / 2);
+    const cropY = Math.round((vh - cropH) / 2);
+
+    // Draw cropped region at a good OCR resolution (min 1200px wide)
+    let outW = cropW, outH = cropH;
+    if (outW < 1200) {
+      const scale = 1200 / outW;
+      outW = 1200;
+      outH = Math.round(outH * scale);
+    }
+
     const canvas = document.createElement('canvas');
-    const w = Math.min(video.videoWidth, 1280);
-    const h = Math.round(video.videoHeight * (w / video.videoWidth));
-    canvas.width = w; canvas.height = h;
+    canvas.width = outW;
+    canvas.height = outH;
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, w, h);
+    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
 
     // Preprocess: grayscale + contrast + binarize
-    const imageData = ctx.getImageData(0, 0, w, h);
+    const imageData = ctx.getImageData(0, 0, outW, outH);
     const d = imageData.data;
-
     // Grayscale
     for (let i = 0; i < d.length; i += 4) {
-      const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+      const g = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
       d[i] = d[i+1] = d[i+2] = g;
     }
     // Contrast stretch
-    let mn=255, mx=0;
-    for (let i=0; i<d.length; i+=4) { if(d[i]<mn) mn=d[i]; if(d[i]>mx) mx=d[i]; }
-    const rng = mx-mn||1;
-    for (let i=0; i<d.length; i+=4) { const v=Math.round(((d[i]-mn)/rng)*255); d[i]=d[i+1]=d[i+2]=v; }
+    let mn = 255, mx = 0;
+    for (let i = 0; i < d.length; i += 4) { if (d[i] < mn) mn = d[i]; if (d[i] > mx) mx = d[i]; }
+    const rng = mx - mn || 1;
+    for (let i = 0; i < d.length; i += 4) { const v = Math.round(((d[i] - mn) / rng) * 255); d[i] = d[i+1] = d[i+2] = v; }
     // Otsu binarize
     const hist = new Array(256).fill(0);
-    for (let i=0; i<d.length; i+=4) hist[d[i]]++;
-    const total = w*h;
-    let sum=0; for(let i=0;i<256;i++) sum+=i*hist[i];
-    let sumB=0,wB=0,wF=0,maxVar=0,thresh=128;
-    for(let i=0;i<256;i++){
-      wB+=hist[i]; if(!wB) continue; wF=total-wB; if(!wF) break;
-      sumB+=i*hist[i];
-      const mB=sumB/wB, mF=(sum-sumB)/wF;
-      const bw=wB*wF*(mB-mF)*(mB-mF);
-      if(bw>maxVar){maxVar=bw;thresh=i;}
+    for (let i = 0; i < d.length; i += 4) hist[d[i]]++;
+    const total = outW * outH;
+    let sum = 0; for (let i = 0; i < 256; i++) sum += i * hist[i];
+    let sumB = 0, wB = 0, wF = 0, maxVar = 0, thresh = 128;
+    for (let i = 0; i < 256; i++) {
+      wB += hist[i]; if (!wB) continue; wF = total - wB; if (!wF) break;
+      sumB += i * hist[i];
+      const mB = sumB / wB, mF = (sum - sumB) / wF;
+      const bw = wB * wF * (mB - mF) * (mB - mF);
+      if (bw > maxVar) { maxVar = bw; thresh = i; }
     }
-    for(let i=0;i<d.length;i+=4){ const v=d[i]>thresh?255:0; d[i]=d[i+1]=d[i+2]=v; }
+    for (let i = 0; i < d.length; i += 4) { const v = d[i] > thresh ? 255 : 0; d[i] = d[i+1] = d[i+2] = v; }
     ctx.putImageData(imageData, 0, 0);
 
     const processed = canvas.toDataURL('image/png');
@@ -4569,24 +4593,20 @@ async function processLiveFrame() {
     // Run OCR
     const { data } = await liveWorker.recognize(processed);
     const text = (data.text || '').trim();
-    const confidence = Math.round(data.confidence || 0);
 
     if (text && text.length > 2) {
-      $('live-detected-text').textContent = text;
-      $('live-confidence').textContent = confidence + '% confidence';
       updateLiveStatus('camera_scanning', 'Scanning...');
-
-      // Only translate if text changed significantly
+      // Only translate if text changed meaningfully
       if (text !== lastDetectedText) {
         lastDetectedText = text;
         await translateLiveText(text);
       }
     } else {
-      updateLiveStatus('camera_ready', 'Ready — point camera at text');
+      updateLiveStatus('camera_ready', 'Ready — align text in the box');
     }
 
   } catch(err) {
-    console.error('Frame processing error:', err);
+    console.error('Frame error:', err);
   }
   liveProcessing = false;
 }
@@ -4594,13 +4614,11 @@ async function processLiveFrame() {
 async function translateLiveText(text) {
   const targetLang = $('live-translate-lang').value;
 
-  // If target is English and detected text is already English, just mirror it
   if (targetLang === 'en') {
     $('live-translated-text').textContent = text;
     return;
   }
 
-  // Check cache
   const cacheKey = targetLang + ':' + text.substring(0, 100);
   if (translationCache[cacheKey]) {
     $('live-translated-text').textContent = translationCache[cacheKey];
@@ -4608,13 +4626,10 @@ async function translateLiveText(text) {
   }
 
   try {
-    // MyMemory language codes
-    const langMap = { zh:'zh-CN', ms:'ms', ta:'ta', tl:'tl', my:'my', en:'en' };
+    const langMap = { zh: 'zh-CN', ms: 'ms', ta: 'ta', tl: 'tl', my: 'my', en: 'en' };
     const to = langMap[targetLang] || targetLang;
-
     const resp = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.substring(0, 500)) + '&langpair=en|' + to);
     const json = await resp.json();
-
     if (json.responseStatus === 200 && json.responseData && json.responseData.translatedText) {
       const translated = json.responseData.translatedText;
       $('live-translated-text').textContent = translated;
@@ -4626,11 +4641,8 @@ async function translateLiveText(text) {
 }
 
 function onLiveLangChange() {
-  // Re-translate current text with new language
-  if (lastDetectedText) {
-    translationCache = {}; // Clear cache for new language
-    translateLiveText(lastDetectedText);
-  }
+  translationCache = {};
+  if (lastDetectedText) translateLiveText(lastDetectedText);
 }
 
 function updateLiveStatus(key, fallback) {
