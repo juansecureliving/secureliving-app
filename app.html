@@ -744,49 +744,104 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- ── TAB: Camera Translation ──────────────────────── -->
 <div id="tab-camera" class="tab-content">
-  <!-- Start Screen -->
-  <div id="camera-start-container" class="card" style="text-align:center">
-    <h2 class="section-title" data-i18n="camera_title" style="margin-top:0">Camera Translation</h2>
-    <p class="text-sm text-muted mb-16" data-i18n="camera_desc">Point your camera at medicine labels to translate text instantly. Nothing is saved.</p>
-    <button class="btn btn-primary" style="width:100%;padding:16px;font-size:16px" onclick="startLiveCamera()" data-i18n="camera_start_live">📷 Start Live Translation</button>
-    <p class="text-sm" style="margin-top:16px;color:var(--muted)" data-i18n="camera_privacy">🔒 Processed on-device only. No photos saved.</p>
+  <!-- Mode Toggle -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;background:var(--bg);padding:5px;border-radius:10px;border:1px solid var(--border)">
+    <button id="mode-translate-btn" class="btn" style="flex:1;padding:10px;background:var(--pri);color:#fff;border:none;font-size:13px" onclick="switchCameraMode('translate')" data-i18n="mode_translate">🔤 Translate</button>
+    <button id="mode-schedule-btn" class="btn" style="flex:1;padding:10px;background:transparent;color:var(--text);border:none;font-size:13px" onclick="switchCameraMode('schedule')" data-i18n="mode_schedule">💊 Med Schedule</button>
   </div>
-  
-  <!-- Live Camera View -->
-  <div id="live-camera-container" style="display:none">
-    <!-- Language selector + Stop on TOP -->
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
-      <button class="btn btn-secondary" onclick="stopLiveCamera()" data-i18n="camera_stop" style="white-space:nowrap">⏹ Stop</button>
-      <select id="live-translate-lang" onchange="onLiveLangChange()" style="flex:1;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
-        <option value="en">English</option>
-        <option value="zh">中文 (Chinese)</option>
-        <option value="ms">Bahasa Melayu</option>
-        <option value="ta">தமிழ் (Tamil)</option>
-        <option value="tl">Tagalog (Filipino)</option>
-        <option value="my">မြန်မာ (Myanmar)</option>
-      </select>
+
+  <!-- ══════ MODE: LIVE TRANSLATE ══════ -->
+  <div id="camera-mode-translate">
+    <!-- Start Screen -->
+    <div id="camera-start-container" class="card" style="text-align:center">
+      <h2 class="section-title" data-i18n="camera_title" style="margin-top:0">Camera Translation</h2>
+      <p class="text-sm text-muted mb-16" data-i18n="camera_desc">Point your camera at medicine labels to translate text instantly. Nothing is saved.</p>
+      <button class="btn btn-primary" style="width:100%;padding:16px;font-size:16px" onclick="startLiveCamera()" data-i18n="camera_start_live">📷 Start Live Translation</button>
+      <p class="text-sm" style="margin-top:16px;color:var(--muted)" data-i18n="camera_privacy">🔒 Processed on-device only. No photos saved.</p>
     </div>
     
-    <!-- Camera Video — cropped to show ONLY the scan strip (tap to focus) -->
-    <div style="position:relative;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:10px;height:130px" onclick="tapToFocus(event)">
-      <!-- Video scaled so its center strip fills this short window -->
-      <video id="live-camera-video" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;min-height:100%;object-fit:cover" autoplay playsinline muted></video>
-      <!-- Corner guides -->
-      <div style="position:absolute;inset:8px;border:2px solid rgba(26,122,109,0.9);border-radius:8px;pointer-events:none"></div>
-      <div style="position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.9);text-shadow:0 1px 3px rgba(0,0,0,0.9);pointer-events:none" data-i18n="camera_align">Align text inside this box</div>
-    </div>
-    
-    <!-- Status -->
-    <div id="live-status" style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:10px" data-i18n="camera_initializing">Initializing OCR engine...</div>
-    
-    <!-- Translation result -->
-    <div class="card" style="margin-top:0">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <h3 style="font-family:var(--font-display);font-size:14px;margin:0;font-weight:600;color:var(--muted)" data-i18n="camera_translation">Translation</h3>
-        <span id="live-frozen-badge" style="display:none;font-size:11px;color:var(--pri);font-weight:600">✓ Ready</span>
+    <!-- Live Camera View -->
+    <div id="live-camera-container" style="display:none">
+      <!-- Language selector + Stop on TOP -->
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <button class="btn btn-secondary" onclick="stopLiveCamera()" data-i18n="camera_stop" style="white-space:nowrap">⏹ Stop</button>
+        <select id="live-translate-lang" onchange="onLiveLangChange()" style="flex:1;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
+          <option value="en">English</option>
+          <option value="zh">中文 (Chinese)</option>
+          <option value="ms">Bahasa Melayu</option>
+          <option value="ta">தமிழ் (Tamil)</option>
+          <option value="tl">Tagalog (Filipino)</option>
+          <option value="my">မြန်မာ (Myanmar)</option>
+        </select>
       </div>
-      <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:50px;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
-      <button id="scan-again-btn" class="btn btn-primary" style="width:100%;margin-top:14px;display:none" onclick="resumeScanning()" data-i18n="camera_scan_again">🔄 Scan Again</button>
+      
+      <!-- Camera Video — cropped to show ONLY the scan strip (tap to focus) -->
+      <div style="position:relative;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:10px;height:130px" onclick="tapToFocus(event)">
+        <video id="live-camera-video" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;min-height:100%;object-fit:cover" autoplay playsinline muted></video>
+        <div style="position:absolute;inset:8px;border:2px solid rgba(26,122,109,0.9);border-radius:8px;pointer-events:none"></div>
+        <div style="position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.9);text-shadow:0 1px 3px rgba(0,0,0,0.9);pointer-events:none" data-i18n="camera_align">Align text inside this box</div>
+      </div>
+      
+      <!-- Status -->
+      <div id="live-status" style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:10px" data-i18n="camera_initializing">Initializing OCR engine...</div>
+      
+      <!-- Translation result -->
+      <div class="card" style="margin-top:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 style="font-family:var(--font-display);font-size:14px;margin:0;font-weight:600;color:var(--muted)" data-i18n="camera_translation">Translation</h3>
+          <span id="live-frozen-badge" style="display:none;font-size:11px;color:var(--pri);font-weight:600">✓ Ready</span>
+        </div>
+        <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:50px;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
+        <button id="scan-again-btn" class="btn btn-primary" style="width:100%;margin-top:14px;display:none" onclick="resumeScanning()" data-i18n="camera_scan_again">🔄 Scan Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ MODE: MEDICATION SCHEDULE ══════ -->
+  <div id="camera-mode-schedule" style="display:none">
+    <div class="card">
+      <h2 class="section-title" data-i18n="sched_title" style="margin-top:0">Prescription Scheduler</h2>
+      <p class="text-sm text-muted mb-16" data-i18n="sched_desc">Upload a photo of your prescription. We'll read the medicines and build a daily reminder schedule.</p>
+      <input type="file" id="rx-photo-input" accept="image/*,.heic,.heif" onchange="handleRxUpload(event)" style="display:none">
+      <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="document.getElementById('rx-photo-input').click()" data-i18n="sched_upload">📁 Upload Prescription Image</button>
+      <p class="text-sm" style="color:var(--muted);text-align:center" data-i18n="sched_formats">Any image format accepted (JPEG, PNG, HEIC, etc.)</p>
+    </div>
+
+    <!-- Uploaded preview -->
+    <div id="rx-preview-container" class="card" style="display:none">
+      <img id="rx-preview-image" style="width:100%;border-radius:8px;max-height:300px;object-fit:contain;background:#000">
+      <button id="rx-extract-btn" class="btn btn-primary" style="width:100%;margin-top:12px" onclick="extractRxSchedule()" data-i18n="sched_analyze">🔍 Read Prescription</button>
+    </div>
+
+    <!-- Processing -->
+    <div id="rx-processing" class="card" style="display:none;text-align:center;padding:30px 20px">
+      <div id="rx-status" style="color:var(--muted);margin-bottom:16px;font-size:14px" data-i18n="sched_reading">Reading prescription...</div>
+      <div style="width:40px;height:40px;border:3px solid rgba(26,122,109,0.2);border-top-color:var(--pri);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
+    </div>
+
+    <!-- Detected Medicines -->
+    <div id="rx-medicines-container" style="display:none">
+      <div class="card">
+        <h3 style="font-family:var(--font-display);font-size:16px;margin:0 0 12px 0;font-weight:600" data-i18n="sched_medicines">Detected Medicines</h3>
+        <div id="rx-medicines-list"></div>
+        <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="addManualMedicine()" data-i18n="sched_add_manual">+ Add Medicine Manually</button>
+      </div>
+
+      <!-- Start time setting -->
+      <div class="card">
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:8px" data-i18n="sched_start_time">First dose time</label>
+        <input type="time" id="rx-start-time" value="08:00" onchange="buildSchedule()" style="width:100%;padding:10px 12px;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:14px">
+      </div>
+
+      <!-- Generated Schedule -->
+      <div id="rx-schedule-container" class="card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h3 style="font-family:var(--font-display);font-size:16px;margin:0;font-weight:600" data-i18n="sched_daily">Daily Schedule</h3>
+          <span style="font-size:11px;color:var(--pri);font-weight:600">🔔</span>
+        </div>
+        <div id="rx-schedule-list"></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="saveSchedule()" data-i18n="sched_save">💾 Save Schedule</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1447,6 +1502,15 @@ const LANG = {
     camera_ready:'Ready — align text in the box', camera_scanning:'Scanning...', camera_pointing:'Point camera at text...',
     camera_align:'Align text inside this area', camera_scan_again:'🔄 Scan Again',
     camera_done:'Translation ready. Tap Scan Again for new text.',
+    mode_translate:'🔤 Translate', mode_schedule:'💊 Med Schedule',
+    sched_title:'Prescription Scheduler', sched_desc:"Upload a photo of your prescription. We'll read the medicines and build a daily reminder schedule.",
+    sched_upload:'📁 Upload Prescription Image', sched_formats:'Any image format accepted (JPEG, PNG, HEIC, etc.)',
+    sched_analyze:'🔍 Read Prescription', sched_reading:'Reading prescription...', sched_converting:'Loading image...',
+    sched_medicines:'Detected Medicines', sched_add_manual:'+ Add Medicine Manually',
+    sched_start_time:'First dose time', sched_daily:'Daily Schedule', sched_save:'💾 Save Schedule',
+    sched_med_name:'Medicine name', sched_pills:'Pills/dose', sched_times:'Times/day', sched_interval:'Every (hrs)',
+    sched_pill_unit:'pill', sched_pills_unit:'pills', sched_saved:'Schedule saved!',
+    sched_error:'Could not read prescription. Try adding manually.',
     // Readings
     readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
@@ -1567,6 +1631,15 @@ const LANG = {
     camera_ready:'就绪 — 将文字对准框内', camera_scanning:'扫描中...', camera_pointing:'将相机对准文字...',
     camera_align:'将文字对齐在此区域内', camera_scan_again:'🔄 再次扫描',
     camera_done:'翻译完成。点击再次扫描以翻译新文字。',
+    mode_translate:'🔤 翻译', mode_schedule:'💊 用药时间表',
+    sched_title:'处方时间表', sched_desc:'上传处方照片，我们将读取药物并生成每日提醒时间表。',
+    sched_upload:'📁 上传处方图片', sched_formats:'接受任何图片格式（JPEG、PNG、HEIC等）',
+    sched_analyze:'🔍 读取处方', sched_reading:'正在读取处方...', sched_converting:'加载图片中...',
+    sched_medicines:'检测到的药物', sched_add_manual:'+ 手动添加药物',
+    sched_start_time:'首次服药时间', sched_daily:'每日时间表', sched_save:'💾 保存时间表',
+    sched_med_name:'药物名称', sched_pills:'每次药量', sched_times:'每日次数', sched_interval:'间隔(小时)',
+    sched_pill_unit:'粒', sched_pills_unit:'粒', sched_saved:'时间表已保存！',
+    sched_error:'无法读取处方，请尝试手动添加。',
     readings:'读数', log_glucose:'记录血糖', glucose_value:'血糖(毫克/分升)',
     glucose_time:'时间段', fasting:'空腹', before_meal:'进餐前', after_meal:'进餐后', bedtime:'睡前',
     glucose_history:'血糖历史', log_cholesterol:'记录胆固醇', total_cholesterol:'总胆固醇',
@@ -4699,6 +4772,327 @@ function onLiveLangChange() {
 function updateLiveStatus(key, fallback) {
   const t = LANG[currentLang] || LANG.en;
   if ($('live-status')) $('live-status').textContent = (key && t[key]) ? t[key] : fallback;
+}
+
+/* ═══════════ MODE SWITCHING ═══════════ */
+function switchCameraMode(mode) {
+  if (mode === 'translate') {
+    $('camera-mode-translate').style.display = 'block';
+    $('camera-mode-schedule').style.display = 'none';
+    $('mode-translate-btn').style.background = 'var(--pri)';
+    $('mode-translate-btn').style.color = '#fff';
+    $('mode-schedule-btn').style.background = 'transparent';
+    $('mode-schedule-btn').style.color = 'var(--text)';
+  } else {
+    // Stop live camera if running
+    if (liveStream) stopLiveCamera();
+    $('camera-mode-translate').style.display = 'none';
+    $('camera-mode-schedule').style.display = 'block';
+    $('mode-schedule-btn').style.background = 'var(--pri)';
+    $('mode-schedule-btn').style.color = '#fff';
+    $('mode-translate-btn').style.background = 'transparent';
+    $('mode-translate-btn').style.color = 'var(--text)';
+  }
+}
+
+/* ═══════════ PRESCRIPTION SCHEDULER ═══════════ */
+let rxImageData = null;
+let rxMedicines = [];
+
+// Convert any image (incl HEIC) to JPEG via Canvas with fallbacks
+async function convertToJpeg(file) {
+  const name = (file.name || '').toLowerCase();
+  const type = (file.type || '').toLowerCase();
+  const isHeic = name.endsWith('.heic') || name.endsWith('.heif') || type === 'image/heic' || type === 'image/heif';
+
+  // Method 1: native decode via object URL
+  try {
+    return await loadImgToJpeg(file);
+  } catch(e) { console.log('native decode failed', e); }
+
+  // Method 2: HEIC library fallback
+  if (isHeic) {
+    try {
+      if (typeof heic2any === 'undefined') {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+          s.onload = res; s.onerror = () => rej(new Error('heic lib fail'));
+          document.head.appendChild(s);
+        });
+      }
+      const jpegBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+      const blob = Array.isArray(jpegBlob) ? jpegBlob[0] : jpegBlob;
+      return await loadImgToJpeg(blob);
+    } catch(e) { console.error('HEIC convert fail', e); }
+  }
+
+  // Method 3: FileReader fallback
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try { resolve(await dataUrlToJpeg(e.target.result)); }
+      catch(err) { reject(err); }
+    };
+    reader.onerror = () => reject(new Error('FileReader failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImgToJpeg(fileOrBlob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(fileOrBlob);
+    const img = new Image();
+    img.onload = () => { try { const r = imgToJpeg(img); URL.revokeObjectURL(url); resolve(r); } catch(e){ URL.revokeObjectURL(url); reject(e); } };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode fail')); };
+    img.src = url;
+  });
+}
+
+function dataUrlToJpeg(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => { try { resolve(imgToJpeg(img)); } catch(e){ reject(e); } };
+    img.onerror = () => reject(new Error('decode fail'));
+    img.src = dataUrl;
+  });
+}
+
+function imgToJpeg(img) {
+  const canvas = document.createElement('canvas');
+  const maxDim = 2400;
+  let w = img.naturalWidth, h = img.naturalHeight;
+  if (w > maxDim || h > maxDim) {
+    if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+    else { w = Math.round(w * maxDim / h); h = maxDim; }
+  }
+  canvas.width = w; canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL('image/jpeg', 0.92);
+}
+
+function handleRxUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const t = LANG[currentLang] || LANG.en;
+  $('rx-preview-container').style.display = 'none';
+  $('rx-medicines-container').style.display = 'none';
+  $('rx-processing').style.display = 'block';
+  $('rx-status').textContent = t.sched_converting || 'Loading image...';
+
+  convertToJpeg(file)
+    .then(jpeg => {
+      rxImageData = jpeg;
+      $('rx-preview-image').src = jpeg;
+      $('rx-processing').style.display = 'none';
+      $('rx-preview-container').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Rx image error:', err);
+      toast(t.camera_load_error || 'Could not load image.', 'error');
+      $('rx-processing').style.display = 'none';
+    });
+}
+
+async function extractRxSchedule() {
+  if (!rxImageData) return;
+  const t = LANG[currentLang] || LANG.en;
+  $('rx-preview-container').style.display = 'none';
+  $('rx-processing').style.display = 'block';
+  $('rx-status').textContent = t.sched_reading || 'Reading prescription...';
+
+  try {
+    if (typeof Tesseract === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Failed to load OCR'));
+        document.head.appendChild(s);
+      });
+    }
+    const worker = await Tesseract.createWorker('eng');
+    const { data: { text } } = await worker.recognize(rxImageData);
+    await worker.terminate();
+
+    // Parse medicines from OCR text
+    rxMedicines = parseMedicines(text);
+
+    $('rx-processing').style.display = 'none';
+    if (rxMedicines.length === 0) {
+      // Add one empty row so user can fill manually
+      rxMedicines.push({ name:'', pills:1, timesPerDay:3, intervalHrs:6 });
+    }
+    renderMedicines();
+    $('rx-medicines-container').style.display = 'block';
+    buildSchedule();
+  } catch(err) {
+    console.error('Rx OCR error:', err);
+    toast(t.sched_error || 'Could not read prescription. Try adding manually.', 'error');
+    $('rx-processing').style.display = 'none';
+    rxMedicines = [{ name:'', pills:1, timesPerDay:3, intervalHrs:6 }];
+    renderMedicines();
+    $('rx-medicines-container').style.display = 'block';
+  }
+}
+
+// Parse medication instructions from OCR text
+function parseMedicines(text) {
+  const meds = [];
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
+  
+  for (const line of lines) {
+    const lower = line.toLowerCase();
+    // Look for a medicine name (word with 4+ letters, often capitalized)
+    const nameMatch = line.match(/[A-Za-z][A-Za-z\-]{3,}/);
+    if (!nameMatch) continue;
+    const name = nameMatch[0];
+    
+    // Skip common non-medicine words
+    if (/^(tablet|capsule|take|times|after|before|every|daily|hour|hours|meal|meals|dose|doses|instruction|prescription|patient|doctor|date|name|pharmacy)$/i.test(name)) continue;
+
+    // Pills per dose: "2 pills", "1 capsule", "2 tablets"
+    let pills = 1;
+    const pillMatch = lower.match(/(\d+)\s*(pill|tablet|capsule|tab|cap)/);
+    if (pillMatch) pills = parseInt(pillMatch[1]);
+
+    // Times per day: "3 times a day", "twice daily", "four times"
+    let timesPerDay = 0;
+    const timesMatch = lower.match(/(\d+)\s*times?\s*(a|per)?\s*day/);
+    if (timesMatch) timesPerDay = parseInt(timesMatch[1]);
+    else if (/\bonce\b/.test(lower)) timesPerDay = 1;
+    else if (/\btwice\b/.test(lower)) timesPerDay = 2;
+    else if (/\bthrice|three times\b/.test(lower)) timesPerDay = 3;
+    else if (/\bfour times\b/.test(lower)) timesPerDay = 4;
+
+    // Interval: "every 6 hours", "every 4 hrs"
+    let intervalHrs = 0;
+    const intMatch = lower.match(/every\s*(\d+)\s*(hour|hr|h)/);
+    if (intMatch) intervalHrs = parseInt(intMatch[1]);
+
+    // Derive missing values
+    if (timesPerDay && !intervalHrs) intervalHrs = Math.round(24 / timesPerDay);
+    if (intervalHrs && !timesPerDay) timesPerDay = Math.round(24 / intervalHrs);
+    
+    // Only add if we found some dosing info
+    if (timesPerDay || intervalHrs) {
+      if (!timesPerDay) timesPerDay = 3;
+      if (!intervalHrs) intervalHrs = Math.round(24 / timesPerDay);
+      meds.push({ name, pills, timesPerDay, intervalHrs });
+    }
+  }
+  return meds;
+}
+
+function renderMedicines() {
+  const t = LANG[currentLang] || LANG.en;
+  const html = rxMedicines.map((m, i) => `
+    <div style="padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <input type="text" value="${esc(m.name)}" placeholder="${t.sched_med_name || 'Medicine name'}" onchange="updateMed(${i},'name',this.value)" style="flex:1;padding:8px 10px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:14px;font-weight:600">
+        <button onclick="removeMed(${i})" style="margin-left:8px;background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer">×</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div>
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px" data-i18n="sched_pills">Pills/dose</label>
+          <input type="number" min="1" value="${m.pills}" onchange="updateMed(${i},'pills',this.value)" style="width:100%;padding:6px 8px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px" data-i18n="sched_times">Times/day</label>
+          <input type="number" min="1" max="12" value="${m.timesPerDay}" onchange="updateMed(${i},'timesPerDay',this.value)" style="width:100%;padding:6px 8px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:13px">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:3px" data-i18n="sched_interval">Every (hrs)</label>
+          <input type="number" min="1" max="24" value="${m.intervalHrs}" onchange="updateMed(${i},'intervalHrs',this.value)" style="width:100%;padding:6px 8px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:6px;font-size:13px">
+        </div>
+      </div>
+    </div>
+  `).join('');
+  $('rx-medicines-list').innerHTML = html;
+}
+
+function updateMed(index, field, value) {
+  if (field === 'name') rxMedicines[index].name = value;
+  else rxMedicines[index][field] = parseInt(value) || 1;
+  // If times changed, recalc interval
+  if (field === 'timesPerDay') rxMedicines[index].intervalHrs = Math.round(24 / rxMedicines[index].timesPerDay);
+  if (field === 'intervalHrs') rxMedicines[index].timesPerDay = Math.round(24 / rxMedicines[index].intervalHrs);
+  buildSchedule();
+}
+
+function removeMed(index) {
+  rxMedicines.splice(index, 1);
+  renderMedicines();
+  buildSchedule();
+}
+
+function addManualMedicine() {
+  rxMedicines.push({ name:'', pills:1, timesPerDay:3, intervalHrs:6 });
+  renderMedicines();
+}
+
+// Build combined daily schedule from all medicines
+function buildSchedule() {
+  const t = LANG[currentLang] || LANG.en;
+  const startTime = $('rx-start-time') ? $('rx-start-time').value : '08:00';
+  const [startH, startM] = startTime.split(':').map(Number);
+  const startMinutes = startH * 60 + startM;
+
+  // Collect all dose times (in minutes from midnight) per medicine
+  const slots = {}; // key: minutes, value: array of med descriptions
+
+  rxMedicines.forEach(med => {
+    if (!med.name || !med.timesPerDay) return;
+    for (let dose = 0; dose < med.timesPerDay; dose++) {
+      let mins = startMinutes + dose * med.intervalHrs * 60;
+      mins = mins % (24 * 60); // wrap around 24h
+      // Round to nearest 5 min
+      mins = Math.round(mins / 5) * 5;
+      if (!slots[mins]) slots[mins] = [];
+      const pillText = med.pills > 1 ? `${med.pills} ${t.sched_pills_unit || 'pills'}` : `1 ${t.sched_pill_unit || 'pill'}`;
+      slots[mins].push(`${med.name} (${pillText})`);
+    }
+  });
+
+  const sortedTimes = Object.keys(slots).map(Number).sort((a, b) => a - b);
+  
+  if (sortedTimes.length === 0) {
+    $('rx-schedule-container').style.display = 'none';
+    return;
+  }
+
+  const html = sortedTimes.map(mins => {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    const ampm = h < 12 ? 'AM' : 'PM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    const timeStr = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+    const medsHtml = slots[mins].map(med => `<div style="font-size:13px;color:var(--text);padding:2px 0">💊 ${esc(med)}</div>`).join('');
+    return `
+      <div style="display:flex;gap:14px;padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--pri);margin-bottom:10px">
+        <div style="font-weight:700;font-size:15px;color:var(--pri);min-width:75px">${timeStr}</div>
+        <div style="flex:1">${medsHtml}</div>
+      </div>
+    `;
+  }).join('');
+
+  $('rx-schedule-list').innerHTML = html;
+  $('rx-schedule-container').style.display = 'block';
+}
+
+function saveSchedule() {
+  const t = LANG[currentLang] || LANG.en;
+  try {
+    localStorage.setItem('al_med_schedule', JSON.stringify({
+      medicines: rxMedicines,
+      startTime: $('rx-start-time').value,
+      savedAt: new Date().toISOString()
+    }));
+    toast(t.sched_saved || 'Schedule saved! 💊', 'success');
+  } catch(e) {
+    console.error('Save error:', e);
+    toast('Could not save schedule', 'error');
+  }
 }
 
 async function processGeocodeQueue() {
