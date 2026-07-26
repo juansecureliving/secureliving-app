@@ -783,8 +783,12 @@ button{cursor:pointer;border:none;background:none}
     
     <!-- Translation Only -->
     <div class="card">
-      <h3 style="font-family:var(--font-display);font-size:14px;margin:0 0 10px 0;font-weight:600;color:var(--muted)" data-i18n="camera_translation">Translation</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h3 style="font-family:var(--font-display);font-size:14px;margin:0;font-weight:600;color:var(--muted)" data-i18n="camera_translation">Translation</h3>
+        <span id="live-frozen-badge" style="display:none;font-size:11px;color:var(--pri);font-weight:600">✓ Ready</span>
+      </div>
       <div id="live-translated-text" style="font-size:15px;line-height:1.8;color:var(--text);min-height:60px;white-space:pre-wrap;word-break:break-word;padding:14px;background:var(--pri-light);border-radius:8px;border-left:4px solid var(--pri)"></div>
+      <button id="scan-again-btn" class="btn btn-primary" style="width:100%;margin-top:14px;display:none" onclick="resumeScanning()" data-i18n="camera_scan_again">🔄 Scan Again</button>
     </div>
   </div>
 </div>
@@ -1443,7 +1447,8 @@ const LANG = {
     camera_detected:'Detected Text', camera_translation:'Translation', camera_processing:'Processing...',
     camera_initializing:'Initializing OCR engine...', camera_loading_ocr:'Loading OCR engine...',
     camera_ready:'Ready — align text in the box', camera_scanning:'Scanning...', camera_pointing:'Point camera at text...',
-    camera_align:'Align text inside this area',
+    camera_align:'Align text inside this area', camera_scan_again:'🔄 Scan Again',
+    camera_done:'Translation ready. Tap Scan Again for new text.',
     // Readings
     readings:'Readings', log_glucose:'Log Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Time of Day', fasting:'Fasting', before_meal:'Before Meal', after_meal:'After Meal', bedtime:'Bedtime',
@@ -1562,7 +1567,8 @@ const LANG = {
     camera_detected:'检测到的文字', camera_translation:'翻译', camera_processing:'处理中...',
     camera_initializing:'正在初始化OCR引擎...', camera_loading_ocr:'正在加载OCR引擎...',
     camera_ready:'就绪 — 将文字对准框内', camera_scanning:'扫描中...', camera_pointing:'将相机对准文字...',
-    camera_align:'将文字对齐在此区域内',
+    camera_align:'将文字对齐在此区域内', camera_scan_again:'🔄 再次扫描',
+    camera_done:'翻译完成。点击再次扫描以翻译新文字。',
     readings:'读数', log_glucose:'记录血糖', glucose_value:'血糖(毫克/分升)',
     glucose_time:'时间段', fasting:'空腹', before_meal:'进餐前', after_meal:'进餐后', bedtime:'睡前',
     glucose_history:'血糖历史', log_cholesterol:'记录胆固醇', total_cholesterol:'总胆固醇',
