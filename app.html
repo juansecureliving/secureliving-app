@@ -4895,36 +4895,49 @@ function buildSchedule(forceShow) {
   const startMinutes = startH * 60 + startM;
 
   // Collect all dose times (in minutes from midnight) per medicine
-  const slots = {}; // key: minutes, value: array of med descriptions
+  // Track: { mins: time in minutes, order: chronological order, medicines: [...] }
+  const slotsArray = []; // array instead of object to preserve insertion order
 
   rxMedicines.forEach(med => {
     if (!med.name || !med.timesPerDay) return;
     for (let dose = 0; dose < med.timesPerDay; dose++) {
       let mins = startMinutes + dose * med.intervalHrs * 60;
+      let order = mins; // track original order before wrapping
       mins = mins % (24 * 60); // wrap around 24h
       mins = Math.round(mins / 5) * 5;
-      if (!slots[mins]) slots[mins] = [];
+      
       // Format dose: "2 tab", "10 ml", "1 pill"
       const amt = med.doseAmount % 1 === 0 ? med.doseAmount : med.doseAmount;
       const doseText = `${amt} ${med.doseUnit}${(amt > 1 && !['ml','mg','mcg','g'].includes(med.doseUnit)) ? 's' : ''}`;
-      slots[mins].push(`${med.name} (${doseText})`);
+      
+      // Find if this time already exists
+      let slot = slotsArray.find(s => s.mins === mins);
+      if (!slot) {
+        slot = { mins, order, medicines: [] };
+        slotsArray.push(slot);
+      }
+      slot.medicines.push(`${med.name} (${doseText})`);
     }
   });
 
-  const sortedTimes = Object.keys(slots).map(Number).sort((a, b) => a - b);
+  // FIXED: Sort by original chronological order, NOT by wrapped time
+  // This keeps doses that start at 8am grouped together (8am, 4pm, 12am)
+  // instead of sorting by display time (12am, 8am, 4pm)
+  const sortedTimes = slotsArray.sort((a, b) => a.order - b.order);
   
   if (sortedTimes.length === 0) {
     $('rx-schedule-container').style.display = 'none';
     return;
   }
 
-  const html = sortedTimes.map(mins => {
+  const html = sortedTimes.map(slot => {
+    const mins = slot.mins;
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     const ampm = h < 12 ? 'AM' : 'PM';
     const h12 = h % 12 === 0 ? 12 : h % 12;
     const timeStr = `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
-    const medsHtml = slots[mins].map(med => `<div style="font-size:13px;color:var(--text);padding:3px 0;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>${esc(med)}</div>`).join('');
+    const medsHtml = slot.medicines.map(med => `<div style="font-size:13px;color:var(--text);padding:3px 0;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>${esc(med)}</div>`).join('');
     return `
       <div style="display:flex;gap:14px;padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--pri);margin-bottom:10px">
         <div style="font-weight:700;font-size:15px;color:var(--pri);min-width:75px">${timeStr}</div>
@@ -4937,7 +4950,7 @@ function buildSchedule(forceShow) {
   $('rx-schedule-container').style.display = 'block';
 
   // Store times for reminders (strip HTML, keep plain med text)
-  scheduleTimes = sortedTimes.map(mins => ({ mins, meds: slots[mins] }));
+  scheduleTimes = sortedTimes.map(slot => ({ mins: slot.mins, meds: slot.medicines }));
   // If reminders are currently on, refresh them with new times
   if ($('rx-reminder-toggle') && $('rx-reminder-toggle').checked) {
     startReminders();
