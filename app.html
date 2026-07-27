@@ -2811,6 +2811,22 @@ const UPDATE_LANG = {
   }
 };
 
+// Dose unit translations — keys stay English (used as stored values); labels are translated for display
+const UNIT_LANG = {
+  en: { pill:'pill', tab:'tab', cap:'cap', ml:'ml', mg:'mg', mcg:'mcg', g:'g', drop:'drop', spoon:'spoon', tsp:'tsp', tbsp:'tbsp', puff:'puff', unit:'unit', sachet:'sachet' },
+  zh: { pill:'药丸', tab:'药片', cap:'胶囊', ml:'毫升', mg:'毫克', mcg:'微克', g:'克', drop:'滴', spoon:'勺', tsp:'茶匙', tbsp:'汤匙', puff:'喷', unit:'单位', sachet:'袋' },
+  ms: { pill:'pil', tab:'tablet', cap:'kapsul', ml:'ml', mg:'mg', mcg:'mcg', g:'g', drop:'titis', spoon:'sudu', tsp:'sudu teh', tbsp:'sudu besar', puff:'sedutan', unit:'unit', sachet:'paket' },
+  ta: { pill:'மாத்திரை', tab:'டேப்லெட்', cap:'காப்சூல்', ml:'மி.லி', mg:'மி.கி', mcg:'மைக்ரோ.கி', g:'கி', drop:'துளி', spoon:'கரண்டி', tsp:'தேக்கரண்டி', tbsp:'மேசைக்கரண்டி', puff:'பஃப்', unit:'அலகு', sachet:'பொட்டலம்' },
+  tl: { pill:'tableta', tab:'tableta', cap:'kapsula', ml:'ml', mg:'mg', mcg:'mcg', g:'g', drop:'patak', spoon:'kutsara', tsp:'kutsarita', tbsp:'kutsara', puff:'buga', unit:'yunit', sachet:'sachet' },
+  my: { pill:'ဆေးလုံး', tab:'ဆေးပြား', cap:'ဆေးတောင့်', ml:'မီလီလီတာ', mg:'မီလီဂရမ်', mcg:'မိုက်ခရိုဂရမ်', g:'ဂရမ်', drop:'အစက်', spoon:'ဇွန်း', tsp:'လက်ဖက်ရည်ဇွန်း', tbsp:'စားပွဲဇွန်း', puff:'မှုတ်', unit:'ယူနစ်', sachet:'ထုပ်' }
+};
+
+// Get translated unit label (falls back to English key)
+function unitLabel(unitKey) {
+  const u = UNIT_LANG[currentLang] || UNIT_LANG.en;
+  return u[unitKey] || unitKey;
+}
+
 function getUpdateText(originalTitle, field) {
   if (currentLang === 'en') return null;
   const langData = UPDATE_LANG[currentLang];
@@ -4877,7 +4893,7 @@ function renderMedicines() {
   const t = LANG[currentLang] || LANG.en;
   const units = ['pill','tab','cap','ml','mg','mcg','g','drop','spoon','tsp','tbsp','puff','unit','sachet'];
   const html = rxMedicines.map((m, i) => {
-    const unitOpts = units.map(u => `<option value="${u}" ${m.doseUnit===u?'selected':''}>${u}</option>`).join('');
+    const unitOpts = units.map(u => `<option value="${u}" ${m.doseUnit===u?'selected':''}>${unitLabel(u)}</option>`).join('');
     return `
     <div style="padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -4952,9 +4968,12 @@ function buildSchedule(forceShow) {
       mins = mins % (24 * 60); // wrap around 24h
       mins = Math.round(mins / 5) * 5;
       
-      // Format dose: "2 tab", "10 ml", "1 pill"
+      // Format dose: "2 tab", "10 ml", "1 pill" — unit label translated per language
       const amt = med.doseAmount % 1 === 0 ? med.doseAmount : med.doseAmount;
-      const doseText = `${amt} ${med.doseUnit}${(amt > 1 && !['ml','mg','mcg','g'].includes(med.doseUnit)) ? 's' : ''}`;
+      const uLabel = unitLabel(med.doseUnit);
+      // English pluralization only (other languages don't add 's')
+      const plural = (currentLang === 'en' && amt > 1 && !['ml','mg','mcg','g'].includes(med.doseUnit)) ? 's' : '';
+      const doseText = `${amt} ${uLabel}${plural}`;
       
       // Find if this time already exists
       let slot = slotsArray.find(s => s.mins === mins);
