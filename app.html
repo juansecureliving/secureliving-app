@@ -324,6 +324,16 @@ button{cursor:pointer;border:none;background:none}
 .weather-peek-tab:active{transform:scale(0.95)}
 .weather-peek-time{font-size:22px;line-height:1;letter-spacing:-0.5px}
 .weather-peek-label{font-size:9px;opacity:0.7;margin-top:4px}
+
+/* Header weather peek tab */
+.header-weather-peek{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:60px;height:50px;background:rgba(255,255,255,0.1);border-radius:8px;
+  color:#fff;font-weight:600;cursor:pointer;transition:all 0.2s ease;
+  border:1px solid rgba(255,255,255,0.15)}
+.header-weather-peek:hover{background:rgba(255,255,255,0.15);transform:translateY(-1px)}
+.header-weather-peek:active{transform:scale(0.95)}
+.header-weather-peek .peek-time{font-size:16px;line-height:1;letter-spacing:-0.3px}
+.header-weather-peek .peek-label{font-size:8px;opacity:0.7;margin-top:2px}
 .weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0;padding-bottom:4px}
 .forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:calc(25% - 4px);backdrop-filter:blur(10px)}
 @media(min-width:600px){.forecast-card{min-width:70px}}
@@ -585,6 +595,11 @@ button{cursor:pointer;border:none;background:none}
 <div class="top-bar">
   <h1>Ju An SecureLiving</h1>
   <div style="display:flex;align-items:center;gap:10px">
+    <!-- Weather Peek Tab -->
+    <div id="header-weather-peek" class="header-weather-peek" onclick="switchTab('home'); setTimeout(() => { const w = document.querySelector('#tab-home .weather-widget'); if (w) w.classList.add('visible'); }, 50)">
+      <div class="peek-time" id="header-peek-time">13:47</div>
+      <div class="peek-label">Weather</div>
+    </div>
     <select id="lang-select" onchange="setLanguage(this.value)" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:500;outline:none;cursor:pointer">
       <option value="en" style="color:#333">English</option>
       <option value="zh" style="color:#333">中文</option>
@@ -5305,46 +5320,22 @@ window.addEventListener('DOMContentLoaded', () => {
         btn.style.setProperty('--btn-index', index);
       });
       
-      // Weather widget peek tab - fixed at top-right under header
+      // Hide weather by default on Home tab
       const weatherWidget = homeTab.querySelector('.weather-widget');
-      
       if (weatherWidget) {
-        // Hide weather by default
         weatherWidget.classList.remove('visible');
-        
-        // Create peek tab (fixed position, added to body)
-        const peekTab = document.createElement('div');
-        peekTab.className = 'weather-peek-tab';
-        peekTab.id = 'weather-peek-tab';
-        peekTab.innerHTML = '<div class="weather-peek-time" id="peek-time">13:47</div><div class="weather-peek-label">Weather</div>';
-        document.body.appendChild(peekTab);
-        
-        // Update peek time
-        const updatePeekTime = () => {
-          const now = new Date();
-          const timeStr = now.toLocaleTimeString('en-SG', { hour:'2-digit', minute:'2-digit', hour12:false });
-          const peekTimeEl = document.getElementById('peek-time');
-          if (peekTimeEl) peekTimeEl.textContent = timeStr;
-        };
-        updatePeekTime();
-        setInterval(updatePeekTime, 1000);
-        
-        // Toggle weather on peek tab click
-        peekTab.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const isVisible = weatherWidget.classList.toggle('visible');
-          peekTab.style.opacity = isVisible ? '0.7' : '1';
-        });
-        
-        // Hide weather when clicking outside
-        document.addEventListener('click', (e) => {
-          if (e.target !== peekTab && !peekTab.contains(e.target) && !weatherWidget.contains(e.target)) {
-            weatherWidget.classList.remove('visible');
-            peekTab.style.opacity = '1';
-          }
-        });
       }
     }
+    
+    // Update header weather peek time every second
+    const updateHeaderPeekTime = () => {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-SG', { hour:'2-digit', minute:'2-digit', hour12:false });
+      const peekTimeEl = document.getElementById('header-peek-time');
+      if (peekTimeEl) peekTimeEl.textContent = timeStr;
+    };
+    updateHeaderPeekTime();
+    setInterval(updateHeaderPeekTime, 1000);
   }, 50);
 });
 </script>
