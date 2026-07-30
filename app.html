@@ -616,7 +616,7 @@ button{cursor:pointer;border:none;background:none}
 <!-- ── TAB: Home ──────────────────────────── -->
 <div id="tab-home" class="tab-content active">
   <div class="hero-card">
-    <h2 id="greeting" style="display:flex;gap:8px;align-items:center"><span id="greeting-text">Welcome</span> <span id="greeting-initials" style="width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">--</span></h2>
+    <h2 id="greeting" style="display:flex;gap:8px;align-items:center"><span id="greeting-text">Welcome</span></h2>
     <p data-i18n="hero_desc_new">We are your partner in independent living. We provide equipment, consultation, and ongoing support so you're prepared for whatever comes.</p>
   </div>
 
@@ -652,9 +652,9 @@ button{cursor:pointer;border:none;background:none}
       <div class="qa-label" data-i18n="equipment">Equipment</div>
       <div class="qa-sub" data-i18n="rent_or_buy">Rent or buy</div>
     </button>
-    <button class="quick-action" onclick="switchTab('history')">
-      <div class="qa-icon" style="background:#E8F8EF">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <button class="quick-action" onclick="switchTab('reports')">
+      <div class="qa-icon" style="background:#FFE8E8">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       </div>
       <div class="qa-label" data-i18n="health_log">Health Log</div>
       <div class="qa-sub" data-i18n="track_bp">Track BP & more</div>
@@ -692,7 +692,7 @@ button{cursor:pointer;border:none;background:none}
       </div>
       <div style="flex:1;min-width:100px;text-align:center">
         <div style="display:flex;justify-content:center;margin-bottom:8px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--pri)"><circle cx="12" cy="12" r="1"/><path d="M12 9v.01M15.51 11.83l.71-.71M18.364 9.879l.707-.707M20 9.172l-1 1M11 15.51l-.71.71M9.879 18.364l-.707.707M9.172 20l-1-1M11 8.49l-.71-.71M9.879 5.636l-.707-.707M9.172 4l-1 1M15.51 12.17l.71.71M18.364 14.121l.707.707M20 14.828l-1-1"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--pri)"><path d="M6 13.5V3.5A1.5 1.5 0 0 0 4.5 2h-3A1.5 1.5 0 0 0 0 3.5v10A1.5 1.5 0 0 0 1.5 15h3a1.5 1.5 0 0 0 1.5-1.5z"/><path d="M6 13.5V3.5A1.5 1.5 0 0 1 7.5 2h3A1.5 1.5 0 0 1 12 3.5v10a1.5 1.5 0 0 1-1.5 1.5h-3a1.5 1.5 0 0 1-1.5-1.5z"/></svg>
         </div>
         <div class="text-sm" style="font-weight:600" data-i18n="equip">Equip</div>
       </div>
@@ -704,7 +704,7 @@ button{cursor:pointer;border:none;background:none}
       </div>
       <div style="flex:1;min-width:100px;text-align:center">
         <div style="display:flex;justify-content:center;margin-bottom:8px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--pri)"><path d="M12 2c0 0-5 3-5 8c0 4 2 8 5 10c3-2 5-6 5-10c0-5-5-8-5-8z"/><line x1="12" y1="20" x2="12" y2="24"/><line x1="12" y1="24" x2="9" y2="23"/><line x1="12" y1="24" x2="15" y2="23"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--pri)"><path d="M12 2a1 1 0 0 0-1 1v3H9a1 1 0 0 0 0 2h2v2H7a1 1 0 0 0 0 2h4v2H5a1 1 0 0 0 0 2h6v4a1 1 0 0 0 2 0v-4h6a1 1 0 0 0 0-2h-6v-2h4a1 1 0 0 0 0-2h-4v-2h2a1 1 0 0 0 0-2h-2V3a1 1 0 0 0-1-1z"/></svg>
         </div>
         <div class="text-sm" style="font-weight:600" data-i18n="sustain">Sustain</div>
       </div>
@@ -2310,13 +2310,9 @@ function applyLanguage() {
     $('greeting-text').textContent = `${greet}, ${greetingName}`;
   }
   // Update greeting initials
-  if ($('greeting-initials')) {
-    if (ME) {
-      $('greeting-initials').textContent = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    } else {
-      $('greeting-initials').textContent = 'GU';
-    }
-  }
+  // Update greeting initials (avatar removed from greeting card)
+  
+  // Update greeting initials for guest mode (avatar removed)
   
   // 4. Update lang selector
   if ($('lang-select')) $('lang-select').value = currentLang;
