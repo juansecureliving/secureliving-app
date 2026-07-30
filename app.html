@@ -264,8 +264,9 @@ button{cursor:pointer;border:none;background:none}
 .weather-detail{flex:1;display:flex;flex-direction:column;gap:4px}
 .weather-detail-val{font-weight:600}
 .weather-detail-label{opacity:.75}
-.weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0}
-.forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:50px;backdrop-filter:blur(10px)}
+.weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0;padding-bottom:4px}
+.forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:calc(25% - 4px);backdrop-filter:blur(10px)}
+@media(min-width:600px){.forecast-card{min-width:70px}}
 .forecast-card .forecast-time{font-size:9px;opacity:.75;margin-bottom:3px}
 .forecast-card .forecast-icon{font-size:18px;margin-bottom:2px}
 .forecast-card .forecast-temp{font-size:10px;font-weight:600}
@@ -556,7 +557,7 @@ button{cursor:pointer;border:none;background:none}
           <span class="temp-val" id="current-temp">--</span>
           <span class="temp-unit">°C</span>
         </div>
-        <div class="weather-desc" id="weather-desc" data-i18n="loading" style="margin-top:2px">Loading...</div>
+        <div class="weather-desc" id="weather-desc" style="margin-top:2px">Loading...</div>
       </div>
       <div class="weather-icon" id="weather-icon">🌤️</div>
     </div>
