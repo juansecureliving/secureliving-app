@@ -311,16 +311,16 @@ button{cursor:pointer;border:none;background:none}
 .weather-detail-val{font-weight:600}
 .weather-detail-label{opacity:.75}
 
-/* Weather peek tab - positioned above greeting card */
-.weather-peek-tab{position:absolute;top:-70px;right:0;width:70px;height:65px;
+/* Weather peek tab - fixed position at top-right under app header */
+.weather-peek-tab{position:fixed;top:70px;right:16px;width:70px;height:65px;
   background:linear-gradient(135deg,rgba(26,122,109,0.85),rgba(20,95,85,0.85));
-  border-radius:12px 12px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   color:#fff;font-weight:700;z-index:20;cursor:pointer;
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  box-shadow:0 -2px 12px rgba(26,122,109,0.25);transition:all 0.3s ease;
-  border:1.5px solid rgba(255,255,255,0.15);position:relative}
-.weather-peek-tab::after{content:'▲';position:absolute;bottom:-8px;font-size:12px;opacity:0.6}
-.weather-peek-tab:hover{transform:translateY(-2px);box-shadow:0 -4px 16px rgba(26,122,109,0.3)}
+  box-shadow:0 2px 12px rgba(26,122,109,0.25);transition:all 0.3s ease;
+  border:1.5px solid rgba(255,255,255,0.15)}
+.weather-peek-tab::after{content:'▼';position:absolute;bottom:-10px;font-size:12px;opacity:0.6}
+.weather-peek-tab:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(26,122,109,0.3)}
 .weather-peek-tab:active{transform:scale(0.95)}
 .weather-peek-time{font-size:22px;line-height:1;letter-spacing:-0.5px}
 .weather-peek-label{font-size:9px;opacity:0.7;margin-top:4px}
@@ -5305,26 +5305,19 @@ window.addEventListener('DOMContentLoaded', () => {
         btn.style.setProperty('--btn-index', index);
       });
       
-      // Weather widget peek tab - positioned above greeting card
-      const greetingCard = homeTab.querySelector('.hero-card');
+      // Weather widget peek tab - fixed at top-right under header
       const weatherWidget = homeTab.querySelector('.weather-widget');
       
-      if (greetingCard && weatherWidget) {
-        // Create wrapper for positioning
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'relative';
-        wrapper.style.marginBottom = '12px';
-        greetingCard.parentNode.insertBefore(wrapper, greetingCard);
-        wrapper.appendChild(greetingCard);
-        
+      if (weatherWidget) {
         // Hide weather by default
         weatherWidget.classList.remove('visible');
         
-        // Create peek tab
+        // Create peek tab (fixed position, added to body)
         const peekTab = document.createElement('div');
         peekTab.className = 'weather-peek-tab';
+        peekTab.id = 'weather-peek-tab';
         peekTab.innerHTML = '<div class="weather-peek-time" id="peek-time">13:47</div><div class="weather-peek-label">Weather</div>';
-        wrapper.appendChild(peekTab);
+        document.body.appendChild(peekTab);
         
         // Update peek time
         const updatePeekTime = () => {
@@ -5345,7 +5338,7 @@ window.addEventListener('DOMContentLoaded', () => {
         
         // Hide weather when clicking outside
         document.addEventListener('click', (e) => {
-          if (!wrapper.contains(e.target) && !weatherWidget.contains(e.target)) {
+          if (e.target !== peekTab && !peekTab.contains(e.target) && !weatherWidget.contains(e.target)) {
             weatherWidget.classList.remove('visible');
             peekTab.style.opacity = '1';
           }
