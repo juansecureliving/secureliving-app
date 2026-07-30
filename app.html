@@ -604,10 +604,6 @@ button{cursor:pointer;border:none;background:none}
       <option value="tl" style="color:#333">Tagalog</option>
       <option value="my" style="color:#333">မြန်မာ</option>
     </select>
-    <div class="user-pill" onclick="isGuest ? doLogout() : switchTab('profile')">
-      <div class="avatar" id="top-avatar"></div>
-      <span id="top-name"></span>
-    </div>
     <!-- Weather Peek Tab at far right -->
     <div id="header-weather-peek" class="header-weather-peek" onclick="toggleWeatherFromHeader(event)">
       <div class="peek-time" id="header-peek-time">13:47</div>
@@ -5338,6 +5334,19 @@ window.addEventListener('DOMContentLoaded', () => {
     };
     updateHeaderPeekTime();
     setInterval(updateHeaderPeekTime, 1000);
+    
+    // Re-attach weather peek click handler (persists after language changes)
+    const attachWeatherPeekHandler = () => {
+      const peekTab = document.getElementById('header-weather-peek');
+      if (peekTab) {
+        // Remove old listeners by cloning
+        const newPeekTab = peekTab.cloneNode(true);
+        peekTab.parentNode.replaceChild(newPeekTab, peekTab);
+        // Add new listener
+        newPeekTab.addEventListener('click', toggleWeatherFromHeader);
+      }
+    };
+    attachWeatherPeekHandler();
   }, 50);
 
 // Toggle weather from header - works from any tab
@@ -5353,7 +5362,12 @@ function toggleWeatherFromHeader(event) {
     if (homeTab) {
       const weatherWidget = homeTab.querySelector('.weather-widget');
       if (weatherWidget) {
-        weatherWidget.classList.toggle('visible');
+        const isCurrentlyVisible = weatherWidget.classList.contains('visible');
+        if (isCurrentlyVisible) {
+          weatherWidget.classList.remove('visible');
+        } else {
+          weatherWidget.classList.add('visible');
+        }
       }
     }
   }, 50);
