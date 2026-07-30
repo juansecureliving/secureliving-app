@@ -97,19 +97,19 @@ button{cursor:pointer;border:none;background:none}
 /* Tabs */
 .tab-bar{position:fixed;bottom:0;left:0;right:0;background:#FFFFFF;
   border-top:1px solid #E2DFD8;display:flex;z-index:100;
-  padding-bottom:env(safe-area-inset-bottom)}
+  padding-bottom:env(safe-area-inset-bottom);justify-content:space-between;align-items:flex-end;gap:0px}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:12px 4px 10px;gap:4px;font-size:11px;color:var(--muted);
+  padding:10px 2px 8px;gap:3px;font-size:10px;color:var(--muted);
   font-weight:500;transition:color .2s}
 .tab-btn.active{color:var(--pri)}
 .tab-btn svg{width:28px;height:28px}
 .tab-btn.active svg{stroke-width:2.5}
 
-/* Special camera (translate) button - featured in the middle */
-.tab-btn-camera{flex:0;padding:16px 24px 12px!important;background:linear-gradient(135deg,var(--pri),rgba(26,122,109,0.8));border-radius:20px;color:#fff!important;
-  font-size:13px;font-weight:600;transition:all .3s;transform:scale(1);box-shadow:0 4px 12px rgba(26,122,109,0.3)}
-.tab-btn-camera:active{transform:scale(0.95);box-shadow:0 2px 6px rgba(26,122,109,0.2)}
-.tab-btn-camera svg{width:32px;height:32px;color:#fff}
+/* Special camera (translate) button - semi-circle featured button in the middle */
+.tab-btn-camera{flex:0;padding:16px 12px 8px!important;background:var(--card);border-radius:50% 50% 0 0;color:var(--pri)!important;
+  font-size:12px;font-weight:600;transition:all .3s;box-shadow:0 2px 8px rgba(26,122,109,0.2);border-top:2px solid var(--pri)}
+.tab-btn-camera:active{transform:scale(0.95)}
+.tab-btn-camera svg{width:32px;height:32px;color:var(--pri);stroke-width:2.5}
 .tab-btn-camera span{white-space:nowrap}
 
 .tab-content{display:none;padding:16px;max-width:600px;margin:0 auto}
