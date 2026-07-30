@@ -141,7 +141,7 @@ button{cursor:pointer;border:none;background:none}
 .hero-card p{opacity:.85;font-size:14px;line-height:1.5}
 .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .quick-action{background:var(--card);border-radius:var(--radius);padding:18px 14px;
-  text-align:center;box-shadow:var(--shadow);transition:transform .15s}
+  text-align:center;box-shadow:var(--shadow);transition:transform .15s;opacity:0;animation:fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;animation-delay:calc(var(--btn-index, 0) * 100ms)}
 .quick-action:hover{transform:translateY(-2px)}
 .quick-action .qa-icon{width:44px;height:44px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
@@ -5226,7 +5226,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Resize chart on orientation change
   window.addEventListener('resize', () => { if (ME) renderBPChart(); });
   
-  // Shopify-style scroll animations for all cards
+  // Shopify-style scroll animations for cards (Home, Appointment, Products, Camera tabs only)
   const observerOptions = {
     threshold: 0.05,
     rootMargin: '0px 0px -100px 0px'
@@ -5244,14 +5244,29 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }, observerOptions);
   
-  // Observe all cards on the page (all tabs)
+  // Observe cards only in specific tabs (Home, Appointment, Products, Camera)
   setTimeout(() => {
-    const cards = document.querySelectorAll('.card');
-    cards.forEach((card, index) => {
-      // Add stagger delay based on position
-      card.style.setProperty('--stagger-index', index);
-      observer.observe(card);
+    const animatedTabs = ['tab-home', 'tab-consult', 'tab-products', 'tab-camera'];
+    animatedTabs.forEach(tabId => {
+      const tabElement = document.getElementById(tabId);
+      if (tabElement) {
+        const cards = tabElement.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+          // Add stagger delay based on position
+          card.style.setProperty('--stagger-index', index);
+          observer.observe(card);
+        });
+      }
     });
+    
+    // Add animation to quick-action buttons (Home tab only)
+    const homeTab = document.getElementById('tab-home');
+    if (homeTab) {
+      const buttons = homeTab.querySelectorAll('.quick-action');
+      buttons.forEach((btn, index) => {
+        btn.style.setProperty('--btn-index', index);
+      });
+    }
   }, 50);
 });
 </script>
