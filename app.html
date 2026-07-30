@@ -5508,6 +5508,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     });
   }, 50);
+}); // ← close DOMContentLoaded here so functions below are global
 
 // Toggle weather from header - works from any tab with smooth animation
 function toggleWeatherFromHeader(event) {
@@ -5593,7 +5594,6 @@ function selectLangFromMenu(lang) {
   const langSelect = $('lang-select');
   if (langSelect) langSelect.value = lang;
 }
-});
 </script>
 <!-- SOS Emergency Modal -->
 <div id="sos-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px">
