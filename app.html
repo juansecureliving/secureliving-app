@@ -311,17 +311,19 @@ button{cursor:pointer;border:none;background:none}
 .weather-detail-val{font-weight:600}
 .weather-detail-label{opacity:.75}
 
-/* Weather peek tab at top-right */
-.weather-peek-tab{position:absolute;top:0;right:0;width:60px;height:60px;
-  background:linear-gradient(135deg,rgba(26,122,109,0.8),rgba(20,95,85,0.8));
-  border-radius:0 0 0 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:#fff;font-weight:700;font-size:18px;z-index:20;cursor:pointer;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  box-shadow:-2px 2px 8px rgba(26,122,109,0.2);transition:all 0.3s ease;
-  border:2px solid rgba(255,255,255,0.1)}
+/* Weather peek tab - positioned above greeting card */
+.weather-peek-tab{position:absolute;top:-70px;right:0;width:70px;height:65px;
+  background:linear-gradient(135deg,rgba(26,122,109,0.85),rgba(20,95,85,0.85));
+  border-radius:12px 12px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;z-index:20;cursor:pointer;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 -2px 12px rgba(26,122,109,0.25);transition:all 0.3s ease;
+  border:1.5px solid rgba(255,255,255,0.15);position:relative}
+.weather-peek-tab::after{content:'▲';position:absolute;bottom:-8px;font-size:12px;opacity:0.6}
+.weather-peek-tab:hover{transform:translateY(-2px);box-shadow:0 -4px 16px rgba(26,122,109,0.3)}
 .weather-peek-tab:active{transform:scale(0.95)}
-.weather-peek-time{font-size:14px;line-height:1.1}
-.weather-peek-icon{font-size:24px;margin-top:2px}
+.weather-peek-time{font-size:22px;line-height:1;letter-spacing:-0.5px}
+.weather-peek-label{font-size:9px;opacity:0.7;margin-top:4px}
 .weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0;padding-bottom:4px}
 .forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:calc(25% - 4px);backdrop-filter:blur(10px)}
 @media(min-width:600px){.forecast-card{min-width:70px}}
@@ -5303,15 +5305,17 @@ window.addEventListener('DOMContentLoaded', () => {
         btn.style.setProperty('--btn-index', index);
       });
       
-      // Weather widget peek tab at top-right
+      // Weather widget peek tab - positioned above greeting card
+      const greetingCard = homeTab.querySelector('.hero-card');
       const weatherWidget = homeTab.querySelector('.weather-widget');
-      if (weatherWidget) {
-        // Wrap in position:relative container
-        const container = document.createElement('div');
-        container.style.position = 'relative';
-        container.style.marginBottom = '12px';
-        weatherWidget.parentNode.insertBefore(container, weatherWidget);
-        container.appendChild(weatherWidget);
+      
+      if (greetingCard && weatherWidget) {
+        // Create wrapper for positioning
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.marginBottom = '12px';
+        greetingCard.parentNode.insertBefore(wrapper, greetingCard);
+        wrapper.appendChild(greetingCard);
         
         // Hide weather by default
         weatherWidget.classList.remove('visible');
@@ -5319,14 +5323,15 @@ window.addEventListener('DOMContentLoaded', () => {
         // Create peek tab
         const peekTab = document.createElement('div');
         peekTab.className = 'weather-peek-tab';
-        peekTab.innerHTML = '<div class="weather-peek-time" id="peek-time">13:47</div><div class="weather-peek-icon" id="peek-icon">🌤️</div>';
-        container.appendChild(peekTab);
+        peekTab.innerHTML = '<div class="weather-peek-time" id="peek-time">13:47</div><div class="weather-peek-label">Weather</div>';
+        wrapper.appendChild(peekTab);
         
         // Update peek time
         const updatePeekTime = () => {
           const now = new Date();
           const timeStr = now.toLocaleTimeString('en-SG', { hour:'2-digit', minute:'2-digit', hour12:false });
-          document.getElementById('peek-time').textContent = timeStr;
+          const peekTimeEl = document.getElementById('peek-time');
+          if (peekTimeEl) peekTimeEl.textContent = timeStr;
         };
         updatePeekTime();
         setInterval(updatePeekTime, 1000);
@@ -5334,13 +5339,15 @@ window.addEventListener('DOMContentLoaded', () => {
         // Toggle weather on peek tab click
         peekTab.addEventListener('click', (e) => {
           e.stopPropagation();
-          weatherWidget.classList.toggle('visible');
+          const isVisible = weatherWidget.classList.toggle('visible');
+          peekTab.style.opacity = isVisible ? '0.7' : '1';
         });
         
         // Hide weather when clicking outside
         document.addEventListener('click', (e) => {
-          if (!container.contains(e.target)) {
+          if (!wrapper.contains(e.target) && !weatherWidget.contains(e.target)) {
             weatherWidget.classList.remove('visible');
+            peekTab.style.opacity = '1';
           }
         });
       }
