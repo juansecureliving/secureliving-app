@@ -325,15 +325,16 @@ button{cursor:pointer;border:none;background:none}
 .weather-peek-time{font-size:22px;line-height:1;letter-spacing:-0.5px}
 .weather-peek-label{font-size:9px;opacity:0.7;margin-top:4px}
 
-/* Header weather peek tab */
+/* Header weather peek tab - at far right */
 .header-weather-peek{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  width:60px;height:50px;background:rgba(255,255,255,0.1);border-radius:8px;
+  width:50px;height:40px;background:rgba(255,255,255,0.08);border-radius:6px;
   color:#fff;font-weight:600;cursor:pointer;transition:all 0.2s ease;
-  border:1px solid rgba(255,255,255,0.15)}
+  border:1px solid rgba(255,255,255,0.12);position:relative;order:999}
 .header-weather-peek:hover{background:rgba(255,255,255,0.15);transform:translateY(-1px)}
 .header-weather-peek:active{transform:scale(0.95)}
-.header-weather-peek .peek-time{font-size:16px;line-height:1;letter-spacing:-0.3px}
-.header-weather-peek .peek-label{font-size:8px;opacity:0.7;margin-top:2px}
+.header-weather-peek .peek-time{font-size:14px;line-height:1;letter-spacing:-0.3px}
+.header-weather-peek .peek-label{font-size:8px;opacity:0.8;margin-top:1px;font-weight:500}
+.header-weather-peek .peek-arrow{font-size:8px;opacity:0.6;margin-top:1px}
 .weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0;padding-bottom:4px}
 .forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:calc(25% - 4px);backdrop-filter:blur(10px)}
 @media(min-width:600px){.forecast-card{min-width:70px}}
@@ -595,11 +596,6 @@ button{cursor:pointer;border:none;background:none}
 <div class="top-bar">
   <h1>Ju An SecureLiving</h1>
   <div style="display:flex;align-items:center;gap:10px">
-    <!-- Weather Peek Tab -->
-    <div id="header-weather-peek" class="header-weather-peek" onclick="switchTab('home'); setTimeout(() => { const w = document.querySelector('#tab-home .weather-widget'); if (w) w.classList.add('visible'); }, 50)">
-      <div class="peek-time" id="header-peek-time">13:47</div>
-      <div class="peek-label">Weather</div>
-    </div>
     <select id="lang-select" onchange="setLanguage(this.value)" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:500;outline:none;cursor:pointer">
       <option value="en" style="color:#333">English</option>
       <option value="zh" style="color:#333">中文</option>
@@ -611,6 +607,12 @@ button{cursor:pointer;border:none;background:none}
     <div class="user-pill" onclick="isGuest ? doLogout() : switchTab('profile')">
       <div class="avatar" id="top-avatar"></div>
       <span id="top-name"></span>
+    </div>
+    <!-- Weather Peek Tab at far right -->
+    <div id="header-weather-peek" class="header-weather-peek" onclick="toggleWeatherFromHeader(event)">
+      <div class="peek-time" id="header-peek-time">13:47</div>
+      <div class="peek-label" data-i18n="weather_tab">Weather</div>
+      <div class="peek-arrow">▼</div>
     </div>
   </div>
 </div>
@@ -1582,7 +1584,7 @@ const LANG = {
     daily_stats:'Daily Stats', login_count:'Login Count', total_time:'Total Time',
     // Tabs
     tab_home:'Home', tab_appt:'Appointment', tab_products:'Products',
-    tab_camera:'Translate', tab_monitor:'Monitor', tab_readings:'Readings', tab_profile:'Profile',
+    tab_camera:'Translate', tab_monitor:'Monitor', tab_readings:'Readings', tab_profile:'Profile', weather_tab:'Weather',
     // Camera
     camera_title:'Camera Translation', camera_desc:'Point your camera at medicine labels to translate text instantly. Nothing is saved.',
     camera_start_live:'📷 Start Live Translation', camera_stop:'⏹ Stop',
@@ -1713,7 +1715,7 @@ const LANG = {
     daily_stats:'每日统计', login_count:'登录次数', total_time:'总时间',
     singapore:'新加坡', loading:'加载中...',
     tab_home:'首页', tab_appt:'预约', tab_products:'设备',
-    tab_camera:'翻译', tab_monitor:'监控', tab_readings:'读数', tab_profile:'档案',
+    tab_camera:'翻译', tab_monitor:'监控', tab_readings:'读数', tab_profile:'档案', weather_tab:'天气',
     camera_title:'相机翻译', camera_desc:'将相机对准药品标签即可即时翻译。不保存任何照片。',
     camera_start_live:'📷 开始实时翻译', camera_stop:'⏹ 停止',
     camera_privacy:'🔒 相机画面仅在您的设备上处理，不会保存或上传任何照片。',
@@ -1841,7 +1843,7 @@ const LANG = {
     daily_stats:'Statistik Harian', login_count:'Jumlah Login', total_time:'Jumlah Waktu',
     singapore:'Singapura', loading:'Memuatkan...',
     tab_home:'Utama', tab_appt:'Temu Janji', tab_products:'Peralatan',
-    tab_monitor:'Monitor', tab_readings:'Bacaan', tab_profile:'Profil',
+    tab_monitor:'Monitor', tab_readings:'Bacaan', tab_profile:'Profil', weather_tab:'Cuaca',
     readings:'Bacaan', log_glucose:'Log Glukosa Darah', glucose_value:'Glukosa (mg/dL)',
     glucose_time:'Masa dalam Sehari', fasting:'Puasa', before_meal:'Sebelum Makan', after_meal:'Selepas Makan', bedtime:'Menjelang Tidur',
     glucose_history:'Sejarah Glukosa', log_cholesterol:'Log Kolesterol', total_cholesterol:'Jumlah Kolesterol',
@@ -1961,7 +1963,7 @@ const LANG = {
     daily_stats:'தினசரி புள்ளிவிவரங்கள்', login_count:'உள்நுழைவு எண்ணிக்கை', total_time:'மொத்த நேரம்',
     singapore:'சிங்கப்பூர்', loading:'ஏற்றுகிறது...',
     tab_home:'முகப்பு', tab_appt:'சந்திப்பு', tab_products:'உபகரணங்கள்',
-    tab_monitor:'கண்காணி', tab_readings:'விளக்கம்', tab_profile:'சுயவிவரம்',
+    tab_monitor:'கண்காணி', tab_readings:'விளக்கம்', tab_profile:'சுயவிவரம்', weather_tab:'வானிலை',
     readings:'விளக்கம்', log_glucose:'இரத்த சர்க்கரை பதிவு', glucose_value:'குளுக்கோஸ் (மிகி/டிஎல்)',
     glucose_time:'நாளின் நேரம்', fasting:'உண்ணாவிரதம்', before_meal:'உணவுக்கு முன்', after_meal:'உணவுக்குப் பிறகு', bedtime:'படுக்கைக்குச் செல்லும் நேரம்',
     glucose_history:'குளுக்கோஸ் வரலாறு', log_cholesterol:'கொலஸ்ட்ரால் பதிவு', total_cholesterol:'மொத்த கொலஸ்ட்ரால்',
@@ -2081,7 +2083,7 @@ const LANG = {
     app_usage:'Paggamit ng App', session_duration:'Tagal ng Session', last_active:'Huling Aktibo',
     daily_stats:'Araw-araw na Stats', login_count:'Login Count', total_time:'Kabuuang Oras',
     tab_home:'Home', tab_appt:'Appointment', tab_products:'Produkto',
-    tab_monitor:'Monitor', tab_readings:'Readings', tab_profile:'Profile',
+    tab_monitor:'Monitor', tab_readings:'Readings', tab_profile:'Profile', weather_tab:'Panahon',
     readings:'Readings', log_glucose:'I-log ang Blood Glucose', glucose_value:'Glucose (mg/dL)',
     glucose_time:'Oras ng Araw', fasting:'Fasting', before_meal:'Bago Kumain', after_meal:'Pagkatapos Kumain', bedtime:'Bedtime',
     glucose_history:'Kasaysayan ng Glucose', log_cholesterol:'I-log ang Cholesterol', total_cholesterol:'Total Cholesterol',
@@ -2201,7 +2203,7 @@ const LANG = {
     app_usage:'App အသုံးပြုမှု', session_duration:'Session ကြာချိန်', last_active:'နောက်ဆုံး အသုံးပြု',
     daily_stats:'နေ့စဉ် စာရင်းအင်း', login_count:'Login အကြိမ်ရေ', total_time:'စုစုပေါင်း အချိန်',
     tab_home:'ပင်မ', tab_appt:'ချိန်းဆိုမှု', tab_products:'ကိရိယာ',
-    tab_monitor:'စောင့်ကြည့်', tab_readings:'Readings', tab_profile:'ပရိုဖိုင်',
+    tab_monitor:'စောင့်ကြည့်', tab_readings:'Readings', tab_profile:'ပရိုဖိုင်', weather_tab:'ရာသီဥတု',
     readings:'Readings', log_glucose:'Blood Glucose မှတ်တမ်းတင်ရန်', glucose_value:'Glucose (mg/dL)',
     glucose_time:'နေ့၏ အချိန်', fasting:'အစာရှောင်', before_meal:'အစာမစားမီ', after_meal:'အစာစားပြီး', bedtime:'အိပ်ယာဝင်ချိန်',
     glucose_history:'Glucose မှတ်တမ်း', log_cholesterol:'Cholesterol မှတ်တမ်းတင်ရန်', total_cholesterol:'Total Cholesterol',
@@ -5337,6 +5339,25 @@ window.addEventListener('DOMContentLoaded', () => {
     updateHeaderPeekTime();
     setInterval(updateHeaderPeekTime, 1000);
   }, 50);
+
+// Toggle weather from header - works from any tab
+function toggleWeatherFromHeader(event) {
+  event.stopPropagation();
+  
+  // Switch to home tab
+  switchTab('home');
+  
+  // Toggle weather widget visibility after switching
+  setTimeout(() => {
+    const homeTab = document.getElementById('tab-home');
+    if (homeTab) {
+      const weatherWidget = homeTab.querySelector('.weather-widget');
+      if (weatherWidget) {
+        weatherWidget.classList.toggle('visible');
+      }
+    }
+  }, 50);
+}
 });
 </script>
 <!-- SOS Emergency Modal -->
