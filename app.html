@@ -390,6 +390,43 @@ button{cursor:pointer;border:none;background:none}
 .guest-prompt h3{font-family:var(--font-display);font-size:20px;margin-bottom:8px}
 .guest-prompt p{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.5}
 .guest-prompt .btn{max-width:220px;margin:0 auto}
+
+/* ── Language Selector ────────────────────────────────── */
+.lang-select{
+  background:var(--card);
+  color:var(--text);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all 0.2s ease;
+  outline:none;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A7A6D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat:no-repeat;
+  background-position:right 8px center;
+  background-size:18px;
+  padding-right:32px;
+}
+.lang-select:hover{
+  border-color:var(--pri);
+  background-color:rgba(26,122,109,0.05)
+}
+.lang-select:focus{
+  border-color:var(--pri);
+  background-color:rgba(26,122,109,0.08);
+  box-shadow:0 0 0 3px rgba(26,122,109,0.1)
+}
+.lang-select option{
+  background:#fff;
+  color:#333;
+  padding:8px;
+  font-size:14px
+}
 </style>
 </head>
 <body>
@@ -405,7 +442,7 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- Language Selector (Auth Screen Only) -->
 <div style="position:absolute;top:12px;right:12px;z-index:100">
-  <select id="lang-select-auth" onchange="setLanguageAuth(this.value)" style="background:rgba(26,122,109,0.1);color:#1A7A6D;border:1px solid rgba(26,122,109,0.3);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;outline:none;cursor:pointer">
+  <select id="lang-select-auth" class="lang-select" onchange="setLanguageAuth(this.value)">
     <option value="en" style="color:#333">English</option>
     <option value="zh" style="color:#333">中文</option>
     <option value="ms" style="color:#333">Melayu</option>
@@ -604,7 +641,7 @@ button{cursor:pointer;border:none;background:none}
 <div class="top-bar">
   <h1>Ju An SecureLiving</h1>
   <div style="display:flex;align-items:center;gap:10px">
-    <select id="lang-select" onchange="setLanguage(this.value)" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:500;outline:none;cursor:pointer">
+    <select id="lang-select" class="lang-select" onchange="setLanguage(this.value)">
       <option value="en" style="color:#333">English</option>
       <option value="zh" style="color:#333">中文</option>
       <option value="ms" style="color:#333">Melayu</option>
