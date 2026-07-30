@@ -280,11 +280,20 @@ button{cursor:pointer;border:none;background:none}
   background:var(--accent);border-radius:50%}
 
 /* ── Weather Widget (Apple-style) ──────────────────── */
+@keyframes weatherSlideDown {
+  from{opacity:0;transform:translateY(-16px);max-height:0;overflow:hidden}
+  to{opacity:1;transform:translateY(0);max-height:500px}
+}
+@keyframes weatherSlideUp {
+  from{opacity:1;transform:translateY(0);max-height:500px}
+  to{opacity:0;transform:translateY(-16px);max-height:0;overflow:hidden}
+}
 .weather-widget{background:linear-gradient(135deg,rgba(26,122,109,0.75),rgba(20,95,85,0.75));
   color:#fff;border-radius:16px;padding:16px;margin-bottom:12px;
   box-shadow:0 4px 16px rgba(26,122,109,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  display:none}
-.weather-widget.visible{display:block}
+  display:none;animation-duration:0.4s;animation-timing-function:ease;animation-fill-mode:forwards}
+.weather-widget.visible{display:block;animation-name:weatherSlideDown}
+.weather-widget.hiding{animation-name:weatherSlideUp}
 .weather-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0}
 .time-display{flex:1}
 .time-display .time-main{font-size:28px;font-weight:700;line-height:1;letter-spacing:-0.5px}
@@ -327,14 +336,13 @@ button{cursor:pointer;border:none;background:none}
 
 /* Header weather peek tab - at far right */
 .header-weather-peek{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  width:50px;height:40px;background:rgba(255,255,255,0.08);border-radius:6px;
   color:#fff;font-weight:600;cursor:pointer;transition:all 0.2s ease;
-  border:1px solid rgba(255,255,255,0.12);position:relative;order:999}
-.header-weather-peek:hover{background:rgba(255,255,255,0.15);transform:translateY(-1px)}
+  position:relative;order:999;padding:0;background:none;border:none}
+.header-weather-peek:hover .peek-arrow{opacity:0.9}
 .header-weather-peek:active{transform:scale(0.95)}
-.header-weather-peek .peek-time{font-size:18px;line-height:1;letter-spacing:-0.3px;font-weight:700}
-.header-weather-peek .peek-label{font-size:8px;opacity:0.8;margin-top:1px;font-weight:500}
-.header-weather-peek .peek-arrow{font-size:8px;opacity:0.6;margin-top:1px}
+.header-weather-peek .peek-time{font-size:28px;line-height:1;letter-spacing:-0.5px;font-weight:700}
+.header-weather-peek .peek-label{display:none}
+.header-weather-peek .peek-arrow{font-size:12px;opacity:0.6;margin-top:2px;transition:opacity 0.2s ease}
 .weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0;padding-bottom:4px}
 .forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:calc(25% - 4px);backdrop-filter:blur(10px)}
 @media(min-width:600px){.forecast-card{min-width:70px}}
@@ -5344,28 +5352,32 @@ window.addEventListener('DOMContentLoaded', () => {
     attachWeatherPeekHandler();
   }, 50);
 
-// Toggle weather from header - works from any tab
+// Toggle weather from header - works from any tab with smooth animation
 function toggleWeatherFromHeader(event) {
   event.stopPropagation();
   
-  // Switch to home tab
-  switchTab('home');
+  const homeTab = document.getElementById('tab-home');
+  if (!homeTab) return;
   
-  // Toggle weather widget visibility after switching
-  setTimeout(() => {
-    const homeTab = document.getElementById('tab-home');
-    if (homeTab) {
-      const weatherWidget = homeTab.querySelector('.weather-widget');
-      if (weatherWidget) {
-        const isCurrentlyVisible = weatherWidget.classList.contains('visible');
-        if (isCurrentlyVisible) {
-          weatherWidget.classList.remove('visible');
-        } else {
-          weatherWidget.classList.add('visible');
-        }
-      }
-    }
-  }, 50);
+  const weatherWidget = homeTab.querySelector('.weather-widget');
+  if (!weatherWidget) return;
+  
+  const isCurrentlyVisible = weatherWidget.classList.contains('visible');
+  
+  if (isCurrentlyVisible) {
+    // Hide animation: add hiding class, remove visible after animation completes
+    weatherWidget.classList.add('hiding');
+    setTimeout(() => {
+      weatherWidget.classList.remove('visible');
+      weatherWidget.classList.remove('hiding');
+    }, 400);
+  } else {
+    // Show animation: switch to home tab, then add visible class
+    switchTab('home');
+    setTimeout(() => {
+      weatherWidget.classList.add('visible');
+    }, 50);
+  }
 }
 });
 </script>
