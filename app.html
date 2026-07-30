@@ -638,9 +638,23 @@ button{cursor:pointer;border:none;background:none}
           <span class="temp-val" id="current-temp">--</span>
           <span class="temp-unit">°C</span>
         </div>
-        <div class="weather-desc" id="weather-desc" style="margin-top:2px">Loading...</div>
+        <div class="weather-desc" id="weather-desc" style="margin-top:2px" data-i18n="loading">Loading...</div>
       </div>
       <div class="weather-icon" id="weather-icon">🌤️</div>
+    </div>
+    <div class="weather-details" style="display:flex;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15)">
+      <div class="weather-detail" style="flex:1">
+        <div class="weather-detail-val" id="humidity" style="font-size:16px">--</div>
+        <div class="weather-detail-label" data-i18n="humidity" style="font-size:11px">Humidity</div>
+      </div>
+      <div class="weather-detail" style="flex:1">
+        <div class="weather-detail-val" id="wind-speed" style="font-size:16px">--</div>
+        <div class="weather-detail-label" data-i18n="wind" style="font-size:11px">Wind</div>
+      </div>
+      <div class="weather-detail" style="flex:1">
+        <div class="weather-detail-val" id="feels-like" style="font-size:16px">--</div>
+        <div class="weather-detail-label" data-i18n="feels_like" style="font-size:11px">Feels Like</div>
+      </div>
     </div>
     <div class="weather-forecast" id="weather-forecast" style="margin-top:8px"></div>
   </div>
