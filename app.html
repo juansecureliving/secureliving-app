@@ -255,9 +255,20 @@ button{cursor:pointer;border:none;background:none}
 }
 
 /* Cards start invisible, become visible only when .animate-fade-in is added */
-.card{
+/* Cards in animated tabs (Home, Consult, Products, Camera) start invisible */
+#tab-home .card,
+#tab-consult .card,
+#tab-products .card,
+#tab-camera .card {
   opacity:0;
   will-change:opacity,transform;
+}
+
+/* Cards in non-animated tabs (History/Monitor, Reports/Readings, Profile) stay visible */
+#tab-history .card,
+#tab-reports .card,
+#tab-profile .card {
+  opacity:1;
 }
 .modal h3{font-family:var(--font-display);font-size:20px;margin-bottom:16px}
 .modal-close{position:absolute;top:16px;right:16px;font-size:22px;color:var(--muted)}
