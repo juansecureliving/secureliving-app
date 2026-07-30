@@ -2670,9 +2670,8 @@ async function enterGuest() {
     localStorage.setItem('al_guest', 'true');
     hide('auth-screen');
     
-    // Set up top bar for guest
-    $('top-avatar').textContent = '👤';
-    $('top-name').textContent = (LANG[currentLang]||LANG.en).guest || 'Guest';
+    // Set up top bar for guest (avatar removed from header)
+    // User can access profile via the Profile tab at the bottom
     
     // Greeting will be set by applyLanguage() with proper translations
     // No need to set it here
@@ -2730,8 +2729,8 @@ async function enterApp() {
     hide('auth-screen');
     const name = ME.name || 'User';
     const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    $('top-avatar').textContent = initials;
-    $('top-name').textContent = name.split(' ')[0];
+    // Avatar button removed from header, so no need to update it
+    // User can access profile via the Profile tab at the bottom
 
     // Greeting will be set by applyLanguage() with proper translations
     // No need to set it here with hardcoded English text
