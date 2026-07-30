@@ -246,6 +246,19 @@ button{cursor:pointer;border:none;background:none}
   width:100%;max-width:500px;max-height:85vh;overflow-y:auto;
   animation:slideUp .25s ease-out}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Fade-in animation for cards on scroll */
+.card{opacity:0;animation:fadeInUp 0.6s ease-out forwards}
+.card:nth-child(1){animation-delay:0ms}
+.card:nth-child(2){animation-delay:80ms}
+.card:nth-child(3){animation-delay:160ms}
+.card:nth-child(4){animation-delay:240ms}
+.card:nth-child(5){animation-delay:320ms}
+.card:nth-child(6){animation-delay:400ms}
+.card:nth-child(7){animation-delay:480ms}
+.card:nth-child(8){animation-delay:560ms}
+.card:nth-child(n+9){animation-delay:640ms}
 .modal h3{font-family:var(--font-display);font-size:20px;margin-bottom:16px}
 .modal-close{position:absolute;top:16px;right:16px;font-size:22px;color:var(--muted)}
 .modal .form-group{margin-bottom:14px}
@@ -5212,6 +5225,34 @@ window.addEventListener('DOMContentLoaded', () => {
   
   // Resize chart on orientation change
   window.addEventListener('resize', () => { if (ME) renderBPChart(); });
+  
+  // Scroll-triggered animations for cards
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.target.classList.contains('card')) {
+        // Trigger the animation by resetting and replaying
+        const card = entry.target;
+        card.style.animation = 'none';
+        // Trigger reflow to restart animation
+        void card.offsetHeight;
+        card.style.animation = '';
+        // Stop observing this card
+        observer.unobserve(card);
+      }
+    });
+  }, observerOptions);
+  
+  // Observe all cards in the home tab on page load
+  setTimeout(() => {
+    document.querySelectorAll('#tab-home .card').forEach(card => {
+      observer.observe(card);
+    });
+  }, 100);
 });
 </script>
 <!-- SOS Emergency Modal -->
