@@ -282,7 +282,22 @@ button{cursor:pointer;border:none;background:none}
 /* ── Weather Widget (Apple-style) ──────────────────── */
 .weather-widget{background:linear-gradient(135deg,rgba(26,122,109,0.75),rgba(20,95,85,0.75));
   color:#fff;border-radius:16px;padding:16px;margin-bottom:12px;
-  box-shadow:0 4px 16px rgba(26,122,109,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  box-shadow:0 4px 16px rgba(26,122,109,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  cursor:pointer;transition:transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform:translateX(calc(100% + 20px));position:relative;z-index:10}
+.weather-widget.visible{transform:translateX(0)}
+.weather-widget::before{content:'';position:absolute;left:-50px;top:0;width:50px;height:100%;background:linear-gradient(90deg,rgba(26,122,109,0.3),transparent);border-radius:16px 0 0 16px;z-index:-1}
+
+/* Minimal clock peek when weather is hidden */
+.weather-peek{position:fixed;bottom:auto;top:575px;right:16px;width:60px;height:60px;
+  background:linear-gradient(135deg,rgba(26,122,109,0.6),rgba(20,95,85,0.6));
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:20px;z-index:9;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 2px 8px rgba(26,122,109,0.2);cursor:pointer;
+  transition:all 0.3s ease;opacity:0;pointer-events:none}
+.weather-widget:not(.visible) ~ .weather-peek{opacity:1;pointer-events:auto}
+.weather-peek:active{transform:scale(0.95)}
 .weather-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0}
 .time-display{flex:1}
 .time-display .time-main{font-size:28px;font-weight:700;line-height:1;letter-spacing:-0.5px}
@@ -5276,6 +5291,43 @@ window.addEventListener('DOMContentLoaded', () => {
       const buttons = homeTab.querySelectorAll('.quick-action');
       buttons.forEach((btn, index) => {
         btn.style.setProperty('--btn-index', index);
+      });
+    }
+    
+    // Weather widget toggle - click to show/hide
+    const weatherWidget = document.querySelector('.weather-widget');
+    if (weatherWidget) {
+      // Start hidden
+      weatherWidget.classList.remove('visible');
+      
+      // Click to toggle
+      weatherWidget.addEventListener('click', (e) => {
+        e.stopPropagation();
+        weatherWidget.classList.remove('visible');
+      });
+      
+      // Create peek clock element
+      const peek = document.createElement('div');
+      peek.className = 'weather-peek';
+      peek.id = 'weather-peek';
+      peek.textContent = new Date().toLocaleTimeString('en-SG', { hour:'2-digit', minute:'2-digit', hour12:false });
+      weatherWidget.parentNode.insertBefore(peek, weatherWidget.nextSibling);
+      
+      // Update peek time
+      setInterval(() => {
+        const peek = document.getElementById('weather-peek');
+        if (peek) peek.textContent = new Date().toLocaleTimeString('en-SG', { hour:'2-digit', minute:'2-digit', hour12:false });
+      }, 1000);
+      
+      // Click peek to show weather
+      peek.addEventListener('click', (e) => {
+        e.stopPropagation();
+        weatherWidget.classList.add('visible');
+      });
+      
+      // Click elsewhere to hide weather
+      document.addEventListener('click', () => {
+        weatherWidget.classList.remove('visible');
       });
     }
   }, 50);
