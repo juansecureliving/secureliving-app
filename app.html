@@ -431,20 +431,22 @@ button{cursor:pointer;border:none;background:none}
 /* ── Custom Language Dropdown ────────────────────────────────── */
 .lang-dropdown-wrapper{
   position:relative;
-  display:inline-block
+  display:inline-block;
+  z-index:50
 }
 .lang-dropdown-menu{
   position:absolute;
-  top:100%;
+  top:calc(100% + 6px);
   right:0;
   background:#fff;
   border-radius:12px;
-  box-shadow:0 4px 20px rgba(26,122,109,0.15);
-  z-index:1000;
-  min-width:160px;
-  margin-top:6px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  z-index:9999;
+  min-width:180px;
   overflow:hidden;
-  display:none
+  display:none;
+  max-height:400px;
+  overflow-y:auto
 }
 .lang-dropdown-menu.active{
   display:block;
@@ -464,7 +466,8 @@ button{cursor:pointer;border:none;background:none}
   transition:all 0.15s ease;
   display:flex;
   align-items:center;
-  gap:8px
+  gap:8px;
+  white-space:nowrap
 }
 .lang-option:hover{
   background:rgba(26,122,109,0.08)
@@ -701,9 +704,9 @@ button{cursor:pointer;border:none;background:none}
         <option value="tl" style="color:#333">Tagalog</option>
         <option value="my" style="color:#333">မြန်မာ</option>
       </select>
-      <button id="lang-toggle-btn" class="lang-select" style="border:none;background:var(--card);display:flex;align-items:center;gap:6px" onclick="toggleLangDropdown()">
+      <button id="lang-toggle-btn" class="lang-select" style="border:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:10px 12px" onclick="toggleLangDropdown(event)">
         <span id="lang-display">English</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pri)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pri);flex-shrink:0">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
@@ -5535,7 +5538,8 @@ function toggleWeatherFromHeader(event) {
 }
 
 // Custom Language Dropdown Functions
-function toggleLangDropdown() {
+function toggleLangDropdown(e) {
+  if (e) e.stopPropagation();
   const menu = $('lang-dropdown-menu');
   if (menu) {
     menu.classList.toggle('active');
@@ -5568,9 +5572,15 @@ function selectLangFromMenu(lang) {
   const display = $('lang-display');
   if (display) display.textContent = langNames[lang] || 'English';
   
-  // Update active state in menu
-  document.querySelectorAll('.lang-option').forEach(opt => opt.classList.remove('active'));
-  event.target.closest('.lang-option').classList.add('active');
+  // Update active state in menu - find and mark the clicked option
+  const langLabels = {'en':'English', 'zh':'中文', 'ms':'Melayu', 'ta':'தமிழ்', 'tl':'Tagalog', 'my':'မြန်မာ'};
+  document.querySelectorAll('.lang-option').forEach(opt => {
+    if (opt.textContent.includes(langLabels[lang])) {
+      opt.classList.add('active');
+    } else {
+      opt.classList.remove('active');
+    }
+  });
   
   // Close dropdown and apply language
   const menu = $('lang-dropdown-menu');
