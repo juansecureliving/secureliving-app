@@ -105,6 +105,13 @@ button{cursor:pointer;border:none;background:none}
 .tab-btn svg{width:28px;height:28px}
 .tab-btn.active svg{stroke-width:2.5}
 
+/* Special camera (translate) button - featured in the middle */
+.tab-btn-camera{flex:0;padding:16px 24px 12px!important;background:linear-gradient(135deg,var(--pri),rgba(26,122,109,0.8));border-radius:20px;color:#fff!important;
+  font-size:13px;font-weight:600;transition:all .3s;transform:scale(1);box-shadow:0 4px 12px rgba(26,122,109,0.3)}
+.tab-btn-camera:active{transform:scale(0.95);box-shadow:0 2px 6px rgba(26,122,109,0.2)}
+.tab-btn-camera svg{width:32px;height:32px;color:#fff}
+.tab-btn-camera span{white-space:nowrap}
+
 .tab-content{display:none;padding:16px;max-width:600px;margin:0 auto}
 .tab-content.active{display:block}
 
@@ -1206,7 +1213,7 @@ button{cursor:pointer;border:none;background:none}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span data-i18n="tab_products">Products</span>
   </button>
-  <button class="tab-btn" onclick="switchTab('camera')" data-tab="camera">
+  <button class="tab-btn tab-btn-camera" onclick="switchTab('camera')" data-tab="camera">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
     <span data-i18n="tab_camera">Translate</span>
   </button>
