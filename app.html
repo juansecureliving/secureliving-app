@@ -106,10 +106,12 @@ button{cursor:pointer;border:none;background:none}
 .tab-btn.active svg{stroke-width:2.5}
 
 /* Special camera (translate) button - semi-circle featured button in the middle */
-.tab-btn-camera{flex:0;padding:16px 12px 8px!important;background:var(--card);border-radius:50% 50% 0 0;color:var(--pri)!important;
-  font-size:12px;font-weight:600;transition:all .3s;box-shadow:0 2px 8px rgba(26,122,109,0.2);border-top:2px solid var(--pri)}
+.tab-btn-camera{flex:0;padding:16px 12px 8px!important;background:var(--card);border-radius:50% 50% 0 0;color:var(--muted)!important;
+  font-size:12px;font-weight:600;transition:all .3s;box-shadow:0 2px 8px rgba(26,122,109,0.2)}
+.tab-btn-camera.active{color:var(--pri)!important;border-top:2px solid var(--pri)}
+.tab-btn-camera:not(.active){border-top:2px solid transparent}
 .tab-btn-camera:active{transform:scale(0.95)}
-.tab-btn-camera svg{width:32px;height:32px;color:var(--pri);stroke-width:2.5}
+.tab-btn-camera svg{width:32px;height:32px;color:inherit;stroke-width:2.5}
 .tab-btn-camera span{white-space:nowrap}
 
 .tab-content{display:none;padding:16px;max-width:600px;margin:0 auto}
@@ -1202,7 +1204,7 @@ button{cursor:pointer;border:none;background:none}
 <!-- ── TAB BAR ─────────────────────────────── -->
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('home')" data-tab="home">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M9 21V9h6v12"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
     <span data-i18n="tab_home">Home</span>
   </button>
   <button class="tab-btn" onclick="switchTab('consult')" data-tab="consult">
@@ -1218,7 +1220,7 @@ button{cursor:pointer;border:none;background:none}
     <span data-i18n="tab_camera">Translate</span>
   </button>
   <button class="tab-btn" onclick="switchTab('history')" data-tab="history">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M3 12a9 9 0 0 0 9 9m0-18a9 9 0 0 0-9 9m18 0a9 9 0 0 1-9 9m0 0a9 9 0 0 1 9-9m0 0a9 9 0 1 1-9 9"/><polyline points="12 7 12 12 16 14"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     <span data-i18n="tab_monitor">Monitor</span>
   </button>
   <button class="tab-btn" onclick="switchTab('reports')" data-tab="reports">
