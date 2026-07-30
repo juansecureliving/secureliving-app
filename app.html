@@ -427,6 +427,57 @@ button{cursor:pointer;border:none;background:none}
   padding:8px;
   font-size:14px
 }
+
+/* ── Custom Language Dropdown ────────────────────────────────── */
+.lang-dropdown-wrapper{
+  position:relative;
+  display:inline-block
+}
+.lang-dropdown-menu{
+  position:absolute;
+  top:100%;
+  right:0;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 4px 20px rgba(26,122,109,0.15);
+  z-index:1000;
+  min-width:160px;
+  margin-top:6px;
+  overflow:hidden;
+  display:none
+}
+.lang-dropdown-menu.active{
+  display:block;
+  animation:dropdownSlideDown 0.2s ease
+}
+@keyframes dropdownSlideDown{
+  from{opacity:0;transform:translateY(-8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.lang-option{
+  padding:12px 16px;
+  cursor:pointer;
+  color:var(--text);
+  font-size:14px;
+  font-weight:500;
+  border-left:3px solid transparent;
+  transition:all 0.15s ease;
+  display:flex;
+  align-items:center;
+  gap:8px
+}
+.lang-option:hover{
+  background:rgba(26,122,109,0.08)
+}
+.lang-option.active{
+  background:rgba(26,122,109,0.15);
+  border-left-color:var(--pri);
+  color:var(--pri)
+}
+.lang-option-flag{
+  font-size:16px;
+  min-width:20px
+}
 </style>
 </head>
 <body>
@@ -641,14 +692,48 @@ button{cursor:pointer;border:none;background:none}
 <div class="top-bar">
   <h1>Ju An SecureLiving</h1>
   <div style="display:flex;align-items:center;gap:10px">
-    <select id="lang-select" class="lang-select" onchange="setLanguage(this.value)">
-      <option value="en" style="color:#333">English</option>
-      <option value="zh" style="color:#333">中文</option>
-      <option value="ms" style="color:#333">Melayu</option>
-      <option value="ta" style="color:#333">தமிழ்</option>
-      <option value="tl" style="color:#333">Tagalog</option>
-      <option value="my" style="color:#333">မြန်မာ</option>
-    </select>
+    <div class="lang-dropdown-wrapper">
+      <select id="lang-select" class="lang-select" onchange="setLanguage(this.value)" style="display:none">
+        <option value="en" style="color:#333">English</option>
+        <option value="zh" style="color:#333">中文</option>
+        <option value="ms" style="color:#333">Melayu</option>
+        <option value="ta" style="color:#333">தமிழ்</option>
+        <option value="tl" style="color:#333">Tagalog</option>
+        <option value="my" style="color:#333">မြန်မာ</option>
+      </select>
+      <button id="lang-toggle-btn" class="lang-select" style="border:none;background:var(--card);display:flex;align-items:center;gap:6px" onclick="toggleLangDropdown()">
+        <span id="lang-display">English</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pri)">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div id="lang-dropdown-menu" class="lang-dropdown-menu">
+        <div class="lang-option active" onclick="selectLangFromMenu('en')">
+          <span class="lang-option-flag">🇬🇧</span>
+          <span>English</span>
+        </div>
+        <div class="lang-option" onclick="selectLangFromMenu('zh')">
+          <span class="lang-option-flag">🇨🇳</span>
+          <span>中文</span>
+        </div>
+        <div class="lang-option" onclick="selectLangFromMenu('ms')">
+          <span class="lang-option-flag">🇲🇾</span>
+          <span>Melayu</span>
+        </div>
+        <div class="lang-option" onclick="selectLangFromMenu('ta')">
+          <span class="lang-option-flag">🇮🇳</span>
+          <span>தமிழ்</span>
+        </div>
+        <div class="lang-option" onclick="selectLangFromMenu('tl')">
+          <span class="lang-option-flag">🇵🇭</span>
+          <span>Tagalog</span>
+        </div>
+        <div class="lang-option" onclick="selectLangFromMenu('my')">
+          <span class="lang-option-flag">🇲🇲</span>
+          <span>မြန်မာ</span>
+        </div>
+      </div>
+    </div>
     <!-- Weather Peek Tab at far right -->
     <div id="header-weather-peek" class="header-weather-peek" onclick="toggleWeatherFromHeader(event)">
       <div class="peek-time" id="header-peek-time">13:47</div>
@@ -2312,6 +2397,9 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('al_lang', lang);
   applyLanguage();
+  // Update the dropdown to reflect current selection
+  const langSelect = $('lang-select');
+  if (langSelect) langSelect.value = lang;
 }
 
 function setLanguageAuth(lang) {
@@ -5401,6 +5489,21 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     };
     attachWeatherPeekHandler();
+    
+    // Initialize language display
+    const langNames = {'en':'English', 'zh':'中文', 'ms':'Melayu', 'ta':'தமிழ்', 'tl':'Tagalog', 'my':'မြန်မာ'};
+    const display = $('lang-display');
+    if (display) display.textContent = langNames[currentLang] || 'English';
+    
+    // Set active option in dropdown menu
+    const options = document.querySelectorAll('.lang-option');
+    options.forEach(opt => {
+      if (opt.textContent.includes(langNames[currentLang])) {
+        opt.classList.add('active');
+      } else {
+        opt.classList.remove('active');
+      }
+    });
   }, 50);
 
 // Toggle weather from header - works from any tab with smooth animation
@@ -5429,6 +5532,56 @@ function toggleWeatherFromHeader(event) {
       weatherWidget.classList.add('visible');
     }, 50);
   }
+}
+
+// Custom Language Dropdown Functions
+function toggleLangDropdown() {
+  const menu = $('lang-dropdown-menu');
+  if (menu) {
+    menu.classList.toggle('active');
+    // Close when clicking outside
+    if (menu.classList.contains('active')) {
+      setTimeout(() => {
+        document.addEventListener('click', closeLangDropdownOnClick);
+      }, 100);
+    } else {
+      document.removeEventListener('click', closeLangDropdownOnClick);
+    }
+  }
+}
+
+function closeLangDropdownOnClick(e) {
+  const wrapper = $('lang-dropdown-wrapper') || document.querySelector('.lang-dropdown-wrapper');
+  const menu = $('lang-dropdown-menu');
+  if (wrapper && menu && !wrapper.contains(e.target)) {
+    menu.classList.remove('active');
+    document.removeEventListener('click', closeLangDropdownOnClick);
+  }
+}
+
+function selectLangFromMenu(lang) {
+  currentLang = lang;
+  localStorage.setItem('al_lang', lang);
+  
+  // Update display text
+  const langNames = {'en':'English', 'zh':'中文', 'ms':'Melayu', 'ta':'தமிழ்', 'tl':'Tagalog', 'my':'မြန်မာ'};
+  const display = $('lang-display');
+  if (display) display.textContent = langNames[lang] || 'English';
+  
+  // Update active state in menu
+  document.querySelectorAll('.lang-option').forEach(opt => opt.classList.remove('active'));
+  event.target.closest('.lang-option').classList.add('active');
+  
+  // Close dropdown and apply language
+  const menu = $('lang-dropdown-menu');
+  if (menu) menu.classList.remove('active');
+  document.removeEventListener('click', closeLangDropdownOnClick);
+  
+  applyLanguage();
+  
+  // Update hidden select for compatibility
+  const langSelect = $('lang-select');
+  if (langSelect) langSelect.value = lang;
 }
 });
 </script>
