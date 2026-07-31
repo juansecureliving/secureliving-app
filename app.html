@@ -462,18 +462,35 @@ button{cursor:pointer;border:none;background:none}
   from{opacity:0;transform:scale(0.95) translateY(-12px)}
   to{opacity:1;transform:scale(1) translateY(0)}
 }
-@keyframes welcomeGlow{
-  0%{background:rgba(26,122,109,0.08)}
-  50%{background:rgba(26,122,109,0.15)}
-  100%{background:rgba(26,122,109,0.08)}
-}
 .hero-card{
   animation:welcomeFadeInScale 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
   animation-delay:0.1s
 }
 .hero-card h2{
-  animation:welcomeGlow 2.5s ease-in-out forwards;
-  animation-delay:0.7s
+  animation:welcomeFadeInScale 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  animation-delay:0.1s
+}
+
+/* ── Tagline Section ──────────────────────────────────────────────── */
+@keyframes taglineFadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+.tagline-section{
+  text-align:center;
+  padding:20px 24px;
+  margin-bottom:12px
+}
+.tagline{
+  font-family:'Georgia','Times New Roman',serif;
+  font-size:16px;
+  font-weight:300;
+  font-style:italic;
+  color:var(--muted);
+  margin:0;
+  line-height:1.6;
+  animation:taglineFadeIn 1.2s ease-in 0.8s forwards;
+  opacity:0
 }
 .lang-option{
   padding:12px 16px;
@@ -768,6 +785,11 @@ button{cursor:pointer;border:none;background:none}
       <div class="peek-arrow">▼</div>
     </div>
   </div>
+</div>
+
+<!-- Tagline Section -->
+<div class="tagline-section">
+  <p class="tagline">Because living well matters more than living long.</p>
 </div>
 
 <!-- ── TAB: Home ──────────────────────────── -->
