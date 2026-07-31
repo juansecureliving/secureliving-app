@@ -139,8 +139,10 @@ button{cursor:pointer;border:none;background:none}
   box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
 .hero-card p{opacity:.85;font-size:14px;line-height:1.5}
-.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.service-item{text-align:center;padding:12px 8px;border-radius:12px;transition:all 0.2s ease;background:rgba(26,122,109,0.03)}
+.services-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.service-item{grid-column:span 2;text-align:center;padding:12px 8px;border-radius:12px;transition:all 0.2s ease;background:rgba(26,122,109,0.03)}
+.services-grid .service-item:nth-child(4){grid-column:2 / span 2}
+.services-grid .service-item:nth-child(5){grid-column:4 / span 2}
 .service-item:hover{background:rgba(26,122,109,0.06);transform:translateY(-2px)}
 .service-icon{width:36px;height:36px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
 .service-icon svg{width:30px;height:30px;stroke:var(--pri);stroke-width:2;color:var(--pri)}
@@ -296,12 +298,8 @@ button{cursor:pointer;border:none;background:none}
   box-shadow:0 4px 16px rgba(26,122,109,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   display:none;animation-duration:0.4s;animation-timing-function:ease;animation-fill-mode:forwards}
 .weather-widget.visible{display:block;animation-name:weatherSlideDown}
+.weather-widget.visible .weather-details{display:flex!important}
 .weather-widget.hiding{animation-name:weatherSlideUp}
-/* Appointment tab weather - always visible, no toggle */
-.weather-widget-appt{background:linear-gradient(135deg,rgba(26,122,109,0.75),rgba(20,95,85,0.75));
-  color:#fff;border-radius:16px;padding:16px;margin-bottom:16px;
-  box-shadow:0 4px 16px rgba(26,122,109,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.weather-widget-appt .weather-details{display:flex!important}
 .weather-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0}
 .time-display{flex:1}
 .time-display .time-main{font-size:28px;font-weight:700;line-height:1;letter-spacing:-0.5px}
@@ -352,7 +350,9 @@ button{cursor:pointer;border:none;background:none}
 .header-weather-peek .peek-label{display:none}
 .header-weather-peek .peek-arrow{font-size:12px;opacity:0.6;margin-top:2px;transition:opacity 0.2s ease}
 /* Header clock - appointment tab only */
-.header-clock{display:flex;align-items:center;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px;padding:0 4px}
+.header-clock{display:flex;align-items:center;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px;padding:0 4px;cursor:pointer;transition:opacity 0.2s ease}
+.header-clock:hover{opacity:0.7}
+.header-clock:active{transform:scale(0.95)}
 .weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0;padding-bottom:4px}
 .forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:calc(25% - 4px);backdrop-filter:blur(10px)}
 @media(min-width:600px){.forecast-card{min-width:70px}}
@@ -741,9 +741,10 @@ button{cursor:pointer;border:none;background:none}
 <div class="top-bar">
   <h1>Ju An SecureLiving</h1>
   <div style="display:flex;align-items:center;gap:10px">
-    <!-- Clock (only visible on Appointment tab) -->
-    <div id="header-clock" class="header-clock" style="display:none">
+    <!-- Clock (only visible on Appointment tab) - tap to toggle weather -->
+    <div id="header-clock" class="header-clock" style="display:none" onclick="toggleApptWeather(event)">
       <span id="header-clock-time">00:00</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:4px;opacity:0.6"><polyline points="6 9 12 15 18 9"></polyline></svg>
     </div>
     <div class="lang-dropdown-wrapper">
       <select id="lang-select" class="lang-select" onchange="setLanguage(this.value)" style="display:none">
@@ -811,12 +812,13 @@ button{cursor:pointer;border:none;background:none}
   <div class="card">
     <h3 style="font-family:var(--font-display);margin-bottom:16px" data-i18n="our_services">Our Services</h3>
     <div class="services-grid">
+      <!-- Row 1: Emergency Preparedness, Health & Location, Continuous Community -->
       <div class="service-item">
         <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
         </div>
-        <div class="service-name" data-i18n="service_equipment">Assistive Equipment Access</div>
-        <div class="service-desc" data-i18n="service_equipment_desc">Flexible rental and purchase options to help you maintain independence at home</div>
+        <div class="service-name" data-i18n="service_preparedness">Emergency Preparedness</div>
+        <div class="service-desc" data-i18n="service_preparedness_desc">Practical support to help you prepare for life's uncertainties with confidence</div>
       </div>
       <div class="service-item">
         <div class="service-icon">
@@ -827,24 +829,25 @@ button{cursor:pointer;border:none;background:none}
       </div>
       <div class="service-item">
         <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 019.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
         </div>
-        <div class="service-name" data-i18n="service_preparedness">Emergency Preparedness</div>
-        <div class="service-desc" data-i18n="service_preparedness_desc">Practical support to help you prepare for life's uncertainties with confidence</div>
+        <div class="service-name" data-i18n="service_support">Continuous Community Care</div>
+        <div class="service-desc" data-i18n="service_support_desc">Ongoing support and connection with professionals who understand your journey</div>
       </div>
-      <div class="service-item">
+      <!-- Row 2 (centered): Assistive Equipment, Health Education -->
+      <div class="service-item service-item-bottom">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div class="service-name" data-i18n="service_equipment">Assistive Equipment Access</div>
+        <div class="service-desc" data-i18n="service_equipment_desc">Flexible rental and purchase options to help you maintain independence at home</div>
+      </div>
+      <div class="service-item service-item-bottom">
         <div class="service-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         </div>
         <div class="service-name" data-i18n="service_education">Health Education & Resources</div>
         <div class="service-desc" data-i18n="service_education_desc">Accessible information to empower you with knowledge about health, safety, and independent living</div>
-      </div>
-      <div class="service-item">
-        <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 019.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-        </div>
-        <div class="service-name" data-i18n="service_support">Continuous Community Care</div>
-        <div class="service-desc" data-i18n="service_support_desc">Ongoing support and connection with professionals who understand your journey</div>
       </div>
     </div>
   </div>
@@ -858,23 +861,6 @@ button{cursor:pointer;border:none;background:none}
       We help you prepare, educate, and equip so that sudden disability or medical needs
       never catch you off guard.
     </p>
-    <div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap">
-      <div style="flex:1;min-width:100px;text-align:center">
-        <div class="text-sm" style="font-weight:600" data-i18n="prepare">Prepare</div>
-      </div>
-      <div style="flex:1;min-width:100px;text-align:center">
-        <div class="text-sm" style="font-weight:600" data-i18n="educate">Educate</div>
-      </div>
-      <div style="flex:1;min-width:100px;text-align:center">
-        <div class="text-sm" style="font-weight:600" data-i18n="equip">Equip</div>
-      </div>
-      <div style="flex:1;min-width:100px;text-align:center">
-        <div class="text-sm" style="font-weight:600" data-i18n="support">Support</div>
-      </div>
-      <div style="flex:1;min-width:100px;text-align:center">
-        <div class="text-sm" style="font-weight:600" data-i18n="sustain">Sustain</div>
-      </div>
-    </div>
   </div>
 
   <!-- Vision -->
@@ -904,8 +890,8 @@ button{cursor:pointer;border:none;background:none}
   </div>
   <h2 class="section-title" data-i18n="appointment_title">Appointment</h2>
 
-  <!-- Weather Widget (Appointment Tab) -->
-  <div class="weather-widget-appt">
+  <!-- Weather Widget (Appointment Tab - collapsible) -->
+  <div class="weather-widget" id="appt-weather-widget">
     <div class="weather-header">
       <div class="time-display">
         <div class="time-main" id="current-time">00:00</div>
@@ -1476,13 +1462,13 @@ button{cursor:pointer;border:none;background:none}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span data-i18n="tab_home">Home</span>
   </button>
-  <button class="tab-btn" onclick="switchTab('consult')" data-tab="consult">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span data-i18n="tab_appt">Appointment</span>
-  </button>
   <button class="tab-btn" onclick="switchTab('products')" data-tab="products">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span data-i18n="tab_products">Products</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('consult')" data-tab="consult">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span data-i18n="tab_appt">Appointment</span>
   </button>
   <button class="tab-btn tab-btn-camera" onclick="switchTab('camera')" data-tab="camera">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -2998,10 +2984,10 @@ async function enterGuest() {
     await loadUpdates();
     await loadProducts();
     
-    // Lock member-only tabs - guests can access home, consult (appointment), products, and profile
+    // Lock member-only tabs - guests can access home, products, and profile
     document.querySelectorAll('.tab-btn').forEach(btn => {
       const tab = btn.getAttribute('data-tab');
-      if (tab !== 'home' && tab !== 'consult' && tab !== 'products' && tab !== 'profile') {
+      if (tab !== 'home' && tab !== 'products' && tab !== 'profile') {
         btn.classList.add('locked');
       } else {
         btn.classList.remove('locked');
@@ -3109,8 +3095,8 @@ function switchTab(tab) {
   // Stop live camera when leaving camera tab
   if (tab !== 'camera' && liveStream) { stopLiveCamera(); }
   
-  // Block member-only tabs for guests - only allow home, consult (appointment), products, and profile
-  if (isGuest && tab !== 'home' && tab !== 'consult' && tab !== 'products' && tab !== 'profile') {
+  // Block member-only tabs for guests - only allow home, products, and profile
+  if (isGuest && tab !== 'home' && tab !== 'products' && tab !== 'profile') {
     // Redirect guest to home tab
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -5650,30 +5636,22 @@ window.addEventListener('DOMContentLoaded', () => {
 }); // ← close DOMContentLoaded here so functions below are global
 
 // Toggle weather from header - works from any tab with smooth animation
-function toggleWeatherFromHeader(event) {
-  event.stopPropagation();
+function toggleApptWeather(event) {
+  if (event) event.stopPropagation();
   
-  const homeTab = document.getElementById('tab-home');
-  if (!homeTab) return;
-  
-  const weatherWidget = homeTab.querySelector('.weather-widget');
+  const weatherWidget = document.getElementById('appt-weather-widget');
   if (!weatherWidget) return;
   
   const isCurrentlyVisible = weatherWidget.classList.contains('visible');
   
   if (isCurrentlyVisible) {
-    // Hide animation: add hiding class, remove visible after animation completes
     weatherWidget.classList.add('hiding');
     setTimeout(() => {
       weatherWidget.classList.remove('visible');
       weatherWidget.classList.remove('hiding');
     }, 400);
   } else {
-    // Show animation: switch to home tab, then add visible class
-    switchTab('home');
-    setTimeout(() => {
-      weatherWidget.classList.add('visible');
-    }, 50);
+    weatherWidget.classList.add('visible');
   }
 }
 
