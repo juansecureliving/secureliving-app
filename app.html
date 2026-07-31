@@ -139,16 +139,13 @@ button{cursor:pointer;border:none;background:none}
   box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
 .hero-card p{opacity:.85;font-size:14px;line-height:1.5}
-.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.quick-action{background:var(--card);border-radius:var(--radius);padding:18px 14px;
-  text-align:center;box-shadow:var(--shadow);transition:transform .15s;opacity:0;animation:fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;animation-delay:calc(var(--btn-index, 0) * 100ms)}
-.quick-action:hover{transform:translateY(-2px)}
-.quick-action .qa-icon{width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 8px;font-size:22px}
-.quick-action .qa-icon svg{width:24px;height:24px;stroke:var(--pri);stroke-width:2}
-.quick-action .qa-label{font-weight:600;font-size:13px}
-.quick-action .qa-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.services-list{display:flex;flex-direction:column;gap:14px}
+.service-item{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;transition:all 0.2s ease;background:rgba(26,122,109,0.03)}
+.service-item:hover{background:rgba(26,122,109,0.06);transform:translateX(2px)}
+.service-icon{font-size:28px;min-width:32px;text-align:center}
+.service-content{flex:1}
+.service-name{font-weight:600;font-size:14px;color:var(--text);margin-bottom:4px}
+.service-desc{font-size:12px;color:var(--muted);line-height:1.5}
 .update-item{padding:14px 0;border-bottom:1px solid var(--border)}
 .update-item:last-child{border-bottom:none}
 .update-item .update-date{font-size:11px;color:var(--muted);margin-bottom:4px}
@@ -830,35 +827,46 @@ button{cursor:pointer;border:none;background:none}
     <div class="weather-forecast" id="weather-forecast" style="margin-top:8px"></div>
   </div>
 
-  <div class="quick-actions">
-    <button class="quick-action" onclick="switchTab('consult')">
-      <div class="qa-icon" style="background:#E8F4FD">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  <!-- Our Services -->
+  <div class="card">
+    <h3 style="font-family:var(--font-display);margin-bottom:16px" data-i18n="our_services">Our Services</h3>
+    <div class="services-list">
+      <div class="service-item">
+        <div class="service-icon">🏠</div>
+        <div class="service-content">
+          <div class="service-name" data-i18n="service_equipment">Assistive Equipment Access</div>
+          <div class="service-desc" data-i18n="service_equipment_desc">Flexible rental and purchase options to help you maintain independence at home</div>
+        </div>
       </div>
-      <div class="qa-label" data-i18n="book_appt">Book Appointment</div>
-      <div class="qa-sub" data-i18n="free_assessment">Free assessment</div>
-    </button>
-    <button class="quick-action" onclick="switchTab('products')">
-      <div class="qa-icon" style="background:#FEF3E2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <div class="service-item">
+        <div class="service-icon">📊</div>
+        <div class="service-content">
+          <div class="service-name" data-i18n="service_monitoring">Health & Location Monitoring</div>
+          <div class="service-desc" data-i18n="service_monitoring_desc">Simple tools to track your wellbeing and keep loved ones informed of your safety</div>
+        </div>
       </div>
-      <div class="qa-label" data-i18n="equipment">Equipment</div>
-      <div class="qa-sub" data-i18n="rent_or_buy">Rent or buy</div>
-    </button>
-    <button class="quick-action" onclick="switchTab('reports')">
-      <div class="qa-icon" style="background:#FFE8E8">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <div class="service-item">
+        <div class="service-icon">🛡️</div>
+        <div class="service-content">
+          <div class="service-name" data-i18n="service_preparedness">Emergency Preparedness</div>
+          <div class="service-desc" data-i18n="service_preparedness_desc">Practical support to help you prepare for life's uncertainties with confidence</div>
+        </div>
       </div>
-      <div class="qa-label" data-i18n="health_log">Health Log</div>
-      <div class="qa-sub" data-i18n="track_bp">Track BP & more</div>
-    </button>
-    <button class="quick-action" onclick="switchTab('profile')">
-      <div class="qa-icon" style="background:#F5EEF8">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="service-item">
+        <div class="service-icon">📚</div>
+        <div class="service-content">
+          <div class="service-name" data-i18n="service_education">Health Education & Resources</div>
+          <div class="service-desc" data-i18n="service_education_desc">Accessible information to empower you with knowledge about health, safety, and independent living</div>
+        </div>
       </div>
-      <div class="qa-label" data-i18n="my_profile">My Profile</div>
-      <div class="qa-sub" data-i18n="health_data">Health data</div>
-    </button>
+      <div class="service-item">
+        <div class="service-icon">🤝</div>
+        <div class="service-content">
+          <div class="service-name" data-i18n="service_support">Continuous Community Care</div>
+          <div class="service-desc" data-i18n="service_support_desc">Ongoing support and connection with professionals who understand your journey</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Mission -->
@@ -1706,6 +1714,17 @@ const LANG = {
     health_log:'Health Log', track_bp:'Track BP & more',
     my_profile:'My Profile', health_data:'Health data',
     our_mission:'Our Mission',
+    our_services:'Our Services',
+    service_equipment:'Assistive Equipment Access',
+    service_equipment_desc:'Flexible rental and purchase options to help you maintain independence at home',
+    service_monitoring:'Health & Location Monitoring',
+    service_monitoring_desc:'Simple tools to track your wellbeing and keep loved ones informed of your safety',
+    service_preparedness:'Emergency Preparedness',
+    service_preparedness_desc:'Practical support to help you prepare for life\'s uncertainties with confidence',
+    service_education:'Health Education & Resources',
+    service_education_desc:'Accessible information to empower you with knowledge about health, safety, and independent living',
+    service_support:'Continuous Community Care',
+    service_support_desc:'Ongoing support and connection with professionals who understand your journey',
     our_vision:'Our Vision',
     vision_desc:'A Singapore where every person, regardless of age or ability, can live independently with dignity, confidence, and community support.',
     mission_desc:'As Singapore\'s population ages and more people live independently, we believe everyone deserves access to quality assistive equipment and support — before an emergency happens. We help you prepare, educate, and equip so that sudden disability or medical needs never catch you off guard.',
@@ -1851,6 +1870,17 @@ const LANG = {
     health_log:'健康日志', track_bp:'追踪血压等',
     my_profile:'我的档案', health_data:'健康数据',
     our_mission:'我们的使命',
+    our_services:'我们的服务',
+    service_equipment:'辅助设备获取',
+    service_equipment_desc:'灵活的租赁和购买选项,帮助您在家中保持独立生活',
+    service_monitoring:'健康和位置监测',
+    service_monitoring_desc:'简单的工具可跟踪您的幸福并让亲人了解您的安全情况',
+    service_preparedness:'紧急准备',
+    service_preparedness_desc:'实际支持,帮助您以信心面对生活中的不确定性',
+    service_education:'健康教育与资源',
+    service_education_desc:'无障碍信息赋予您关于健康、安全和独立生活的知识',
+    service_support:'持续社区关怀',
+    service_support_desc:'了解您旅程的专业人士的持续支持和联系',
     our_vision:'我们的愿景',
     vision_desc:'一个新加坡，每个人无论年龄或能力如何，都能独立生活，拥有尊严、信心和社区支持。',
     mission_desc:'随着新加坡人口老龄化，越来越多人独立生活。我们相信每个人都应在紧急情况发生前获得优质辅助设备和支持。我们帮助您做好准备、教育和装备，让突发残疾或医疗需求不会让您措手不及。',
@@ -1982,6 +2012,17 @@ const LANG = {
     health_log:'Log Kesihatan', track_bp:'Jejak tekanan darah',
     my_profile:'Profil Saya', health_data:'Data kesihatan',
     our_mission:'Misi Kami',
+    our_services:'Layanan Kami',
+    service_equipment:'Akses Peralatan Bantu',
+    service_equipment_desc:'Pilihan sewa dan pembelian yang fleksibel untuk membantu Anda mempertahankan kemandirian di rumah',
+    service_monitoring:'Pemantauan Kesehatan & Lokasi',
+    service_monitoring_desc:'Alat sederhana untuk melacak kesejahteraan Anda dan membuat orang-orang terkasih tetap terinformasi tentang keselamatan Anda',
+    service_preparedness:'Kesiapan Darurat',
+    service_preparedness_desc:'Dukungan praktis untuk membantu Anda bersiap menghadapi ketidakpastian hidup dengan percaya diri',
+    service_education:'Pendidikan & Sumber Daya Kesehatan',
+    service_education_desc:'Informasi yang dapat diakses untuk memberdayakan Anda dengan pengetahuan tentang kesehatan, keselamatan, dan kehidupan independen',
+    service_support:'Perawatan Komunitas Berkelanjutan',
+    service_support_desc:'Dukungan berkelanjutan dan koneksi dengan profesional yang memahami perjalanan Anda',
     our_vision:'Visi Kami',
     vision_desc:'Singapura di mana setiap orang, tanpa memandang usia atau kemampuan, dapat hidup mandiri dengan martabat, percaya diri, dan dukungan komunitas.',
     mission_desc:'Apabila populasi Singapura semakin menua dan lebih ramai hidup berdikari, kami percaya semua orang berhak mendapat akses kepada peralatan bantuan dan sokongan berkualiti — sebelum kecemasan berlaku. Kami membantu anda bersedia, mendidik, dan melengkapkan supaya kecacatan mendadak atau keperluan perubatan tidak mengejutkan anda.',
@@ -2105,6 +2146,17 @@ const LANG = {
     health_log:'சுகாதார பதிவு', track_bp:'இரத்த அழுத்தம் கண்காணி',
     my_profile:'என் சுயவிவரம்', health_data:'சுகாதார தரவு',
     our_mission:'எங்கள் நோக்கம்',
+    our_services:'எங்கள் சேவைகள்',
+    service_equipment:'உதவிக் கருவி அணுக்கம்',
+    service_equipment_desc:'உங்கள் வீட்டில் சுயாதீனத்தை பராமரிக்க உதவ நমনீய வாடகை மற்றும் கொள்முதல் விருப்பங்கள்',
+    service_monitoring:'ஆரோக்கியம் மற்றும் இடம் கண்காணிப்பு',
+    service_monitoring_desc:'உங்கள் நலம் கண்காணிக்க மற்றும் உங்கள் பாதுகாப்பு பற்றி அன்பினரை தெரிந்துகொள்ள எளிய கருவிகள்',
+    service_preparedness:'அவசரநிலை தயாரிப்பு',
+    service_preparedness_desc:'வாழ்க்கைத் தெளிவின்மையை நம்பிக்கையுடன் சामना செய்ய உதவ பரிணாமிக் ஆதரவு',
+    service_education:'ஆரோக்கியம் கல்வி மற்றும் வளங்கள்',
+    service_education_desc:'ஆரோக்கியம், பாதுகாப்பு மற்றும் சுயாதீன வாழ்க்கை பற்றிய ஞானத்தைக் கொண்டு உங்களை அதிகாரப்பூண்ட்ட தகவல்',
+    service_support:'தொடர்ச்சியான சமூக கவனிப்பு',
+    service_support_desc:'உங்கள் பயணத்தை புரிந்துகொள்ளும் தொழிலாளிகளுடன் தொடர்ச்சியான ஆதரவு மற்றும் இணைப்பு',
     our_vision:'எங்கள் பார்வை',
     vision_desc:'சிங்கப்பூர், ஒவ்வொரு நபரும் வயது அல்லது திறன் பொருட்படுத்தாமல், கண்ணியம், நம்பிக்கை மற்றும் சமூக ஆதரவுடன் சுயாதீனமாக வாழக்கூடிய ஒரு நாடு.',
     mission_desc:'சிங்கப்பூரின் மக்கள்தொகை வயதாகி, அதிகமானோர் சுதந்திரமாக வாழ்கையில், அவசரநிலை ஏற்படுமுன் தரமான உதவி உபகரணங்களையும் ஆதரவையும் பெற அனைவருக்கும் உரிமை உண்டு என்று நாங்கள் நம்புகிறோம்.',
@@ -2228,6 +2280,17 @@ const LANG = {
     health_log:'Health Log', track_bp:'I-track ang BP',
     my_profile:'Aking Profile', health_data:'Health data',
     our_mission:'Aming Misyon',
+    our_services:'Ang Aming Mga Serbisyo',
+    service_equipment:'Tulong sa Pagkuha ng Kagamitan',
+    service_equipment_desc:'Flexible na rental at pagbili ng mga opsyon upang makatulong sa iyo na mapanatili ang kalayaan sa tahanan',
+    service_monitoring:'Kalusugan at Lokasyong Pagsubaybay',
+    service_monitoring_desc:'Mga simpleng tool upang subaybayan ang iyong kaginhawahan at panatilihing handa ang iyong mga mahal sa buhay sa iyong kaligtasan',
+    service_preparedness:'Paghahanda sa Emerhensya',
+    service_preparedness_desc:'Praktikal na tulong upang tulungan kang maghanda para sa mga hindi siguradong sakali ng buhay na may tiwala',
+    service_education:'Edukasyon sa Kalusugan at Mga Mapagkukunan',
+    service_education_desc:'Accessible na impormasyon upang bigyan ka ng kapangyarihan ng kaalaman tungkol sa kalusugan, kaligtasan, at independiyenteng pamumuhay',
+    service_support:'Patuloy na Pag-aalaga ng Komunidad',
+    service_support_desc:'Patuloy na suporta at koneksyon sa mga propesyonal na nakakaintindi ng iyong paglalakbay',
     our_vision:'Ang Aming Pananaw',
     vision_desc:'Isang Singapore kung saan ang bawat tao, anuman ang edad o kakayahan, ay maaaring mamuhay nang independyente nang may dignidad, kumpiyansa, at suporta ng komunidad.',
     mission_desc:'Habang tumatanda ang populasyon ng Singapore at mas maraming taong nakatira nang mag-isa, naniniwala kami na lahat ay nararapat sa de-kalidad na assistive equipment at suporta — bago pa man mangyari ang emergency.',
@@ -2351,6 +2414,17 @@ const LANG = {
     health_log:'ကျန်းမာရေး မှတ်တမ်း', track_bp:'BP ခြေရာခံ',
     my_profile:'ကျွန်ုပ်၏ ပရိုဖိုင်', health_data:'ကျန်းမာရေး အချက်အလက်',
     our_mission:'ကျွန်ုပ်တို့၏ ရည်ရွယ်ချက်',
+    our_services:'ကျွန်ုပ်တို့၏ ဝန်ဆောင်မှုများ',
+    service_equipment:'ကူညီရန် ကိရိယာ အ ဝင်ရောက်',
+    service_equipment_desc:'သင့်အိမ်တွင် လွတ်လပ်မှု ထိန်းသိမ်းရန် ကူညီရန် အ유연한ငှားရမ်း နှင့် ဝယ်ယူမှု ရွေးချယ်မှုများ',
+    service_monitoring:'ကျန်းမာရေး နှင့် တည်နေရာ စောင့်ကြည့်မှု',
+    service_monitoring_desc:'သင့်ကျန်းမာရေး စောင့်ကြည့်ရန် နှင့် သင့်ခွင့်လွှတ်ချက်သူများကို သင့်ဘေးကင်းမှု ကြေးမုံလူ ရန်စေည်စာကျ ရန်ကူညီသည့် လျှင်လျင်ကိရိယာများ',
+    service_preparedness:'အရေးပေါ်အတွက် ပြင်ဆင်ခြင်း',
+    service_preparedness_desc:'အသက်ခွင့်လွှတ်ချက်မှု၏ လည်ပင်း အေ็း အငြင်းအခုံစီမံခန့်ခွဲမှု အတွက် သင့်ကူညီရန် လက်တွေ့ အပ့ံအကူ',
+    service_education:'ကျန်းမာရေး ပညာသင်ခန်းစာ နှင့် ကမ္ဘာ့အသုံးအဆောင်သုံးစွဲမှုများ',
+    service_education_desc:'ကျန်းမာရေး၊ ဘေးကင်းမှု နှင့် လွတ်လပ်သည့် အသက်ရှင်ကျင့်သုံးမှု အကြောင်း ဆန္ဒအခွင့်လွှတ်ချက်မြှင့်တင်ရန် လူ့သုံးလဲ့အင်ဒိုင်း',
+    service_support:'အပ်နီးကပ် လူမှုအဖွဲ့အစည်း စောင့်ရှောက်မှု',
+    service_support_desc:'သင့်ခြေလျင်းတစ်ခုအတွက် ကောင်းကျိုးရှီ သည့် သမားလည်ပင်း လူ့အဖွဲ့အစည်း ပံ့ပိုးမှု နှင့်ဆက်သွယ်မှု',
     our_vision:'ကျွန်ုပ်တို့၏ အမြင်',
     vision_desc:'ကျေးဇူးရှိသည့် အသက်အရွယ် သို့မဟုတ် စွမ်းရည်မည်သည့် အခြေအခြင် လူတစ်ဦးတစ်ေတွ လွတ်လပ်စွာ ၊ ကျေးဇူးရှိသည့်အတူ ၊ သံသယမှလွတ်မြေ လူမှုအဖွဲ့အစည်းအကူအညီဖြင့် နေထိုင်နိုင်သည့် စင်ကာပူတစ်ခု။',
     mission_desc:'စင်ကာပူ၏ လူဦးရေ သက်ကြီးရွယ်အိုများ ပိုမိုများပြားလာသည်နှင့်အမျှ လူတိုင်းသည် အရေးပေါ်မတိုင်မီ အရည်အသွေးမြင့် အကူအညီပေးကိရိယာများ ရရှိသင့်ပါသည်။',
