@@ -139,18 +139,18 @@ button{cursor:pointer;border:none;background:none}
   box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
 .hero-card p{opacity:.85;font-size:14px;line-height:1.5}
-.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.service-item{text-align:center;padding:14px;border-radius:12px;transition:all 0.2s ease;background:rgba(26,122,109,0.03)}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.service-item{text-align:center;padding:12px 8px;border-radius:12px;transition:all 0.2s ease;background:rgba(26,122,109,0.03)}
 .service-item:hover{background:rgba(26,122,109,0.06);transform:translateY(-2px)}
-.service-icon{width:40px;height:40px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
-.service-icon svg{width:32px;height:32px;stroke:var(--pri);stroke-width:2;color:var(--pri)}
-.service-name{font-weight:600;font-size:13px;color:var(--text);margin-bottom:6px;line-height:1.3}
-.service-desc{font-size:11px;color:var(--muted);line-height:1.4}
-@media(max-width:900px){
-  .services-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:600px){
-  .services-grid{grid-template-columns:repeat(2,1fr)}
+.service-icon{width:36px;height:36px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+.service-icon svg{width:30px;height:30px;stroke:var(--pri);stroke-width:2;color:var(--pri)}
+.service-name{font-weight:600;font-size:12px;color:var(--text);margin-bottom:4px;line-height:1.25}
+.service-desc{font-size:10px;color:var(--muted);line-height:1.35}
+@media(max-width:400px){
+  .services-grid{gap:6px}
+  .service-item{padding:10px 5px}
+  .service-name{font-size:11px}
+  .service-desc{font-size:9px}
 }
 .update-item{padding:14px 0;border-bottom:1px solid var(--border)}
 .update-item:last-child{border-bottom:none}
@@ -297,6 +297,11 @@ button{cursor:pointer;border:none;background:none}
   display:none;animation-duration:0.4s;animation-timing-function:ease;animation-fill-mode:forwards}
 .weather-widget.visible{display:block;animation-name:weatherSlideDown}
 .weather-widget.hiding{animation-name:weatherSlideUp}
+/* Appointment tab weather - always visible, no toggle */
+.weather-widget-appt{background:linear-gradient(135deg,rgba(26,122,109,0.75),rgba(20,95,85,0.75));
+  color:#fff;border-radius:16px;padding:16px;margin-bottom:16px;
+  box-shadow:0 4px 16px rgba(26,122,109,0.15);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.weather-widget-appt .weather-details{display:flex!important}
 .weather-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0}
 .time-display{flex:1}
 .time-display .time-main{font-size:28px;font-weight:700;line-height:1;letter-spacing:-0.5px}
@@ -346,6 +351,8 @@ button{cursor:pointer;border:none;background:none}
 .header-weather-peek .peek-time{font-size:28px;line-height:1;letter-spacing:-0.5px;font-weight:700}
 .header-weather-peek .peek-label{display:none}
 .header-weather-peek .peek-arrow{font-size:12px;opacity:0.6;margin-top:2px;transition:opacity 0.2s ease}
+/* Header clock - appointment tab only */
+.header-clock{display:flex;align-items:center;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.5px;padding:0 4px}
 .weather-forecast{display:flex;gap:6px;overflow-x:auto;padding-top:0;-webkit-overflow-scrolling:touch;margin-top:0;padding-bottom:4px}
 .forecast-card{flex-shrink:0;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 6px;text-align:center;min-width:calc(25% - 4px);backdrop-filter:blur(10px)}
 @media(min-width:600px){.forecast-card{min-width:70px}}
@@ -734,6 +741,10 @@ button{cursor:pointer;border:none;background:none}
 <div class="top-bar">
   <h1>Ju An SecureLiving</h1>
   <div style="display:flex;align-items:center;gap:10px">
+    <!-- Clock (only visible on Appointment tab) -->
+    <div id="header-clock" class="header-clock" style="display:none">
+      <span id="header-clock-time">00:00</span>
+    </div>
     <div class="lang-dropdown-wrapper">
       <select id="lang-select" class="lang-select" onchange="setLanguage(this.value)" style="display:none">
         <option value="en" style="color:#333">English</option>
@@ -781,12 +792,6 @@ button{cursor:pointer;border:none;background:none}
         </div>
       </div>
     </div>
-    <!-- Weather Peek Tab at far right -->
-    <div id="header-weather-peek" class="header-weather-peek" onclick="toggleWeatherFromHeader(event)">
-      <div class="peek-time" id="header-peek-time">13:47</div>
-      <div class="peek-label" data-i18n="weather_tab">Weather</div>
-      <div class="peek-arrow">▼</div>
-    </div>
   </div>
 </div>
 
@@ -800,37 +805,6 @@ button{cursor:pointer;border:none;background:none}
   <!-- Tagline Section - Home Tab Only -->
   <div class="tagline-section">
     <p class="tagline" data-i18n="app_tagline">Because living well matters more than living long.</p>
-  </div>
-
-  <!-- Weather Widget -->
-  <div class="weather-widget">
-    <div class="weather-header">
-      <div class="time-display">
-        <div class="time-main" id="current-time">00:00</div>
-        <div class="time-date" id="current-date" data-i18n="today">Today</div>
-        <div class="weather-temp" style="margin-top:4px">
-          <span class="temp-val" id="current-temp">--</span>
-          <span class="temp-unit">°C</span>
-        </div>
-        <div class="weather-desc" id="weather-desc" style="margin-top:2px">Loading...</div>
-      </div>
-      <div class="weather-icon" id="weather-icon">🌤️</div>
-    </div>
-    <div class="weather-details" style="display:flex;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15)">
-      <div class="weather-detail" style="flex:1">
-        <div class="weather-detail-val" id="humidity" style="font-size:16px">--</div>
-        <div class="weather-detail-label" data-i18n="humidity" style="font-size:11px">Humidity</div>
-      </div>
-      <div class="weather-detail" style="flex:1">
-        <div class="weather-detail-val" id="wind-speed" style="font-size:16px">--</div>
-        <div class="weather-detail-label" data-i18n="wind" style="font-size:11px">Wind</div>
-      </div>
-      <div class="weather-detail" style="flex:1">
-        <div class="weather-detail-val" id="feels-like" style="font-size:16px">--</div>
-        <div class="weather-detail-label" data-i18n="feels_like" style="font-size:11px">Feels Like</div>
-      </div>
-    </div>
-    <div class="weather-forecast" id="weather-forecast" style="margin-top:8px"></div>
   </div>
 
   <!-- Our Services -->
@@ -929,6 +903,37 @@ button{cursor:pointer;border:none;background:none}
     <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
   </div>
   <h2 class="section-title" data-i18n="appointment_title">Appointment</h2>
+
+  <!-- Weather Widget (Appointment Tab) -->
+  <div class="weather-widget-appt">
+    <div class="weather-header">
+      <div class="time-display">
+        <div class="time-main" id="current-time">00:00</div>
+        <div class="time-date" id="current-date" data-i18n="today">Today</div>
+        <div class="weather-temp" style="margin-top:4px">
+          <span class="temp-val" id="current-temp">--</span>
+          <span class="temp-unit">°C</span>
+        </div>
+        <div class="weather-desc" id="weather-desc" style="margin-top:2px">Loading...</div>
+      </div>
+      <div class="weather-icon" id="weather-icon">🌤️</div>
+    </div>
+    <div class="weather-details" style="display:flex;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15)">
+      <div class="weather-detail" style="flex:1">
+        <div class="weather-detail-val" id="humidity" style="font-size:16px">--</div>
+        <div class="weather-detail-label" data-i18n="humidity" style="font-size:11px">Humidity</div>
+      </div>
+      <div class="weather-detail" style="flex:1">
+        <div class="weather-detail-val" id="wind-speed" style="font-size:16px">--</div>
+        <div class="weather-detail-label" data-i18n="wind" style="font-size:11px">Wind</div>
+      </div>
+      <div class="weather-detail" style="flex:1">
+        <div class="weather-detail-val" id="feels-like" style="font-size:16px">--</div>
+        <div class="weather-detail-label" data-i18n="feels_like" style="font-size:11px">Feels Like</div>
+      </div>
+    </div>
+    <div class="weather-forecast" id="weather-forecast" style="margin-top:8px"></div>
+  </div>
 
   <div class="card">
     <h3 style="font-family:var(--font-display);font-size:16px;margin-bottom:12px"><span data-i18n="book_an_appt">Book an Appointment</span></h3>
@@ -2761,8 +2766,13 @@ function updateTime() {
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-SG', { hour:'2-digit', minute:'2-digit', hour12:false });
   const dateStr = now.toLocaleDateString('en-SG', { weekday:'short', month:'short', day:'numeric' });
-  $('current-time').textContent = timeStr;
-  $('current-date').textContent = dateStr;
+  const timeEl = $('current-time');
+  const dateEl = $('current-date');
+  if (timeEl) timeEl.textContent = timeStr;
+  if (dateEl) dateEl.textContent = dateStr;
+  // Update header clock (appointment tab)
+  const headerClockTime = $('header-clock-time');
+  if (headerClockTime) headerClockTime.textContent = timeStr;
 }
 
 async function fetchWeather() {
@@ -3115,6 +3125,12 @@ function switchTab(tab) {
   $('tab-' + tab).classList.add('active');
   const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
   if (tabBtn) tabBtn.classList.add('active');
+
+  // Show header clock only on appointment (consult) tab
+  const headerClock = $('header-clock');
+  if (headerClock) {
+    headerClock.style.display = (tab === 'consult') ? 'flex' : 'none';
+  }
 
   if (tab === 'profile' && !isGuest) {
     // Refresh member data from database to get latest profile picture
@@ -5614,36 +5630,7 @@ window.addEventListener('DOMContentLoaded', () => {
       buttons.forEach((btn, index) => {
         btn.style.setProperty('--btn-index', index);
       });
-      
-      // Hide weather by default on Home tab
-      const weatherWidget = homeTab.querySelector('.weather-widget');
-      if (weatherWidget) {
-        weatherWidget.classList.remove('visible');
-      }
     }
-    
-    // Update header weather peek time every second
-    const updateHeaderPeekTime = () => {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-SG', { hour:'2-digit', minute:'2-digit', hour12:false });
-      const peekTimeEl = document.getElementById('header-peek-time');
-      if (peekTimeEl) peekTimeEl.textContent = timeStr;
-    };
-    updateHeaderPeekTime();
-    setInterval(updateHeaderPeekTime, 1000);
-    
-    // Re-attach weather peek click handler (persists after language changes)
-    const attachWeatherPeekHandler = () => {
-      const peekTab = document.getElementById('header-weather-peek');
-      if (peekTab) {
-        // Remove old listeners by cloning
-        const newPeekTab = peekTab.cloneNode(true);
-        peekTab.parentNode.replaceChild(newPeekTab, peekTab);
-        // Add new listener
-        newPeekTab.addEventListener('click', toggleWeatherFromHeader);
-      }
-    };
-    attachWeatherPeekHandler();
     
     // Initialize language display
     const langNames = {'en':'English', 'zh':'中文', 'ms':'Melayu', 'ta':'தமிழ்', 'tl':'Tagalog', 'my':'မြန်မာ'};
