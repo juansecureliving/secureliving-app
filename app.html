@@ -476,7 +476,7 @@ button{cursor:pointer;border:none;background:none}
 .tagline-section{
   text-align:center;
   padding:20px 24px;
-  margin-bottom:12px
+  margin-bottom:32px
 }
 .tagline{
   font-family:'Georgia','Times New Roman',serif;
@@ -784,16 +784,16 @@ button{cursor:pointer;border:none;background:none}
   </div>
 </div>
 
-<!-- Tagline Section -->
-<div class="tagline-section">
-  <p class="tagline" data-i18n="app_tagline">Because living well matters<br>more than living long.</p>
-</div>
-
 <!-- ── TAB: Home ──────────────────────────── -->
 <div id="tab-home" class="tab-content active">
   <div class="hero-card">
     <h2 id="greeting" style="display:flex;gap:8px;align-items:center"><span id="greeting-text">Welcome</span></h2>
     <p data-i18n="hero_desc_new">We are your partner in independent living. We provide equipment, consultation, and ongoing support so you're prepared for whatever comes.</p>
+  </div>
+
+  <!-- Tagline Section - Home Tab Only -->
+  <div class="tagline-section">
+    <p class="tagline" data-i18n="app_tagline">Because living well matters<br>more than living long.</p>
   </div>
 
   <!-- Weather Widget -->
@@ -2471,7 +2471,12 @@ function applyLanguage() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (dict[key] !== undefined) {
-      el.textContent = dict[key];
+      // Use innerHTML for tagline to support <br>, textContent for everything else
+      if (key === 'app_tagline') {
+        el.innerHTML = dict[key];
+      } else {
+        el.textContent = dict[key];
+      }
       debugElements.push({key, tag: el.tagName, text: el.textContent.substring(0, 50)});
     } else {
       // Log missing translations
