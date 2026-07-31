@@ -458,17 +458,14 @@ button{cursor:pointer;border:none;background:none}
 }
 
 /* ── Welcome/Greeting Card Animation ──────────────────────────────── */
-@keyframes welcomeFadeInScale{
-  from{opacity:0;transform:scale(0.95) translateY(-12px)}
-  to{opacity:1;transform:scale(1) translateY(0)}
-}
+/* Uses the fadeInUp keyframe defined above */
 .hero-card{
-  animation:welcomeFadeInScale 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  animation-delay:0.1s
+  animation:fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity:0
 }
 .hero-card h2{
-  animation:welcomeFadeInScale 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  animation-delay:0.1s
+  animation:fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity:0
 }
 
 /* ── Tagline Section ──────────────────────────────────────────────── */
@@ -483,12 +480,12 @@ button{cursor:pointer;border:none;background:none}
 }
 .tagline{
   font-family:'Georgia','Times New Roman',serif;
-  font-size:16px;
+  font-size:22px;
   font-weight:300;
   font-style:italic;
   color:var(--muted);
   margin:0;
-  line-height:1.6;
+  line-height:1.8;
   animation:taglineFadeIn 1.2s ease-in 0.8s forwards;
   opacity:0
 }
@@ -789,7 +786,7 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- Tagline Section -->
 <div class="tagline-section">
-  <p class="tagline">Because living well matters more than living long.</p>
+  <p class="tagline" data-i18n="app_tagline">Because living well matters<br>more than living long.</p>
 </div>
 
 <!-- ── TAB: Home ──────────────────────────── -->
@@ -1800,6 +1797,7 @@ const LANG = {
     // Greetings
     welcome:'Welcome', good_morning:'Good Morning',
     good_afternoon:'Good Afternoon', good_evening:'Good Evening',
+    app_tagline:'Because living well matters<br>more than living long.',
     // Auth
     welcome_back:'Welcome Back', phone_number:'Phone Number',
     account_type:'Account Type', member:'Member', caregiver:'Caregiver',
@@ -1928,6 +1926,7 @@ const LANG = {
     ldl:'低密度脂蛋白', hdl:'高密度脂蛋白', cholesterol_history:'胆固醇历史',
     welcome:'欢迎', good_morning:'早上好',
     good_afternoon:'下午好', good_evening:'晚上好',
+    app_tagline:'生活质量比生活长度更重要。',
     welcome_back:'欢迎回来', phone_number:'手机号码',
     account_type:'账户类型', member:'成员', caregiver:'照护者',
     block:'楼号', street_name:'街道名称', level:'#楼层', unit_no:'单元号', emergency_phone:'紧急电话',
@@ -2039,6 +2038,7 @@ const LANG = {
     ldl:'LDL', hdl:'HDL', cholesterol_history:'Sejarah Kolesterol',
     welcome:'Selamat Datang', good_morning:'Selamat Pagi',
     good_afternoon:'Selamat Tengah Hari', good_evening:'Selamat Petang',
+    app_tagline:'Kerana hidup berkualitas lebih penting daripada hidup lama.',
     welcome_back:'Selamat Kembali', phone_number:'Nombor Telefon',
     account_type:'Jenis Akaun', member:'Ahli', caregiver:'Penjaga',
     block:'No. Blok', street_name:'Nama Jalan', level:'#Tingkat', unit_no:'No. Unit', emergency_phone:'Telefon Kecemasan',
@@ -2159,6 +2159,7 @@ const LANG = {
     ldl:'எல்டிএல்', hdl:'எச்டிஎல்', cholesterol_history:'கொலஸ்ட்ரால் வரலாறு',
     welcome:'வரவேற்கிறோம்', good_morning:'காலை வணக்கம்',
     good_afternoon:'மதிய வணக்கம்', good_evening:'மாலை வணக்கம்',
+    app_tagline:'நன்றாக வாழ்வது நீண்ட நாள் வாழ்வதை விட முக்கியமானது.',
     welcome_back:'மீண்டும் வருக', phone_number:'தொலைபேசி எண்',
     account_type:'கணக்கு வகை', member:'உறுப்பினர்', caregiver:'பராமரிப்பாளர்',
     block:'தொகுதி எண்', street_name:'தெரு பெயர்', level:'#நிலை', unit_no:'அலகு எண்', emergency_phone:'அவசரகால தொலைபேசி',
@@ -2279,6 +2280,7 @@ const LANG = {
     ldl:'LDL', hdl:'HDL', cholesterol_history:'Kasaysayan ng Cholesterol',
     welcome:'Maligayang pagdating', good_morning:'Magandang Umaga',
     good_afternoon:'Magandang Hapon', good_evening:'Magandang Gabi',
+    app_tagline:'Dahil mas mahalaga ang mabuting pamumuhay kaysa sa mahabang buhay.',
     welcome_back:'Maligayang Pagbabalik', phone_number:'Numero ng Telepono',
     account_type:'Uri ng Account',
     block:'Block #', street_name:'Pangalan ng Kalye', level:'#Level', unit_no:'Unit No.', emergency_phone:'Emergency Phone',
@@ -2399,6 +2401,7 @@ const LANG = {
     ldl:'LDL', hdl:'HDL', cholesterol_history:'Cholesterol မှတ်တမ်း',
     welcome:'ကြိုဆိုပါသည်', good_morning:'မင်္ဂလာနံနက်ခင်းပါ',
     good_afternoon:'မင်္ဂလာနေ့လည်ခင်းပါ', good_evening:'မင်္ဂလာညနေခင်းပါ',
+    app_tagline:'ကောင်းမွန်သောအသက်တာ ကြီးမြတ်သောအသက်တာထ다့ လုံးဝ အရေးကြီးသည်။',
     welcome_back:'ပြန်လည် ကြိုဆိုပါသည်', phone_number:'ဖုန်းနံပါတ်',
     account_type:'အကောင့် အမျိုးအစား',
     block:'Block #', street_name:'လမ်းအမည်', level:'#ထပ်', unit_no:'ယူနစ် နံပါတ်', emergency_phone:'အရေးပေါ် ဖုန်း',
