@@ -2593,7 +2593,7 @@ function applyLanguage() {
   }
   
   // 2. Update tab bar labels (special handling for SVG icons)
-  const tabLabels = ['tab_home','tab_appt','tab_products','tab_camera','tab_monitor','tab_readings','tab_profile'];
+  const tabLabels = ['tab_home','tab_products','tab_appt','tab_camera','tab_monitor','tab_readings','tab_profile'];
   const tabBtns = document.querySelectorAll('.tab-btn');
   tabBtns.forEach((btn, i) => {
     if (tabLabels[i] && dict[tabLabels[i]]) {
