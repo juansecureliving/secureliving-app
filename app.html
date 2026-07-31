@@ -878,6 +878,13 @@ button{cursor:pointer;border:none;background:none}
     </div>
     <div id="updates-list"></div>
   </div>
+
+  <!-- Guest Sign-In Prompt (only shown in guest mode) -->
+  <div id="guest-signin-home" class="card hidden" style="text-align:center;background:linear-gradient(135deg,rgba(26,122,109,0.08),rgba(224,122,82,0.04))">
+    <h3 style="font-family:var(--font-display);margin-bottom:6px" data-i18n="guest_home_title">Unlock Full Access</h3>
+    <p class="text-sm text-muted" style="margin-bottom:16px;line-height:1.5" data-i18n="guest_home_msg">Sign in or create an account to book appointments, track your health, and manage your profile.</p>
+    <button class="btn btn-pri" onclick="doLogout()" style="max-width:220px;margin:0 auto" data-i18n="sign_in_register">Sign In / Register</button>
+  </div>
 </div>
 
 <!-- ── TAB: Consultation ──────────────────── -->
@@ -1407,6 +1414,7 @@ button{cursor:pointer;border:none;background:none}
     <p data-i18n="guest_profile_msg">Create an account or sign in to manage your health profile and account details.</p>
     <button class="btn btn-pri" onclick="doLogout()" data-i18n="sign_in_register">Sign In / Register</button>
   </div>
+  <div id="profile-member-content">
   <div class="profile-header">
     <div class="profile-avatar" id="profile-avatar" style="cursor:pointer;position:relative;overflow:hidden" onclick="openPictureUpload()">
       <img id="profile-picture" style="width:100%;height:100%;object-fit:cover;display:none">
@@ -1454,6 +1462,7 @@ button{cursor:pointer;border:none;background:none}
   <div class="text-center mt-24">
     <button class="btn btn-outline" onclick="doLogout()" style="max-width:200px;margin:0 auto" data-i18n="sign_out">Sign Out</button>
   </div>
+  </div><!-- end profile-member-content -->
 </div>
 
 <!-- ── TAB BAR ─────────────────────────────── -->
@@ -1829,6 +1838,8 @@ const LANG = {
     continue_guest:'Continue as Guest',
     sign_in_required:'Sign In Required',
     sign_in_register:'Sign In / Register',
+    guest_home_title:'Unlock Full Access',
+    guest_home_msg:'Sign in or create an account to book appointments, track your health, and manage your profile.',
     guest_appt_msg:'Create an account or sign in to book appointments and consultations.',
     guest_reports_msg:'Create an account or sign in to log blood pressure readings and track your health.',
     guest_profile_msg:'Create an account or sign in to manage your health profile and account details.',
@@ -1970,6 +1981,8 @@ const LANG = {
     continue_guest:'以访客身份继续',
     sign_in_required:'需要登录',
     sign_in_register:'登录 / 注册',
+    guest_home_title:'解锁完整访问权限',
+    guest_home_msg:'登录或创建帐户以预约、跟踪您的健康状况并管理您的个人资料。',
     guest_appt_msg:'创建账户或登录以预约咨询服务。',
     guest_reports_msg:'创建账户或登录以记录血压读数并追踪健康状况。',
     guest_profile_msg:'创建账户或登录以管理您的健康档案和账户信息。',
@@ -2095,6 +2108,8 @@ const LANG = {
     continue_guest:'Teruskan sebagai Tetamu',
     sign_in_required:'Log Masuk Diperlukan',
     sign_in_register:'Log Masuk / Daftar',
+    guest_home_title:'Buka Akses Penuh',
+    guest_home_msg:'Log masuk atau cipta akaun untuk menempah temu janji, menjejaki kesihatan anda, dan mengurus profil anda.',
     guest_appt_msg:'Daftar akaun atau log masuk untuk menempah temu janji dan perundingan.',
     guest_reports_msg:'Daftar akaun atau log masuk untuk merekod bacaan tekanan darah dan menjejak kesihatan.',
     guest_profile_msg:'Daftar akaun atau log masuk untuk mengurus profil kesihatan dan butiran akaun.',
@@ -2231,6 +2246,8 @@ const LANG = {
     continue_guest:'விருந்தினராக தொடரவும்',
     sign_in_required:'உள்நுழைவு தேவை',
     sign_in_register:'உள்நுழை / பதிவு',
+    guest_home_title:'முழு அணுகலைத் திறக்கவும்',
+    guest_home_msg:'சந்திப்புகளை முன்பதிவு செய்ய, உங்கள் ஆரோக்கியத்தைக் கண்காணிக்க மற்றும் உங்கள் சுயவிவரத்தை நிர்வகிக்க உள்நுழையவும் அல்லது கணக்கை உருவாக்கவும்.',
     guest_appt_msg:'சந்திப்புகள் மற்றும் ஆலோசனைகளை முன்பதிவு செய்ய கணக்கு உருவாக்கவும் அல்லது உள்நுழையவும்.',
     guest_reports_msg:'இரத்த அழுத்த வாசிப்புகளை பதிவு செய்ய கணக்கு உருவாக்கவும் அல்லது உள்நுழையவும்.',
     guest_profile_msg:'சுகாதார விவரம் மற்றும் கணக்கு விவரங்களை நிர்வகிக்க கணக்கு உருவாக்கவும்.',
@@ -2365,6 +2382,8 @@ const LANG = {
     continue_guest:'Magpatuloy bilang Bisita',
     sign_in_required:'Kailangan Mag-sign In',
     sign_in_register:'Mag-sign In / Magrehistro',
+    guest_home_title:'I-unlock ang Buong Access',
+    guest_home_msg:'Mag-sign in o gumawa ng account upang mag-book ng appointment, subaybayan ang iyong kalusugan, at pamahalaan ang iyong profile.',
     guest_appt_msg:'Gumawa ng account o mag-sign in para mag-book ng appointment.',
     guest_reports_msg:'Gumawa ng account o mag-sign in para mag-log ng blood pressure readings.',
     guest_profile_msg:'Gumawa ng account o mag-sign in para pamahalaan ang iyong health profile.',
@@ -2499,6 +2518,8 @@ const LANG = {
     continue_guest:'ဧည့်သည်အဖြစ် ဆက်လက်',
     sign_in_required:'ဝင်ရောက်ရန် လိုအပ်သည်',
     sign_in_register:'ဝင်ရောက် / စာရင်းသွင်း',
+    guest_home_title:'အပြည့်အဝ ဝင်ရောက်ခွင့် ဖွင့်ပါ',
+    guest_home_msg:'ချိန်းဆိုမှုများ စာရင်းသွင်းရန်၊ သင့်ကျန်းမာရေး ခြေရာခံရန်နှင့် သင့်ပရိုဖိုင် စီမံခန့်ခွဲရန် ဝင်ရောက်ပါ သို့မဟုတ် အကောင့်ဖန်တီးပါ။',
     guest_appt_msg:'ချိန်းဆိုမှု ယူရန် အကောင့် ဖန်တီးပါ သို့ ဝင်ရောက်ပါ။',
     guest_reports_msg:'သွေးပေါင်ချိန် reading မှတ်တမ်းတင်ရန် အကောင့် ဖန်တီးပါ။',
     guest_profile_msg:'ကျန်းမာရေး ပရိုဖိုင် စီမံရန် အကောင့် ဖန်တီးပါ။',
@@ -2984,10 +3005,10 @@ async function enterGuest() {
     await loadUpdates();
     await loadProducts();
     
-    // Lock member-only tabs - guests can access home, products, and profile
+    // Lock member-only tabs - guests can access home and products only
     document.querySelectorAll('.tab-btn').forEach(btn => {
       const tab = btn.getAttribute('data-tab');
-      if (tab !== 'home' && tab !== 'products' && tab !== 'profile') {
+      if (tab !== 'home' && tab !== 'products') {
         btn.classList.add('locked');
       } else {
         btn.classList.remove('locked');
@@ -2998,6 +3019,10 @@ async function enterGuest() {
     show('guest-prompt-consult');
     show('guest-prompt-reports');
     show('guest-prompt-profile');
+    // Hide member-only profile content for guests
+    hide('profile-member-content');
+    // Show sign-in prompt on home tab
+    show('guest-signin-home');
     
     applyLanguage();
     hide('loading-overlay');
@@ -3095,8 +3120,8 @@ function switchTab(tab) {
   // Stop live camera when leaving camera tab
   if (tab !== 'camera' && liveStream) { stopLiveCamera(); }
   
-  // Block member-only tabs for guests - only allow home, products, and profile
-  if (isGuest && tab !== 'home' && tab !== 'products' && tab !== 'profile') {
+  // Block member-only tabs for guests - only allow home and products
+  if (isGuest && tab !== 'home' && tab !== 'products') {
     // Redirect guest to home tab
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -3322,6 +3347,11 @@ function compressImage(file, maxSize, quality) {
 }
 
 function renderProfile() {
+  // Members see full content, hide guest prompt
+  if (!isGuest) {
+    show('profile-member-content');
+    hide('guest-prompt-profile');
+  }
   const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   
   // Try to get picture from ME object (database) or localStorage
