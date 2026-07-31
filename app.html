@@ -517,43 +517,6 @@ button{cursor:pointer;border:none;background:none}
   font-size:16px;
   min-width:20px
 }
-
-/* ── Service Cards ──────────────────────────────────────────────── */
-.service-card{
-  background:var(--card);
-  border:1.5px solid var(--border);
-  border-radius:14px;
-  padding:16px 12px;
-  text-align:center;
-  transition:all 0.2s ease;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
-  box-shadow:var(--shadow)
-}
-.service-card:hover{
-  border-color:var(--pri);
-  transform:translateY(-4px);
-  box-shadow:0 8px 20px rgba(26,122,109,0.12)
-}
-.service-card:active{
-  transform:scale(0.98)
-}
-.service-emoji{
-  font-size:40px;
-  line-height:1
-}
-.service-title{
-  font-weight:600;
-  font-size:14px;
-  color:var(--text)
-}
-.service-desc{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.3
-}
 </style>
 </head>
 <body>
@@ -941,31 +904,8 @@ button{cursor:pointer;border:none;background:none}
     </div>
   </div>
 
-  <!-- Main Services -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;padding:0 16px">
-    <div class="service-card" onclick="switchTab('products')" style="cursor:pointer">
-      <div class="service-emoji">📡</div>
-      <div class="service-title" data-i18n="monitoring">Monitoring</div>
-      <div class="service-desc" data-i18n="real_time_tracking">Real-time tracking</div>
-    </div>
-    <div class="service-card" onclick="switchTab('products')" style="cursor:pointer">
-      <div class="service-emoji">🏠</div>
-      <div class="service-title" data-i18n="rental">Rental</div>
-      <div class="service-desc" data-i18n="flexible_terms">Flexible terms</div>
-    </div>
-    <div class="service-card" onclick="switchTab('consult')" style="cursor:pointer">
-      <div class="service-emoji">🔧</div>
-      <div class="service-title" data-i18n="repair">Repair</div>
-      <div class="service-desc" data-i18n="quick_service">Quick service</div>
-    </div>
-    <div class="service-card" onclick="switchTab('products')" style="cursor:pointer">
-      <div class="service-emoji">🛒</div>
-      <div class="service-title" data-i18n="purchase">Purchase</div>
-      <div class="service-desc" data-i18n="own_equipment">Own equipment</div>
-    </div>
-  </div>
-
   <!-- Updates -->
+  <div class="card">
     <div class="card-header">
       <h3 data-i18n="latest_updates">Latest Updates</h3>
     </div>
@@ -1760,8 +1700,6 @@ const LANG = {
     our_mission:'Our Mission',
     mission_desc:'As Singapore\'s population ages and more people live independently, we believe everyone deserves access to quality assistive equipment and support — before an emergency happens. We help you prepare, educate, and equip so that sudden disability or medical needs never catch you off guard.',
     prepare:'Prepare', educate:'Educate', equip:'Equip', support:'Support', sustain:'Sustain',
-    monitoring:'Monitoring', rental:'Rental', repair:'Repair', purchase:'Purchase',
-    real_time_tracking:'Real-time tracking', flexible_terms:'Flexible terms', quick_service:'Quick service', own_equipment:'Own equipment',
     latest_updates:'Latest Updates',
     // Tracking
     tracking:'Tracking', my_location:'My Location', member_tracking:'Member Tracking',
@@ -1905,8 +1843,6 @@ const LANG = {
     our_mission:'我们的使命',
     mission_desc:'随着新加坡人口老龄化，越来越多人独立生活。我们相信每个人都应在紧急情况发生前获得优质辅助设备和支持。我们帮助您做好准备、教育和装备，让突发残疾或医疗需求不会让您措手不及。',
     prepare:'准备', educate:'教育', equip:'装备', support:'支持', sustain:'维护',
-    monitoring:'监测', rental:'租赁', repair:'维修', purchase:'购买',
-    real_time_tracking:'实时跟踪', flexible_terms:'灵活条款', quick_service:'快速服务', own_equipment:'拥有设备',
     latest_updates:'最新动态',
     tracking:'追踪', my_location:'我的位置', member_tracking:'成员追踪',
     live_map:'实时地图', location_history:'位置历史', battery_status:'电池状态',
@@ -2036,8 +1972,6 @@ const LANG = {
     our_mission:'Misi Kami',
     mission_desc:'Apabila populasi Singapura semakin menua dan lebih ramai hidup berdikari, kami percaya semua orang berhak mendapat akses kepada peralatan bantuan dan sokongan berkualiti — sebelum kecemasan berlaku. Kami membantu anda bersedia, mendidik, dan melengkapkan supaya kecacatan mendadak atau keperluan perubatan tidak mengejutkan anda.',
     prepare:'Persediaan', educate:'Didik', equip:'Perlengkap', support:'Sokongan', sustain:'Keberterusan',
-    monitoring:'Pemantauan', rental:'Sewaan', repair:'Pembaikan', purchase:'Pembelian',
-    real_time_tracking:'Penjejakan Masa Nyata', flexible_terms:'Syarat Fleksibel', quick_service:'Layanan Pantas', own_equipment:'Miliki Peralatan',
     latest_updates:'Berita Terkini',
     tracking:'Penjejakan', my_location:'Lokasi Saya', member_tracking:'Penjejakan Ahli',
     live_map:'Peta Langsung', location_history:'Sejarah Lokasi', battery_status:'Status Bateri',
@@ -2159,8 +2093,6 @@ const LANG = {
     our_mission:'எங்கள் நோக்கம்',
     mission_desc:'சிங்கப்பூரின் மக்கள்தொகை வயதாகி, அதிகமானோர் சுதந்திரமாக வாழ்கையில், அவசரநிலை ஏற்படுமுன் தரமான உதவி உபகரணங்களையும் ஆதரவையும் பெற அனைவருக்கும் உரிமை உண்டு என்று நாங்கள் நம்புகிறோம்.',
     prepare:'தயாரி', educate:'கல்வி', equip:'உபகரணப்படுத்து', support:'ஆதரவு', sustain:'நிலைத்தவ',
-    monitoring:'கண்காணிப்பு', rental:'வாடகை', repair:'பழுதுசரி', purchase:'கொள்முதல்',
-    real_time_tracking:'நேரம் கொண்ட கண்காணிப்பு', flexible_terms:'நমनீய விதிமுறைகள்', quick_service:'விரைவான சேவை', own_equipment:'சொந்த உபகரணம்',
     latest_updates:'சமீபத்திய செய்திகள்',
     tracking:'கண்காணிப்பு', my_location:'என் இடம்', member_tracking:'உறுப்பினர் கண்காணிப்பு',
     live_map:'நேரடி வரைபடம்', location_history:'இடம் வரலாறு', battery_status:'பேட்டரி நிலை',
@@ -2282,8 +2214,6 @@ const LANG = {
     our_mission:'Aming Misyon',
     mission_desc:'Habang tumatanda ang populasyon ng Singapore at mas maraming taong nakatira nang mag-isa, naniniwala kami na lahat ay nararapat sa de-kalidad na assistive equipment at suporta — bago pa man mangyari ang emergency.',
     prepare:'Maghanda', educate:'Turuan', equip:'Bigyan ng Kagamitan', support:'Suporta', sustain:'Panatilihin',
-    monitoring:'Subaybayan', rental:'Renta', repair:'Pagkukumpuni', purchase:'Bumili',
-    real_time_tracking:'Pagsusunod sa Real-time', flexible_terms:'Flexible na Mga Termino', quick_service:'Mabilis na Serbisyo', own_equipment:'Magkaroon ng Kagamitan',
     latest_updates:'Mga Pinakabagong Update',
     tracking:'Pagsubaybay', my_location:'Aking Lokasyon', member_tracking:'Pagsubaybay sa Miyembro',
     live_map:'Live na Mapa', location_history:'Kasaysayan ng Lokasyon', battery_status:'Status ng Baterya',
@@ -2405,8 +2335,6 @@ const LANG = {
     our_mission:'ကျွန်ုပ်တို့၏ ရည်ရွယ်ချက်',
     mission_desc:'စင်ကာပူ၏ လူဦးရေ သက်ကြီးရွယ်အိုများ ပိုမိုများပြားလာသည်နှင့်အမျှ လူတိုင်းသည် အရေးပေါ်မတိုင်မီ အရည်အသွေးမြင့် အကူအညီပေးကိရိယာများ ရရှိသင့်ပါသည်။',
     prepare:'ပြင်ဆင်', educate:'ပညာပေး', equip:'တပ်ဆင်', support:'ပံ့ပိုး', sustain:'ထိန်းသိမ်း',
-    monitoring:'စောင့်ကြည့်မှု', rental:'ငှားရမ်း', repair:'ပြင်ဆင််', purchase:'ဝယ်ယူ',
-    real_time_tracking:'နီးကပ်သောအချိန် ခြေရာခံခြင်း', flexible_terms:'လွယ်ကူသောစည်းမျဉ်းများ', quick_service:'လျင်မြန်သောဝန်ဆောင်မှု', own_equipment:'ကိုယ်ပိုင်ကိရိယာ',
     latest_updates:'နောက်ဆုံးရ သတင်းများ',
     tracking:'ခြေရာခံခြင်း', my_location:'ကျွန်ုပ်၏ တည်နေရာ', member_tracking:'အဖွဲ့ဝင် ခြေရာခံ',
     live_map:'တိုက်ရိုက် မြေပုံ', location_history:'တည်နေရာ မှတ်တမ်း', battery_status:'ဘက်ထရီ အခြေအနေ',
