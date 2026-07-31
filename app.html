@@ -146,11 +146,11 @@ button{cursor:pointer;border:none;background:none}
 .service-icon svg{width:32px;height:32px;stroke:var(--pri);stroke-width:2;color:var(--pri)}
 .service-name{font-weight:600;font-size:13px;color:var(--text);margin-bottom:6px;line-height:1.3}
 .service-desc{font-size:11px;color:var(--muted);line-height:1.4}
-@media(max-width:768px){
+@media(max-width:900px){
   .services-grid{grid-template-columns:repeat(2,1fr)}
 }
-@media(max-width:480px){
-  .services-grid{grid-template-columns:1fr}
+@media(max-width:600px){
+  .services-grid{grid-template-columns:repeat(2,1fr)}
 }
 .update-item{padding:14px 0;border-bottom:1px solid var(--border)}
 .update-item:last-child{border-bottom:none}
@@ -846,7 +846,7 @@ button{cursor:pointer;border:none;background:none}
       </div>
       <div class="service-item">
         <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
         </div>
         <div class="service-name" data-i18n="service_monitoring">Health & Location Monitoring</div>
         <div class="service-desc" data-i18n="service_monitoring_desc">Simple tools to track your wellbeing and keep loved ones informed of your safety</div>
@@ -1706,8 +1706,8 @@ const LANG = {
     my_profile:'My Profile', health_data:'Health data',
     our_mission:'Our Mission',
     our_services:'Our Services',
-    service_equipment:'Assistive Equipment Access',
-    service_equipment_desc:'Flexible rental and purchase options to help you maintain independence at home',
+    service_equipment:'Assistive Equipment & Repair',
+    service_equipment_desc:'Flexible rental and purchase options, plus professional repair and maintenance services to keep your equipment in optimal condition',
     service_monitoring:'Health & Location Monitoring',
     service_monitoring_desc:'Simple tools to track your wellbeing and keep loved ones informed of your safety',
     service_preparedness:'Emergency Preparedness',
@@ -1862,8 +1862,8 @@ const LANG = {
     my_profile:'我的档案', health_data:'健康数据',
     our_mission:'我们的使命',
     our_services:'我们的服务',
-    service_equipment:'辅助设备获取',
-    service_equipment_desc:'灵活的租赁和购买选项,帮助您在家中保持独立生活',
+    service_equipment:'辅助设备与维修',
+    service_equipment_desc:'灵活的租赁和购买选项，加上专业的维修和保养服务，使您的设备保持最佳状态',
     service_monitoring:'健康和位置监测',
     service_monitoring_desc:'简单的工具可跟踪您的幸福并让亲人了解您的安全情况',
     service_preparedness:'紧急准备',
@@ -2004,8 +2004,8 @@ const LANG = {
     my_profile:'Profil Saya', health_data:'Data kesihatan',
     our_mission:'Misi Kami',
     our_services:'Layanan Kami',
-    service_equipment:'Akses Peralatan Bantu',
-    service_equipment_desc:'Pilihan sewa dan pembelian yang fleksibel untuk membantu Anda mempertahankan kemandirian di rumah',
+    service_equipment:'Peralatan Bantu & Perbaikan',
+    service_equipment_desc:'Pilihan sewa dan pembelian yang fleksibel, ditambah layanan perbaikan dan pemeliharaan profesional untuk menjaga peralatan Anda dalam kondisi optimal',
     service_monitoring:'Pemantauan Kesehatan & Lokasi',
     service_monitoring_desc:'Alat sederhana untuk melacak kesejahteraan Anda dan membuat orang-orang terkasih tetap terinformasi tentang keselamatan Anda',
     service_preparedness:'Kesiapan Darurat',
@@ -2138,8 +2138,10 @@ const LANG = {
     my_profile:'என் சுயவிவரம்', health_data:'சுகாதார தரவு',
     our_mission:'எங்கள் நோக்கம்',
     our_services:'எங்கள் சேவைகள்',
-    service_equipment:'உதவிக் கருவி அணுக்கம்',
-    service_equipment_desc:'உங்கள் வீட்டில் சுயாதீனத்தை பராமரிக்க உதவ நমনீய வாடகை மற்றும் கொள்முதல் விருப்பங்கள்',
+    service_equipment:'உதவிக் கருவி மற்றும் பழுதுசரி',
+    service_equipment_desc:'உங்கள் வீட்டில் சுயாதீனத்தை பராமரிக்க உதவ நமனீய வாடகை மற்றும் கொள்முதல் விருப்பங்கள், மேலும் உங்கள் உபகரணத்தை உயர்ந்த நிலையில் வைக்க பேশாதார பழுதுசரி மற்றும் பராமரிப்பு சேவைகள்',
+    service_equipment:'உதவிக் கருவி மற்றும் பழுதுசரி',
+    service_equipment_desc:'உங்கள் வீட்டில் சுயாதீனத்தை பராமரிக்க உதவ நமனீய வாடகை மற்றும் கொள்முதல் விருப்பங்கள், மேலும் உங்கள் உபகரணத்தை உயர்ந்த நிலையில் வைக்க பேশாதார பழுதுசரி மற்றும் பராமரிப்பு சேவைகள்',
     service_monitoring:'ஆரோக்கியம் மற்றும் இடம் கண்காணிப்பு',
     service_monitoring_desc:'உங்கள் நலம் கண்காணிக்க மற்றும் உங்கள் பாதுகாப்பு பற்றி அன்பினரை தெரிந்துகொள்ள எளிய கருவிகள்',
     service_preparedness:'அவசரநிலை தயாரிப்பு',
@@ -2272,8 +2274,8 @@ const LANG = {
     my_profile:'Aking Profile', health_data:'Health data',
     our_mission:'Aming Misyon',
     our_services:'Ang Aming Mga Serbisyo',
-    service_equipment:'Tulong sa Pagkuha ng Kagamitan',
-    service_equipment_desc:'Flexible na rental at pagbili ng mga opsyon upang makatulong sa iyo na mapanatili ang kalayaan sa tahanan',
+    service_equipment:'Tulong sa Kagamitan at Pagkukumpuni',
+    service_equipment_desc:'Flexible na rental at pagbili ng mga opsyon upang makatulong sa iyo na mapanatili ang kalayaan sa tahanan, kasama ang propesyonal na serbisyo ng pagkukumpuni at pagpapanatili',
     service_monitoring:'Kalusugan at Lokasyong Pagsubaybay',
     service_monitoring_desc:'Mga simpleng tool upang subaybayan ang iyong kaginhawahan at panatilihing handa ang iyong mga mahal sa buhay sa iyong kaligtasan',
     service_preparedness:'Paghahanda sa Emerhensya',
@@ -2406,8 +2408,8 @@ const LANG = {
     my_profile:'ကျွန်ုပ်၏ ပရိုဖိုင်', health_data:'ကျန်းမာရေး အချက်အလက်',
     our_mission:'ကျွန်ုပ်တို့၏ ရည်ရွယ်ချက်',
     our_services:'ကျွန်ုပ်တို့၏ ဝန်ဆောင်မှုများ',
-    service_equipment:'ကူညီရန် ကိရိယာ အ ဝင်ရောက်',
-    service_equipment_desc:'သင့်အိမ်တွင် လွတ်လပ်မှု ထိန်းသိမ်းရန် ကူညီရန် အ유연한ငှားရမ်း နှင့် ဝယ်ယူမှု ရွေးချယ်မှုများ',
+    service_equipment:'ကူညီရန် ကိရိယာ နှင့် ပြင်ဆင်ခြင်း',
+    service_equipment_desc:'သင့်အိမ်တွင် လွတ်လပ်မှု ထိန်းသိမ်းရန် ကူညီရန် အ유연한ငှားရမ်း နှင့် ဝယ်ယူမှု ရွေးချယ်မှုများ၊ ဖြစ်နိုင်သည်ခြင်း သင့်ကိရိယာကို အကောင်းဆုံး အခြေအနေတွင် ထိန်းသိမ်းရန် ပြုပြင်ခြင်း နှင့် ပြင်ဆင်မှု ဝန်ဆောင်မှုများ',
     service_monitoring:'ကျန်းမာရေး နှင့် တည်နေရာ စောင့်ကြည့်မှု',
     service_monitoring_desc:'သင့်ကျန်းမာရေး စောင့်ကြည့်ရန် နှင့် သင့်ခွင့်လွှတ်ချက်သူများကို သင့်ဘေးကင်းမှု ကြေးမုံလူ ရန်စေည်စာကျ ရန်ကူညီသည့် လျှင်လျင်ကိရိယာများ',
     service_preparedness:'အရေးပေါ်အတွက် ပြင်ဆင်ခြင်း',
