@@ -279,6 +279,32 @@ button{cursor:pointer;border:none;background:none}
 .modal-close{position:absolute;top:16px;right:16px;font-size:22px;color:var(--muted)}
 .modal .form-group{margin-bottom:14px}
 
+/* ── Themed Dialog (confirm / alert / prompt) ──────────────── */
+.dialog-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.dialog-box{background:var(--card);border-radius:20px;padding:28px 24px;
+  width:100%;max-width:360px;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  animation:dialogPop .28s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes dialogPop{from{opacity:0;transform:scale(0.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.dialog-icon{width:56px;height:56px;margin:0 auto 16px;border-radius:50%;
+  background:rgba(26,122,109,0.1);display:flex;align-items:center;justify-content:center}
+.dialog-icon svg{width:30px;height:30px;stroke:var(--pri);color:var(--pri)}
+.dialog-title{font-family:var(--font-display);font-size:19px;font-weight:600;
+  color:var(--text);margin-bottom:8px}
+.dialog-message{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.dialog-input-wrap{margin-bottom:20px}
+.dialog-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);
+  border-radius:10px;font-size:15px;background:var(--card);color:var(--text);
+  outline:none;transition:border-color 0.2s ease;text-align:center}
+.dialog-input:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(26,122,109,0.1)}
+.dialog-actions{display:flex;gap:10px}
+.dialog-actions .btn{flex:1;margin:0}
+.dialog-single .dialog-actions .btn-outline{display:none}
+.dialog-single .dialog-actions .btn-pri{flex:1}
+
 /* ── Admin badge ──────────────────────────────── */
 .admin-tab{position:relative}
 .admin-badge{position:absolute;top:-2px;right:-2px;width:8px;height:8px;
@@ -570,6 +596,13 @@ button{cursor:pointer;border:none;background:none}
       <input type="password" id="login-pw" data-i18n-placeholder="password_placeholder" placeholder="Enter password">
     </div>
     <button class="btn btn-pri" onclick="doLogin()" data-i18n="sign_in">Sign In</button>
+
+    <!-- Biometric quick login (shown only if registered on this device) -->
+    <button id="biometric-login-btn" class="btn btn-outline hidden" onclick="biometricLogin()" style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M12 11a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0v-1a3 3 0 0 0-3-3z"/><path d="M2 12a10 10 0 0 1 4-8"/><path d="M22 12a10 10 0 0 0-4-8"/><path d="M5 19.5A8 8 0 0 1 4 12a8 8 0 0 1 16 0 8 8 0 0 1-1 7.5"/></svg>
+      <span data-i18n="login_biometric">Login with Face ID / Fingerprint</span>
+    </button>
+
     <div class="auth-switch">
       New here? <a href="#" onclick="showRegister()" data-i18n="create_account">Create an account</a>
     </div>
@@ -1459,6 +1492,15 @@ button{cursor:pointer;border:none;background:none}
     <div id="orders-list"></div>
   </div>
 
+  <!-- Biometric Login Setting -->
+  <div class="card mt-16" id="biometric-setting-card" style="display:none">
+    <div class="card-header">
+      <h3 data-i18n="biometric_login">Biometric Login</h3>
+    </div>
+    <p class="text-sm text-muted" id="biometric-setting-desc" style="line-height:1.5;margin-bottom:12px" data-i18n="biometric_setting_desc">Use Face ID or fingerprint to log in quickly on this device instead of typing your details.</p>
+    <button class="btn btn-sm btn-outline" id="biometric-toggle-btn" onclick="toggleBiometricSetting()" data-i18n="enable_biometric">Enable Biometric Login</button>
+  </div>
+
   <div class="text-center mt-24">
     <button class="btn btn-outline" onclick="doLogout()" style="max-width:200px;margin:0 auto" data-i18n="sign_out">Sign Out</button>
   </div>
@@ -1641,6 +1683,22 @@ button{cursor:pointer;border:none;background:none}
 </div>
 </div>
 
+<!-- Reusable themed dialog (confirm / alert / prompt) -->
+<div id="app-dialog" class="dialog-overlay hidden" onclick="if(event.target===this)dialogCancel()">
+  <div class="dialog-box">
+    <div class="dialog-icon" id="dialog-icon"></div>
+    <h3 class="dialog-title" id="dialog-title"></h3>
+    <p class="dialog-message" id="dialog-message"></p>
+    <div class="dialog-input-wrap" id="dialog-input-wrap" style="display:none">
+      <input type="password" id="dialog-input" class="dialog-input" autocomplete="current-password">
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-outline" id="dialog-cancel-btn" onclick="dialogCancel()" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-pri" id="dialog-confirm-btn" onclick="dialogConfirm()" data-i18n="confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════
    CONFIG — Replace with your deployment URL
@@ -1765,6 +1823,25 @@ const LANG = {
     // Profile
     health_profile:'Health Profile', account_details:'Account Details',
     my_orders:'My Orders', sign_out:'Sign Out', edit:'Edit',
+    login_biometric:'Login with Face ID / Fingerprint',
+    biometric_login:'Biometric Login',
+    biometric_setting_desc:'Use Face ID or fingerprint to log in quickly on this device instead of typing your details.',
+    enable_biometric:'Enable Biometric Login',
+    disable_biometric:'Disable Biometric Login',
+    biometric_offer:'Enable Face ID / fingerprint for faster login on this device?',
+    biometric_enabled:'Biometric login enabled',
+    biometric_disabled:'Biometric login disabled',
+    biometric_failed:'Could not enable biometric login',
+    biometric_confirm_pw:'Enter your password to enable biometric login:',
+    wrong_password:'Incorrect password',
+    biometric_disable_confirm:'Are you sure you want to turn off biometric login on this device?',
+    biometric_unsupported:'Biometric login isn\'t available on this device or browser. Try a phone or tablet with Face ID, fingerprint, or Windows Hello.',
+    biometric_unavailable:'Not Available',
+    enable:'Enable', not_now:'Not now', disable:'Disable', confirm:'Confirm',
+    please_confirm:'Please Confirm', yes:'Yes', ok:'OK',
+    confirm_delete_photo:'Delete profile picture?',
+    confirm_delete_reading:'Delete this reading?',
+    confirm_cancel_appt:'Cancel this appointment?',
     height:'Height', weight:'Weight', bmi:'BMI', blood_type:'Blood Type',
     allergies:'Allergies', conditions:'Medical Conditions', medications:'Medications',
     name:'Name', phone:'Phone', email:'Email', dob:'Date of Birth',
@@ -1918,6 +1995,25 @@ const LANG = {
     complete_profile:'请完善您的健康档案并添加血压读数以查看摘要。',
     health_profile:'健康档案', account_details:'账户信息',
     my_orders:'我的订单', sign_out:'退出登录', edit:'编辑',
+    login_biometric:'使用面容 ID / 指纹登录',
+    biometric_login:'生物识别登录',
+    biometric_setting_desc:'在此设备上使用面容 ID 或指纹快速登录，无需输入您的详细信息。',
+    enable_biometric:'启用生物识别登录',
+    disable_biometric:'停用生物识别登录',
+    biometric_offer:'在此设备上启用面容 ID / 指纹以便更快登录？',
+    biometric_enabled:'已启用生物识别登录',
+    biometric_disabled:'已停用生物识别登录',
+    biometric_failed:'无法启用生物识别登录',
+    biometric_confirm_pw:'输入您的密码以启用生物识别登录：',
+    wrong_password:'密码不正确',
+    biometric_disable_confirm:'您确定要在此设备上关闭生物识别登录吗？',
+    biometric_unsupported:'此设备或浏览器无法使用生物识别登录。请尝试使用具有面容 ID、指纹或 Windows Hello 的手机或平板电脑。',
+    biometric_unavailable:'不可用',
+    enable:'启用', not_now:'暂不', disable:'停用', confirm:'确认',
+    please_confirm:'请确认', yes:'是', ok:'确定',
+    confirm_delete_photo:'删除头像？',
+    confirm_delete_reading:'删除此读数？',
+    confirm_cancel_appt:'取消此预约？',
     height:'身高', weight:'体重', bmi:'身体质量指数', blood_type:'血型',
     allergies:'过敏', conditions:'医疗状况', medications:'用药情况',
     name:'姓名', phone:'电话', email:'邮箱', dob:'出生日期',
@@ -2062,6 +2158,25 @@ const LANG = {
     complete_profile:'Lengkapkan profil kesihatan dan tambah bacaan tekanan darah untuk melihat ringkasan.',
     health_profile:'Profil Kesihatan', account_details:'Butiran Akaun',
     my_orders:'Pesanan Saya', sign_out:'Log Keluar', edit:'Ubah',
+    login_biometric:'Log Masuk dengan Face ID / Cap Jari',
+    biometric_login:'Log Masuk Biometrik',
+    biometric_setting_desc:'Gunakan Face ID atau cap jari untuk log masuk dengan cepat pada peranti ini tanpa menaip butiran anda.',
+    enable_biometric:'Dayakan Log Masuk Biometrik',
+    disable_biometric:'Lumpuhkan Log Masuk Biometrik',
+    biometric_offer:'Dayakan Face ID / cap jari untuk log masuk lebih pantas pada peranti ini?',
+    biometric_enabled:'Log masuk biometrik didayakan',
+    biometric_disabled:'Log masuk biometrik dilumpuhkan',
+    biometric_failed:'Tidak dapat mendayakan log masuk biometrik',
+    biometric_confirm_pw:'Masukkan kata laluan anda untuk mendayakan log masuk biometrik:',
+    wrong_password:'Kata laluan salah',
+    biometric_disable_confirm:'Adakah anda pasti mahu mematikan log masuk biometrik pada peranti ini?',
+    biometric_unsupported:'Log masuk biometrik tidak tersedia pada peranti atau pelayar ini. Cuba telefon atau tablet dengan Face ID, cap jari, atau Windows Hello.',
+    biometric_unavailable:'Tidak Tersedia',
+    enable:'Dayakan', not_now:'Bukan sekarang', disable:'Lumpuhkan', confirm:'Sahkan',
+    please_confirm:'Sila Sahkan', yes:'Ya', ok:'OK',
+    confirm_delete_photo:'Padam gambar profil?',
+    confirm_delete_reading:'Padam bacaan ini?',
+    confirm_cancel_appt:'Batalkan temu janji ini?',
     height:'Ketinggian', weight:'Berat', bmi:'BMI', blood_type:'Jenis Darah',
     allergies:'Alahan', conditions:'Keadaan Perubatan', medications:'Ubat-ubatan',
     name:'Nama', phone:'Telefon', email:'E-mel', dob:'Tarikh Lahir',
@@ -2200,6 +2315,25 @@ const LANG = {
     complete_profile:'சுகாதார சுயவிவரத்தை நிரப்பி இரத்த அழுத்த வாசிப்புகளை சேர்க்கவும்.',
     health_profile:'சுகாதார விவரம்', account_details:'கணக்கு விவரங்கள்',
     my_orders:'எனது ஆர்டர்கள்', sign_out:'வெளியேறு', edit:'திருத்து',
+    login_biometric:'Face ID / கைரேகை மூலம் உள்நுழையவும்',
+    biometric_login:'உயிரியல் அடையாள உள்நுழைவு',
+    biometric_setting_desc:'உங்கள் விவரங்களைத் தட்டச்சு செய்வதற்குப் பதிலாக இந்தச் சாதனத்தில் விரைவாக உள்நுழைய Face ID அல்லது கைரேகையைப் பயன்படுத்தவும்.',
+    enable_biometric:'உயிரியல் உள்நுழைவை இயக்கவும்',
+    disable_biometric:'உயிரியல் உள்நுழைவை முடக்கவும்',
+    biometric_offer:'இந்தச் சாதனத்தில் வேகமான உள்நுழைவுக்கு Face ID / கைரேகையை இயக்கவா?',
+    biometric_enabled:'உயிரியல் உள்நுழைவு இயக்கப்பட்டது',
+    biometric_disabled:'உயிரியல் உள்நுழைவு முடக்கப்பட்டது',
+    biometric_failed:'உயிரியல் உள்நுழைவை இயக்க முடியவில்லை',
+    biometric_confirm_pw:'உயிரியல் உள்நுழைவை இயக்க உங்கள் கடவுச்சொல்லை உள்ளிடவும்:',
+    wrong_password:'தவறான கடவுச்சொல்',
+    biometric_disable_confirm:'இந்தச் சாதனத்தில் உயிரியல் உள்நுழைவை அணைக்க விரும்புகிறீர்களா?',
+    biometric_unsupported:'இந்தச் சாதனம் அல்லது உலாவியில் உயிரியல் உள்நுழைவு கிடைக்கவில்லை. Face ID, கைரேகை அல்லது Windows Hello உள்ள தொலைபேசி அல்லது டேப்லெட்டை முயற்சிக்கவும்.',
+    biometric_unavailable:'கிடைக்கவில்லை',
+    enable:'இயக்கு', not_now:'இப்போது இல்லை', disable:'முடக்கு', confirm:'உறுதிப்படுத்து',
+    please_confirm:'உறுதிப்படுத்தவும்', yes:'ஆம்', ok:'சரி',
+    confirm_delete_photo:'சுயவிவரப் படத்தை நீக்கவா?',
+    confirm_delete_reading:'இந்த அளவீட்டை நீக்கவா?',
+    confirm_cancel_appt:'இந்தச் சந்திப்பை ரத்து செய்யவா?',
     height:'உயரம்', weight:'எடை', bmi:'BMI', blood_type:'இரத்த வகை',
     allergies:'ஒவ்வாமை', conditions:'மருத்துவ நிலைமைகள்', medications:'மருந்துகள்',
     name:'பெயர்', phone:'தொலைபேசி', email:'மின்னஞ்சல்', dob:'பிறந்த தேதி',
@@ -2336,6 +2470,25 @@ const LANG = {
     complete_profile:'Kumpletuhin ang iyong health profile at magdagdag ng BP readings para makita ang summary dito.',
     health_profile:'Health Profile', account_details:'Mga Detalye ng Account',
     my_orders:'Aking mga Order', sign_out:'Mag-sign Out', edit:'I-edit',
+    login_biometric:'Mag-login gamit ang Face ID / Fingerprint',
+    biometric_login:'Biometric Login',
+    biometric_setting_desc:'Gamitin ang Face ID o fingerprint upang mabilis na mag-login sa device na ito sa halip na i-type ang iyong mga detalye.',
+    enable_biometric:'I-enable ang Biometric Login',
+    disable_biometric:'I-disable ang Biometric Login',
+    biometric_offer:'I-enable ang Face ID / fingerprint para sa mas mabilis na pag-login sa device na ito?',
+    biometric_enabled:'Na-enable ang biometric login',
+    biometric_disabled:'Na-disable ang biometric login',
+    biometric_failed:'Hindi ma-enable ang biometric login',
+    biometric_confirm_pw:'Ilagay ang iyong password upang i-enable ang biometric login:',
+    wrong_password:'Maling password',
+    biometric_disable_confirm:'Sigurado ka bang gusto mong i-off ang biometric login sa device na ito?',
+    biometric_unsupported:'Hindi available ang biometric login sa device o browser na ito. Subukan ang telepono o tablet na may Face ID, fingerprint, o Windows Hello.',
+    biometric_unavailable:'Hindi Available',
+    enable:'I-enable', not_now:'Hindi ngayon', disable:'I-disable', confirm:'Kumpirmahin',
+    please_confirm:'Pakikumpirma', yes:'Oo', ok:'OK',
+    confirm_delete_photo:'Tanggalin ang larawan sa profile?',
+    confirm_delete_reading:'Tanggalin ang reading na ito?',
+    confirm_cancel_appt:'Kanselahin ang appointment na ito?',
     height:'Taas', weight:'Timbang', bmi:'BMI', blood_type:'Uri ng Dugo',
     allergies:'Mga Allergy', conditions:'Mga Kondisyong Medikal', medications:'Mga Gamot',
     name:'Pangalan', phone:'Telepono', email:'Email', dob:'Petsa ng Kapanganakan',
@@ -2472,6 +2625,25 @@ const LANG = {
     complete_profile:'ကျန်းမာရေး ပရိုဖိုင် ဖြည့်စွက်ပြီး BP reading ထည့်ပါ။',
     health_profile:'ကျန်းမာရေး ပရိုဖိုင်', account_details:'အကောင့် အသေးစိတ်',
     my_orders:'ကျွန်ုပ်၏ အမှာစာများ', sign_out:'ထွက်ရန်', edit:'ပြင်ဆင်ရန်',
+    login_biometric:'Face ID / လက်ဗွေဖြင့် ဝင်ရောက်ရန်',
+    biometric_login:'ဇီဝအချက်အလက် ဝင်ရောက်မှု',
+    biometric_setting_desc:'သင့်အချက်အလက်များ ရိုက်ထည့်မည့်အစား ဤစက်ပစ္စည်းတွင် လျင်မြန်စွာ ဝင်ရောက်ရန် Face ID သို့မဟုတ် လက်ဗွေကို အသုံးပြုပါ။',
+    enable_biometric:'ဇီဝအချက်အလက် ဝင်ရောက်မှု ဖွင့်ရန်',
+    disable_biometric:'ဇီဝအချက်အလက် ဝင်ရောက်မှု ပိတ်ရန်',
+    biometric_offer:'ဤစက်ပစ္စည်းတွင် ပိုမိုလျင်မြန်စွာ ဝင်ရောက်ရန် Face ID / လက်ဗွေ ဖွင့်မလား?',
+    biometric_enabled:'ဇီဝအချက်အလက် ဝင်ရောက်မှု ဖွင့်ပြီးပါပြီ',
+    biometric_disabled:'ဇီဝအချက်အလက် ဝင်ရောက်မှု ပိတ်ပြီးပါပြီ',
+    biometric_failed:'ဇီဝအချက်အလက် ဝင်ရောက်မှု မဖွင့်နိုင်ပါ',
+    biometric_confirm_pw:'ဇီဝအချက်အလက် ဝင်ရောက်မှု ဖွင့်ရန် သင့်စကားဝှက်ကို ထည့်ပါ-',
+    wrong_password:'စကားဝှက် မှားယွင်းနေသည်',
+    biometric_disable_confirm:'ဤစက်ပစ္စည်းတွင် ဇီဝအချက်အလက် ဝင်ရောက်မှုကို ပိတ်လိုသည်မှာ သေချာပါသလား?',
+    biometric_unsupported:'ဤစက်ပစ္စည်း သို့မဟုတ် ဘရောက်ဇာတွင် ဇီဝအချက်အလက် ဝင်ရောက်မှု မရရှိနိုင်ပါ။ Face ID၊ လက်ဗွေ သို့မဟုတ် Windows Hello ပါသော ဖုန်း သို့မဟုတ် တက်ဘလက်ကို စမ်းကြည့်ပါ။',
+    biometric_unavailable:'မရရှိနိုင်ပါ',
+    enable:'ဖွင့်ရန်', not_now:'ယခုမဟုတ်', disable:'ပိတ်ရန်', confirm:'အတည်ပြုရန်',
+    please_confirm:'ကျေးဇူးပြု၍ အတည်ပြုပါ', yes:'ဟုတ်ကဲ့', ok:'ရပါပြီ',
+    confirm_delete_photo:'ပရိုဖိုင်ဓာတ်ပုံကို ဖျက်မလား?',
+    confirm_delete_reading:'ဤအချက်အလက်ကို ဖျက်မလား?',
+    confirm_cancel_appt:'ဤချိန်းဆိုမှုကို ပယ်ဖျက်မလား?',
     height:'အရပ်', weight:'ကိုယ်အလေးချိန်', bmi:'BMI', blood_type:'သွေးအမျိုးအစား',
     allergies:'ဓာတ်မတည့်ခြင်း', conditions:'ရောဂါ အခြေအနေ', medications:'ဆေးဝါးများ',
     name:'အမည်', phone:'ဖုန်း', email:'အီးမေးလ်', dob:'မွေးနေ့',
@@ -2853,7 +3025,7 @@ async function fetchWeather() {
 }
 
 /* ── Auth ─────────────────────────────────── */
-function showLogin() { show('login-screen'); hide('register-screen'); }
+function showLogin() { show('login-screen'); hide('register-screen'); refreshBiometricButton(); }
 function selectRole(role) {
   $('reg-role').value = role;
   const memberBtn = $('role-member-btn');
@@ -2880,9 +3052,359 @@ async function doLogin() {
     if (!r.ok) return toast(r.error,'error');
     ME = r.member;
     localStorage.setItem('al_member', JSON.stringify(ME));
+    // After successful login, offer biometric setup if supported and not already enabled
+    maybeOfferBiometric(phone, pw);
     await enterApp();
   } catch(e) { toast('Connection error','error'); }
   finally { loading(false); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   THEMED DIALOG ENGINE — replaces native confirm/alert/prompt
+   ───────────────────────────────────────────────────────────── */
+let _dialogResolve = null;
+
+// Icon presets (SVG paths)
+const DIALOG_ICONS = {
+  question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  biometric: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0v-1a3 3 0 0 0-3-3z"/><path d="M2 12a10 10 0 0 1 4-8"/><path d="M22 12a10 10 0 0 0-4-8"/><path d="M5 19.5A8 8 0 0 1 4 12a8 8 0 0 1 16 0 8 8 0 0 1-1 7.5"/></svg>',
+  warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+};
+
+/*
+  showDialog(opts) → Promise
+  opts: { title, message, icon, type:'confirm'|'alert'|'prompt',
+          confirmText, cancelText, inputType }
+  Resolves: confirm → true/false; prompt → string|null; alert → true
+*/
+function showDialog(opts) {
+  const t = LANG[currentLang] || LANG.en;
+  const overlay = $('app-dialog');
+  const box = overlay.querySelector('.dialog-box');
+  const iconEl = $('dialog-icon');
+  const titleEl = $('dialog-title');
+  const msgEl = $('dialog-message');
+  const inputWrap = $('dialog-input-wrap');
+  const inputEl = $('dialog-input');
+  const cancelBtn = $('dialog-cancel-btn');
+  const confirmBtn = $('dialog-confirm-btn');
+
+  // Icon
+  iconEl.innerHTML = DIALOG_ICONS[opts.icon] || DIALOG_ICONS.info;
+  // Text
+  titleEl.textContent = opts.title || '';
+  titleEl.style.display = opts.title ? '' : 'none';
+  msgEl.textContent = opts.message || '';
+  // Buttons
+  confirmBtn.textContent = opts.confirmText || t.confirm || 'Confirm';
+  cancelBtn.textContent = opts.cancelText || t.cancel || 'Cancel';
+
+  const type = opts.type || 'confirm';
+  if (type === 'alert') {
+    box.classList.add('dialog-single');
+    inputWrap.style.display = 'none';
+  } else if (type === 'prompt') {
+    box.classList.remove('dialog-single');
+    inputWrap.style.display = '';
+    inputEl.type = opts.inputType || 'password';
+    inputEl.value = '';
+  } else { // confirm
+    box.classList.remove('dialog-single');
+    inputWrap.style.display = 'none';
+  }
+
+  overlay.classList.remove('hidden');
+  if (type === 'prompt') setTimeout(() => inputEl.focus(), 100);
+
+  return new Promise(resolve => { _dialogResolve = { resolve, type }; });
+}
+
+function dialogConfirm() {
+  const overlay = $('app-dialog');
+  const inputEl = $('dialog-input');
+  overlay.classList.add('hidden');
+  if (_dialogResolve) {
+    const { resolve, type } = _dialogResolve;
+    _dialogResolve = null;
+    if (type === 'prompt') resolve(inputEl.value);
+    else resolve(true);
+  }
+}
+
+function dialogCancel() {
+  const overlay = $('app-dialog');
+  overlay.classList.add('hidden');
+  if (_dialogResolve) {
+    const { resolve, type } = _dialogResolve;
+    _dialogResolve = null;
+    if (type === 'prompt') resolve(null);
+    else resolve(false);
+  }
+}
+
+// Allow Enter key to confirm in prompt
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && _dialogResolve && !$('app-dialog').classList.contains('hidden')) {
+    e.preventDefault();
+    dialogConfirm();
+  } else if (e.key === 'Escape' && _dialogResolve && !$('app-dialog').classList.contains('hidden')) {
+    dialogCancel();
+  }
+});
+
+// Convenience: themed confirm for delete/cancel actions
+// Returns a Promise<boolean>
+function confirmDialog(messageKey, opts) {
+  const t = LANG[currentLang] || LANG.en;
+  opts = opts || {};
+  return showDialog({
+    icon: opts.icon || 'warning',
+    title: opts.title || t.please_confirm || 'Please Confirm',
+    message: (t[messageKey] || messageKey),
+    type: 'confirm',
+    confirmText: opts.confirmText || t.yes || 'Yes',
+    cancelText: opts.cancelText || t.cancel || 'Cancel'
+  });
+}
+
+// Convenience: themed alert (single OK button). Returns a Promise.
+function alertDialog(message, opts) {
+  const t = LANG[currentLang] || LANG.en;
+  opts = opts || {};
+  return showDialog({
+    icon: opts.icon || 'info',
+    title: opts.title || '',
+    message: message,
+    type: 'alert',
+    confirmText: opts.confirmText || t.ok || 'OK'
+  });
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BIOMETRIC (DEVICE) LOGIN — WebAuthn quick-unlock
+   Note: This is a device-local convenience layer. The biometric
+   (Face ID / fingerprint) is verified by the device via WebAuthn;
+   on success we replay the stored login. It does not add
+   server-side cryptographic auth (that comes with a real backend).
+   ───────────────────────────────────────────────────────────── */
+
+// Feature detection
+function biometricSupported() {
+  return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create);
+}
+
+// Helpers to convert between ArrayBuffer and base64url for storage
+function bufToB64url(buf) {
+  const bytes = new Uint8Array(buf);
+  let str = '';
+  for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
+  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlToBuf(b64url) {
+  const b64 = b64url.replace(/-/g,'+').replace(/_/g,'/');
+  const str = atob(b64);
+  const bytes = new Uint8Array(str.length);
+  for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
+  return bytes.buffer;
+}
+
+// After login, ask the user (once) if they want biometric quick-login on this device
+async function maybeOfferBiometric(phone, pw) {
+  if (!biometricSupported()) return;
+  if (localStorage.getItem('al_biometric_cred')) return; // already set up
+  if (localStorage.getItem('al_biometric_declined')) return; // user said no before
+  const t = LANG[currentLang] || LANG.en;
+  setTimeout(async () => {
+    const yes = await showDialog({
+      icon: 'biometric',
+      title: t.biometric_login || 'Biometric Login',
+      message: t.biometric_offer || 'Enable Face ID / fingerprint for faster login on this device?',
+      type: 'confirm',
+      confirmText: t.enable || 'Enable',
+      cancelText: t.not_now || 'Not now'
+    });
+    if (yes) {
+      const ok = await registerBiometric(phone, pw);
+      if (ok) toast(t.biometric_enabled || 'Biometric login enabled', 'success');
+      else localStorage.setItem('al_biometric_declined','1');
+    } else {
+      localStorage.setItem('al_biometric_declined','1');
+    }
+  }, 600);
+}
+
+// Register a passkey/biometric credential on this device
+async function registerBiometric(phone, pw) {
+  if (!biometricSupported()) return false;
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId = crypto.getRandomValues(new Uint8Array(16));
+    const cred = await navigator.credentials.create({
+      publicKey: {
+        challenge,
+        rp: { name: 'Ju An SecureLiving' },
+        user: {
+          id: userId,
+          name: phone,
+          displayName: (ME && ME.name) ? ME.name : phone
+        },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },   // ES256
+          { type: 'public-key', alg: -257 }  // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',  // built-in Face ID / fingerprint
+          userVerification: 'required',
+          residentKey: 'preferred'
+        },
+        timeout: 60000,
+        attestation: 'none'
+      }
+    });
+    if (!cred) return false;
+    // Store the credential ID + the login it unlocks (device-local)
+    localStorage.setItem('al_biometric_cred', bufToB64url(cred.rawId));
+    localStorage.setItem('al_biometric_login', JSON.stringify({ phone, pw }));
+    refreshBiometricButton();
+    return true;
+  } catch (e) {
+    console.warn('Biometric registration failed/cancelled:', e);
+    return false;
+  }
+}
+
+// Login using the device biometric
+async function biometricLogin() {
+  if (!biometricSupported()) return toast('Biometrics not supported on this device','error');
+  const storedCred = localStorage.getItem('al_biometric_cred');
+  const storedLogin = localStorage.getItem('al_biometric_login');
+  if (!storedCred || !storedLogin) return toast('No biometric login set up on this device','error');
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        allowCredentials: [{
+          type: 'public-key',
+          id: b64urlToBuf(storedCred)
+        }],
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+    if (!assertion) return toast('Biometric verification failed','error');
+    // Biometric verified on device — replay the stored login
+    const { phone, pw } = JSON.parse(storedLogin);
+    loading(true);
+    try {
+      const r = await api({ action:'login', phone, password:pw });
+      if (!r.ok) {
+        // Stored credentials no longer valid — clear biometric setup
+        toast(r.error || 'Login failed','error');
+        disableBiometric();
+        return;
+      }
+      ME = r.member;
+      localStorage.setItem('al_member', JSON.stringify(ME));
+      await enterApp();
+    } finally { loading(false); }
+  } catch (e) {
+    console.warn('Biometric login failed/cancelled:', e);
+    toast('Biometric login cancelled','error');
+  }
+}
+
+// Remove biometric login from this device
+function disableBiometric() {
+  localStorage.removeItem('al_biometric_cred');
+  localStorage.removeItem('al_biometric_login');
+  localStorage.removeItem('al_biometric_declined');
+  refreshBiometricButton();
+}
+
+// Show/hide the biometric button on the login screen based on whether it's registered
+function refreshBiometricButton() {
+  const btn = $('biometric-login-btn');
+  if (!btn) return;
+  if (biometricSupported() && localStorage.getItem('al_biometric_cred')) {
+    btn.classList.remove('hidden');
+  } else {
+    btn.classList.add('hidden');
+  }
+}
+
+// Update the biometric setting card in the profile (shows current state)
+function refreshBiometricSetting() {
+  const card = $('biometric-setting-card');
+  const btn = $('biometric-toggle-btn');
+  const desc = $('biometric-setting-desc');
+  if (!card || !btn) return;
+  const t = LANG[currentLang] || LANG.en;
+  card.style.display = '';
+  if (!biometricSupported()) {
+    // Unsupported device — show informative message, disable button
+    if (desc) desc.textContent = t.biometric_unsupported || 'Biometric login isn\'t available on this device or browser. Try a phone or tablet with Face ID, fingerprint, or Windows Hello.';
+    btn.textContent = t.biometric_unavailable || 'Not Available';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
+    return;
+  }
+  btn.disabled = false;
+  btn.style.opacity = '';
+  btn.style.cursor = '';
+  if (desc) desc.textContent = t.biometric_setting_desc || 'Use Face ID or fingerprint to log in quickly on this device instead of typing your details.';
+  if (localStorage.getItem('al_biometric_cred')) {
+    btn.textContent = t.disable_biometric || 'Disable Biometric Login';
+  } else {
+    btn.textContent = t.enable_biometric || 'Enable Biometric Login';
+  }
+}
+
+// Toggle biometric on/off from the profile
+async function toggleBiometricSetting() {
+  const t = LANG[currentLang] || LANG.en;
+  if (localStorage.getItem('al_biometric_cred')) {
+    // Currently enabled → confirm then disable
+    const yes = await showDialog({
+      icon: 'warning',
+      title: t.disable_biometric || 'Disable Biometric Login',
+      message: t.biometric_disable_confirm || 'Are you sure you want to turn off biometric login on this device?',
+      type: 'confirm',
+      confirmText: t.disable || 'Disable',
+      cancelText: t.cancel || 'Cancel'
+    });
+    if (!yes) return;
+    disableBiometric();
+    refreshBiometricSetting();
+    toast(t.biometric_disabled || 'Biometric login disabled','success');
+  } else {
+    // Not enabled → need stored credentials to register. Ask user to re-enter password.
+    const pw = await showDialog({
+      icon: 'lock',
+      title: t.biometric_login || 'Biometric Login',
+      message: t.biometric_confirm_pw || 'Enter your password to enable biometric login:',
+      type: 'prompt',
+      inputType: 'password',
+      confirmText: t.enable || 'Enable',
+      cancelText: t.cancel || 'Cancel'
+    });
+    if (!pw) return;
+    const phone = ME ? ME.phone : '';
+    if (!phone) return toast('Please log in first','error');
+    // Verify password is correct before storing
+    loading(true);
+    try {
+      const r = await api({ action:'login', phone, password:pw });
+      if (!r.ok) { toast(t.wrong_password || 'Incorrect password','error'); return; }
+      const ok = await registerBiometric(phone, pw);
+      if (ok) { toast(t.biometric_enabled || 'Biometric login enabled','success'); refreshBiometricSetting(); }
+      else toast(t.biometric_failed || 'Could not enable biometric login','error');
+    } catch(e) { toast('Connection error','error'); }
+    finally { loading(false); }
+  }
 }
 
 async function doRegister() {
@@ -3252,7 +3774,7 @@ function openPictureUpload() {
 }
 
 async function deleteProfilePicture() {
-  if (!confirm('Delete profile picture?')) return;
+  if (!await confirmDialog('confirm_delete_photo')) return;
   
   loading(true);
   try {
@@ -3352,6 +3874,7 @@ function renderProfile() {
     show('profile-member-content');
     hide('guest-prompt-profile');
   }
+  refreshBiometricSetting();
   const initials = ME.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   
   // Try to get picture from ME object (database) or localStorage
@@ -3636,7 +4159,7 @@ async function addBP() {
 }
 
 async function deleteBP(id) {
-  if (!confirm('Delete this reading?')) return;
+  if (!await confirmDialog('confirm_delete_reading')) return;
   loading(true);
   try {
     await api({ action:'deleteBPReading', id });
@@ -3690,7 +4213,7 @@ async function loadGlucose() {
 }
 
 async function deleteGlucose(id) {
-  if (!confirm('Delete this reading?')) return;
+  if (!await confirmDialog('confirm_delete_reading')) return;
   loading(true);
   try {
     await api({ action:'deleteGlucoseReading', id });
@@ -3747,7 +4270,7 @@ async function loadCholesterol() {
 }
 
 async function deleteCholesterol(id) {
-  if (!confirm('Delete this reading?')) return;
+  if (!await confirmDialog('confirm_delete_reading')) return;
   loading(true);
   try {
     await api({ action:'deleteCholesterolReading', id });
@@ -3884,7 +4407,7 @@ async function loadAppointments() {
 }
 
 async function cancelAppt(id) {
-  if (!confirm('Cancel this appointment?')) return;
+  if (!await confirmDialog('confirm_cancel_appt')) return;
   loading(true);
   try {
     await api({ action:'cancelAppointment', id });
@@ -5580,6 +6103,8 @@ window.addEventListener('DOMContentLoaded', () => {
   
   const saved = localStorage.getItem('al_member');
   const guestMode = localStorage.getItem('al_guest');
+  // Show biometric login button if set up on this device
+  refreshBiometricButton();
   if (saved) {
     try {
       ME = JSON.parse(saved);
