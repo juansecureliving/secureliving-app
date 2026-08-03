@@ -139,20 +139,20 @@ button{cursor:pointer;border:none;background:none}
   box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
 .hero-card p{opacity:.85;font-size:14px;line-height:1.5}
-.services-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.service-item{grid-column:span 2;text-align:center;padding:12px 8px;border-radius:12px;transition:all 0.2s ease;background:rgba(26,122,109,0.03)}
-.services-grid .service-item:nth-child(4){grid-column:2 / span 2}
-.services-grid .service-item:nth-child(5){grid-column:4 / span 2}
+.services-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.service-item{text-align:center;padding:10px 4px;border-radius:10px;transition:all 0.2s ease;background:rgba(26,122,109,0.03)}
 .service-item:hover{background:rgba(26,122,109,0.06);transform:translateY(-2px)}
-.service-icon{width:36px;height:36px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
-.service-icon svg{width:30px;height:30px;stroke:var(--pri);stroke-width:2;color:var(--pri)}
-.service-name{font-weight:600;font-size:12px;color:var(--text);margin-bottom:4px;line-height:1.25}
-.service-desc{font-size:10px;color:var(--muted);line-height:1.35}
+.service-icon{width:32px;height:32px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center}
+.service-icon svg{width:26px;height:26px;stroke:var(--pri);stroke-width:2;color:var(--pri)}
+.service-name{font-weight:600;font-size:11px;color:var(--text);margin-bottom:3px;line-height:1.2}
+.service-desc{font-size:9px;color:var(--muted);line-height:1.3}
 @media(max-width:400px){
-  .services-grid{gap:6px}
-  .service-item{padding:10px 5px}
-  .service-name{font-size:11px}
-  .service-desc{font-size:9px}
+  .services-grid{gap:4px}
+  .service-item{padding:8px 3px}
+  .service-icon{width:28px;height:28px}
+  .service-icon svg{width:22px;height:22px}
+  .service-name{font-size:10px}
+  .service-desc{font-size:8px}
 }
 .update-item{padding:14px 0;border-bottom:1px solid var(--border)}
 .update-item:last-child{border-bottom:none}
@@ -1770,15 +1770,15 @@ const LANG = {
     our_mission:'Our Mission',
     our_services:'Our Services',
     service_equipment:'Assistive Equipment & Repair',
-    service_equipment_desc:'Flexible rental and purchase options, plus professional repair and maintenance services to keep your equipment in optimal condition',
+    service_equipment_desc:'Rent, buy & repair',
     service_monitoring:'Health & Location Monitoring',
-    service_monitoring_desc:'Simple tools to track your wellbeing and keep loved ones informed of your safety',
+    service_monitoring_desc:'Track wellbeing & safety',
     service_preparedness:'Emergency Preparedness',
-    service_preparedness_desc:'Practical support to help you prepare for life\'s uncertainties with confidence',
+    service_preparedness_desc:'Ready before it happens',
     service_education:'Health Education & Resources',
-    service_education_desc:'Accessible information to empower you with knowledge about health, safety, and independent living',
+    service_education_desc:'Learn health & safety',
     service_support:'Continuous Community Care',
-    service_support_desc:'Ongoing support and connection with professionals who understand your journey',
+    service_support_desc:'Ongoing support & connection',
     our_vision:'Our Vision',
     vision_desc:'A Singapore where every person, regardless of age or ability, can live independently with dignity, confidence, and community support.',
     mission_desc:'As Singapore\'s population ages and more people live independently, we believe everyone deserves access to quality assistive equipment and support — before an emergency happens. We help you prepare, educate, and equip so that sudden disability or medical needs never catch you off guard.',
@@ -1947,15 +1947,15 @@ const LANG = {
     our_mission:'我们的使命',
     our_services:'我们的服务',
     service_equipment:'辅助设备与维修',
-    service_equipment_desc:'灵活的租赁和购买选项，加上专业的维修和保养服务，使您的设备保持最佳状态',
+    service_equipment_desc:'租、买与维修',
     service_monitoring:'健康和位置监测',
-    service_monitoring_desc:'简单的工具可跟踪您的幸福并让亲人了解您的安全情况',
+    service_monitoring_desc:'追踪健康与安全',
     service_preparedness:'紧急准备',
-    service_preparedness_desc:'实际支持,帮助您以信心面对生活中的不确定性',
+    service_preparedness_desc:'防患于未然',
     service_education:'健康教育与资源',
-    service_education_desc:'无障碍信息赋予您关于健康、安全和独立生活的知识',
+    service_education_desc:'了解健康与安全',
     service_support:'持续社区关怀',
-    service_support_desc:'了解您旅程的专业人士的持续支持和联系',
+    service_support_desc:'持续支持与联系',
     our_vision:'我们的愿景',
     vision_desc:'一个新加坡，每个人无论年龄或能力如何，都能独立生活，拥有尊严、信心和社区支持。',
     mission_desc:'随着新加坡人口老龄化，越来越多人独立生活。我们相信每个人都应在紧急情况发生前获得优质辅助设备和支持。我们帮助您做好准备、教育和装备，让突发残疾或医疗需求不会让您措手不及。',
@@ -2110,15 +2110,15 @@ const LANG = {
     our_mission:'Misi Kami',
     our_services:'Layanan Kami',
     service_equipment:'Peralatan Bantu & Perbaikan',
-    service_equipment_desc:'Pilihan sewa dan pembelian yang fleksibel, ditambah layanan perbaikan dan pemeliharaan profesional untuk menjaga peralatan Anda dalam kondisi optimal',
+    service_equipment_desc:'Sewa, beli & baiki',
     service_monitoring:'Pemantauan Kesehatan & Lokasi',
-    service_monitoring_desc:'Alat sederhana untuk melacak kesejahteraan Anda dan membuat orang-orang terkasih tetap terinformasi tentang keselamatan Anda',
+    service_monitoring_desc:'Jejak kesihatan & keselamatan',
     service_preparedness:'Kesiapan Darurat',
-    service_preparedness_desc:'Dukungan praktis untuk membantu Anda bersiap menghadapi ketidakpastian hidup dengan percaya diri',
+    service_preparedness_desc:'Bersedia sebelum berlaku',
     service_education:'Pendidikan & Sumber Daya Kesehatan',
-    service_education_desc:'Informasi yang dapat diakses untuk memberdayakan Anda dengan pengetahuan tentang kesehatan, keselamatan, dan kehidupan independen',
+    service_education_desc:'Pelajari kesihatan & keselamatan',
     service_support:'Perawatan Komunitas Berkelanjutan',
-    service_support_desc:'Dukungan berkelanjutan dan koneksi dengan profesional yang memahami perjalanan Anda',
+    service_support_desc:'Sokongan berterusan',
     our_vision:'Visi Kami',
     vision_desc:'Singapura di mana setiap orang, tanpa memandang usia atau kemampuan, dapat hidup mandiri dengan martabat, percaya diri, dan dukungan komunitas.',
     mission_desc:'Apabila populasi Singapura semakin menua dan lebih ramai hidup berdikari, kami percaya semua orang berhak mendapat akses kepada peralatan bantuan dan sokongan berkualiti — sebelum kecemasan berlaku. Kami membantu anda bersedia, mendidik, dan melengkapkan supaya kecacatan mendadak atau keperluan perubatan tidak mengejutkan anda.',
@@ -2265,17 +2265,17 @@ const LANG = {
     our_mission:'எங்கள் நோக்கம்',
     our_services:'எங்கள் சேவைகள்',
     service_equipment:'உதவிக் கருவி மற்றும் பழுதுசரி',
-    service_equipment_desc:'உங்கள் வீட்டில் சுயாதீனத்தை பராமரிக்க உதவ நமனீய வாடகை மற்றும் கொள்முதல் விருப்பங்கள், மேலும் உங்கள் உபகரணத்தை உயர்ந்த நிலையில் வைக்க பேশாதார பழுதுசரி மற்றும் பராமரிப்பு சேவைகள்',
+    service_equipment_desc:'வாடகை, வாங்க & பழுது',
     service_equipment:'உதவிக் கருவி மற்றும் பழுதுசரி',
-    service_equipment_desc:'உங்கள் வீட்டில் சுயாதீனத்தை பராமரிக்க உதவ நமனீய வாடகை மற்றும் கொள்முதல் விருப்பங்கள், மேலும் உங்கள் உபகரணத்தை உயர்ந்த நிலையில் வைக்க பேশாதார பழுதுசரி மற்றும் பராமரிப்பு சேவைகள்',
+    service_equipment_desc:'வாடகை, வாங்க & பழுது',
     service_monitoring:'ஆரோக்கியம் மற்றும் இடம் கண்காணிப்பு',
-    service_monitoring_desc:'உங்கள் நலம் கண்காணிக்க மற்றும் உங்கள் பாதுகாப்பு பற்றி அன்பினரை தெரிந்துகொள்ள எளிய கருவிகள்',
+    service_monitoring_desc:'நலம் & பாதுகாப்பு கண்காணிப்பு',
     service_preparedness:'அவசரநிலை தயாரிப்பு',
-    service_preparedness_desc:'வாழ்க்கைத் தெளிவின்மையை நம்பிக்கையுடன் சामना செய்ய உதவ பரிணாமிக் ஆதரவு',
+    service_preparedness_desc:'முன்கூட்டியே தயார்',
     service_education:'ஆரோக்கியம் கல்வி மற்றும் வளங்கள்',
-    service_education_desc:'ஆரோக்கியம், பாதுகாப்பு மற்றும் சுயாதீன வாழ்க்கை பற்றிய ஞானத்தைக் கொண்டு உங்களை அதிகாரப்பூண்ட்ட தகவல்',
+    service_education_desc:'நலம் & பாதுகாப்பு அறிக',
     service_support:'தொடர்ச்சியான சமூக கவனிப்பு',
-    service_support_desc:'உங்கள் பயணத்தை புரிந்துகொள்ளும் தொழிலாளிகளுடன் தொடர்ச்சியான ஆதரவு மற்றும் இணைப்பு',
+    service_support_desc:'தொடர்ச்சியான ஆதரவு',
     our_vision:'எங்கள் பார்வை',
     vision_desc:'சிங்கப்பூர், ஒவ்வொரு நபரும் வயது அல்லது திறன் பொருட்படுத்தாமல், கண்ணியம், நம்பிக்கை மற்றும் சமூக ஆதரவுடன் சுயாதீனமாக வாழக்கூடிய ஒரு நாடு.',
     mission_desc:'சிங்கப்பூரின் மக்கள்தொகை வயதாகி, அதிகமானோர் சுதந்திரமாக வாழ்கையில், அவசரநிலை ஏற்படுமுன் தரமான உதவி உபகரணங்களையும் ஆதரவையும் பெற அனைவருக்கும் உரிமை உண்டு என்று நாங்கள் நம்புகிறோம்.',
@@ -2422,15 +2422,15 @@ const LANG = {
     our_mission:'Aming Misyon',
     our_services:'Ang Aming Mga Serbisyo',
     service_equipment:'Tulong sa Kagamitan at Pagkukumpuni',
-    service_equipment_desc:'Flexible na rental at pagbili ng mga opsyon upang makatulong sa iyo na mapanatili ang kalayaan sa tahanan, kasama ang propesyonal na serbisyo ng pagkukumpuni at pagpapanatili',
+    service_equipment_desc:'Umupa, bumili at ayusin',
     service_monitoring:'Kalusugan at Lokasyong Pagsubaybay',
-    service_monitoring_desc:'Mga simpleng tool upang subaybayan ang iyong kaginhawahan at panatilihing handa ang iyong mga mahal sa buhay sa iyong kaligtasan',
+    service_monitoring_desc:'Subaybayan ang kalusugan at kaligtasan',
     service_preparedness:'Paghahanda sa Emerhensya',
-    service_preparedness_desc:'Praktikal na tulong upang tulungan kang maghanda para sa mga hindi siguradong sakali ng buhay na may tiwala',
+    service_preparedness_desc:'Handa bago mangyari',
     service_education:'Edukasyon sa Kalusugan at Mga Mapagkukunan',
-    service_education_desc:'Accessible na impormasyon upang bigyan ka ng kapangyarihan ng kaalaman tungkol sa kalusugan, kaligtasan, at independiyenteng pamumuhay',
+    service_education_desc:'Matuto ng kalusugan at kaligtasan',
     service_support:'Patuloy na Pag-aalaga ng Komunidad',
-    service_support_desc:'Patuloy na suporta at koneksyon sa mga propesyonal na nakakaintindi ng iyong paglalakbay',
+    service_support_desc:'Tuloy-tuloy na suporta',
     our_vision:'Ang Aming Pananaw',
     vision_desc:'Isang Singapore kung saan ang bawat tao, anuman ang edad o kakayahan, ay maaaring mamuhay nang independyente nang may dignidad, kumpiyansa, at suporta ng komunidad.',
     mission_desc:'Habang tumatanda ang populasyon ng Singapore at mas maraming taong nakatira nang mag-isa, naniniwala kami na lahat ay nararapat sa de-kalidad na assistive equipment at suporta — bago pa man mangyari ang emergency.',
@@ -2577,15 +2577,15 @@ const LANG = {
     our_mission:'ကျွန်ုပ်တို့၏ ရည်ရွယ်ချက်',
     our_services:'ကျွန်ုပ်တို့၏ ဝန်ဆောင်မှုများ',
     service_equipment:'ကူညီရန် ကိရိယာ နှင့် ပြင်ဆင်ခြင်း',
-    service_equipment_desc:'သင့်အိမ်တွင် လွတ်လပ်မှု ထိန်းသိမ်းရန် ကူညီရန် အ유연한ငှားရမ်း နှင့် ဝယ်ယူမှု ရွေးချယ်မှုများ၊ ဖြစ်နိုင်သည်ခြင်း သင့်ကိရိယာကို အကောင်းဆုံး အခြေအနေတွင် ထိန်းသိမ်းရန် ပြုပြင်ခြင်း နှင့် ပြင်ဆင်မှု ဝန်ဆောင်မှုများ',
+    service_equipment_desc:'ငှား၊ ဝယ် နှင့် ပြင်',
     service_monitoring:'ကျန်းမာရေး နှင့် တည်နေရာ စောင့်ကြည့်မှု',
-    service_monitoring_desc:'သင့်ကျန်းမာရေး စောင့်ကြည့်ရန် နှင့် သင့်ခွင့်လွှတ်ချက်သူများကို သင့်ဘေးကင်းမှု ကြေးမုံလူ ရန်စေည်စာကျ ရန်ကူညီသည့် လျှင်လျင်ကိရိယာများ',
+    service_monitoring_desc:'ကျန်းမာရေး နှင့် ဘေးကင်းမှု ခြေရာခံ',
     service_preparedness:'အရေးပေါ်အတွက် ပြင်ဆင်ခြင်း',
-    service_preparedness_desc:'အသက်ခွင့်လွှတ်ချက်မှု၏ လည်ပင်း အေ็း အငြင်းအခုံစီမံခန့်ခွဲမှု အတွက် သင့်ကူညီရန် လက်တွေ့ အပ့ံအကူ',
+    service_preparedness_desc:'ကြိုတင်ပြင်ဆင်',
     service_education:'ကျန်းမာရေး ပညာသင်ခန်းစာ နှင့် ကမ္ဘာ့အသုံးအဆောင်သုံးစွဲမှုများ',
-    service_education_desc:'ကျန်းမာရေး၊ ဘေးကင်းမှု နှင့် လွတ်လပ်သည့် အသက်ရှင်ကျင့်သုံးမှု အကြောင်း ဆန္ဒအခွင့်လွှတ်ချက်မြှင့်တင်ရန် လူ့သုံးလဲ့အင်ဒိုင်း',
+    service_education_desc:'ကျန်းမာရေး နှင့် ဘေးကင်းမှု လေ့လာ',
     service_support:'အပ်နီးကပ် လူမှုအဖွဲ့အစည်း စောင့်ရှောက်မှု',
-    service_support_desc:'သင့်ခြေလျင်းတစ်ခုအတွက် ကောင်းကျိုးရှီ သည့် သမားလည်ပင်း လူ့အဖွဲ့အစည်း ပံ့ပိုးမှု နှင့်ဆက်သွယ်မှု',
+    service_support_desc:'စဉ်ဆက်မပြတ် ပံ့ပိုးမှု',
     our_vision:'ကျွန်ုပ်တို့၏ အမြင်',
     vision_desc:'ကျေးဇူးရှိသည့် အသက်အရွယ် သို့မဟုတ် စွမ်းရည်မည်သည့် အခြေအခြင် လူတစ်ဦးတစ်ေတွ လွတ်လပ်စွာ ၊ ကျေးဇူးရှိသည့်အတူ ၊ သံသယမှလွတ်မြေ လူမှုအဖွဲ့အစည်းအကူအညီဖြင့် နေထိုင်နိုင်သည့် စင်ကာပူတစ်ခု။',
     mission_desc:'စင်ကာပူ၏ လူဦးရေ သက်ကြီးရွယ်အိုများ ပိုမိုများပြားလာသည်နှင့်အမျှ လူတိုင်းသည် အရေးပေါ်မတိုင်မီ အရည်အသွေးမြင့် အကူအညီပေးကိရိယာများ ရရှိသင့်ပါသည်။',
