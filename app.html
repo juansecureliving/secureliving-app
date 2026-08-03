@@ -135,11 +135,27 @@ button{cursor:pointer;border:none;background:none}
 
 /* ── Home Tab ─────────────────────────────────── */
 .hero-card{background:var(--card);
-  color:var(--text);border-radius:var(--radius);padding:28px 24px;margin-bottom:16px;
-  box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  color:var(--text);border-radius:20px;padding:28px 24px;margin-bottom:28px;
+  box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  position:relative}
+.hero-card::after{
+  content:'';
+  position:absolute;
+  bottom:-14px;
+  left:36px;
+  width:0;
+  height:0;
+  border-left:16px solid transparent;
+  border-right:0 solid transparent;
+  border-top:16px solid var(--card);
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,0.04))
+}
 .hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
 .hero-card p{opacity:.85;font-size:14px;line-height:1.5}
 /* ── Services Star Formation ──────────────────────────────── */
+.services-section{
+  margin-bottom:16px
+}
 .services-star{
   position:relative;
   width:100%;
@@ -148,6 +164,21 @@ button{cursor:pointer;border:none;background:none}
   /* aspect ratio gives room for the star; padding-bottom = height as % of width */
   padding-bottom:100%;
   height:0
+}
+.services-star-title{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-family:var(--font-display);
+  font-size:17px;
+  font-weight:600;
+  color:var(--pri);
+  text-align:center;
+  margin:0;
+  z-index:2;
+  width:38%;
+  line-height:1.2
 }
 .service-circle{
   position:absolute;
@@ -893,9 +924,9 @@ button{cursor:pointer;border:none;background:none}
   </div>
 
   <!-- Our Services -->
-  <div class="card">
-    <h3 style="font-family:var(--font-display);margin-bottom:16px" data-i18n="our_services">Our Services</h3>
+  <div class="services-section">
     <div class="services-star">
+      <h3 class="services-star-title" data-i18n="our_services">Our Services</h3>
       <!-- Point 1: Top -->
       <div class="service-circle pos-top">
         <div class="service-circle-inner">
