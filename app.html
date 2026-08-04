@@ -221,7 +221,7 @@ button{cursor:pointer;border:none;background:none}
 .svc.active .svc-circle svg{
   stroke:var(--pri);color:var(--pri);
   transform:scale(1.15);
-  filter:drop-shadow(0 2px 4px rgba(26,122,109,0.35))
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,0.4))
 }
 .svc.active .svc-label{
   color:var(--pri)
@@ -258,11 +258,12 @@ button{cursor:pointer;border:none;background:none}
 }
 .svc-desc-text{
   flex:1 1 50%;
-  padding:8px 8px 8px 4px;
+  padding:8px 4px 8px 8px;
   margin:0;
   font-size:15.5px;
   line-height:1.7;
-  color:var(--text)
+  color:var(--text);
+  order:2
 }
 .svc-desc-img-wrap{
   flex:0 0 50%;
@@ -270,7 +271,8 @@ button{cursor:pointer;border:none;background:none}
   display:none;            /* hidden unless a service has an image */
   align-items:center;
   justify-content:center;
-  padding:0
+  padding:0;
+  order:1
 }
 .svc-desc-img-wrap.has-img{
   display:flex
@@ -279,6 +281,10 @@ button{cursor:pointer;border:none;background:none}
   width:100%;
   aspect-ratio:1/1;
   object-fit:cover
+}
+/* Support: hands are lower-right, aim the crop there */
+.svc-desc-img.blob-support{
+  object-position:75% 80%
 }
 /* Per-service organic blob shapes */
 .svc-desc-img.blob-preparedness{clip-path:url(#blob-preparedness);-webkit-clip-path:url(#blob-preparedness)}
