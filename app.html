@@ -156,81 +156,102 @@ button{cursor:pointer;border:none;background:none}
 .services-section{
   margin-bottom:16px
 }
-.services-star{
-  position:relative;
-  width:100%;
-  max-width:380px;
-  margin:8px auto 0;
-  /* taller than wide to spread the star points and open the center */
-  padding-bottom:112%;
-  height:0
-}
-.services-star-title{
-  position:absolute;
-  top:56%;
-  left:50%;
-  transform:translate(-50%,-50%);
+.services-heading{
   font-family:var(--font-display);
   font-size:19px;
   font-weight:600;
-  color:var(--pri);
+  color:var(--text);
   text-align:center;
-  margin:0;
-  z-index:2;
-  width:30%;
-  line-height:1.2
+  margin:0 0 16px
 }
-.service-circle{
-  position:absolute;
-  width:35%;
-  aspect-ratio:1/1;
-  transform:translate(-50%,-50%)
+.services-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:2px;
+  width:100%
 }
-.service-circle-inner{
-  width:100%;
-  height:100%;
-  border-radius:50%;
-  background:rgba(26,122,109,0.06);
-  border:1.5px solid rgba(26,122,109,0.15);
+.svc{
+  flex:1 1 0;
+  min-width:0;
+  background:none;
+  border:none;
+  padding:2px;
+  cursor:pointer;
   display:flex;
   flex-direction:column;
   align-items:center;
+  gap:6px;
+  font-family:inherit
+}
+.svc-circle{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:rgba(26,122,109,0.07);
+  border:1.5px solid rgba(26,122,109,0.15);
+  display:flex;
+  align-items:center;
   justify-content:center;
-  text-align:center;
-  padding:6px;
-  box-sizing:border-box;
   transition:all 0.2s ease;
-  cursor:default
+  flex-shrink:0
 }
-.service-circle-inner:hover{
-  background:rgba(26,122,109,0.12);
+.svc-circle svg{
+  width:22px;height:22px;
+  stroke:var(--pri);color:var(--pri);stroke-width:2
+}
+.svc:hover .svc-circle{
+  background:rgba(26,122,109,0.13);
+  border-color:var(--pri)
+}
+.svc.active .svc-circle{
+  background:var(--pri);
   border-color:var(--pri);
-  transform:scale(1.05)
+  transform:scale(1.08)
 }
-.service-circle-inner svg{
-  width:30px;height:30px;
-  stroke:var(--pri);color:var(--pri);stroke-width:2;
-  margin-bottom:5px;flex-shrink:0
+.svc.active .svc-circle svg{
+  stroke:#fff;color:#fff
 }
-.service-circle-name{
-  font-size:11px;
+.svc-label{
+  font-size:9.5px;
   font-weight:600;
   color:var(--text);
   line-height:1.2;
+  text-align:center;
   overflow-wrap:break-word;
   word-break:break-word;
-  hyphens:auto
+  hyphens:auto;
+  width:100%
 }
-/* Star point positions (percent = center of each circle) — spread wide to open center */
-.pos-top{ top:16%; left:50% }
-.pos-mid-left{ top:40%; left:18% }
-.pos-mid-right{ top:40%; left:82% }
-.pos-bot-left{ top:83%; left:28% }
-.pos-bot-right{ top:83%; left:72% }
-@media(max-width:380px){
-  .service-circle-name{font-size:10px}
-  .service-circle-inner svg{width:26px;height:26px}
-  .services-star-title{font-size:17px}
+.svc.active .svc-label{
+  color:var(--pri)
+}
+.svc-desc-panel{
+  max-height:0;
+  overflow:hidden;
+  opacity:0;
+  transition:max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+  margin-top:0
+}
+.svc-desc-panel.open{
+  max-height:200px;
+  opacity:1;
+  margin-top:16px
+}
+.svc-desc-panel p{
+  background:rgba(26,122,109,0.06);
+  border-left:3px solid var(--pri);
+  border-radius:8px;
+  padding:14px 16px;
+  margin:0;
+  font-size:13px;
+  line-height:1.6;
+  color:var(--text)
+}
+@media(max-width:360px){
+  .svc-circle{width:40px;height:40px}
+  .svc-circle svg{width:20px;height:20px}
+  .svc-label{font-size:8.5px}
 }
 .update-item{padding:14px 0;border-bottom:1px solid var(--border)}
 .update-item:last-child{border-bottom:none}
@@ -941,43 +962,41 @@ button{cursor:pointer;border:none;background:none}
 
   <!-- Our Services -->
   <div class="services-section">
-    <div class="services-star">
-      <h3 class="services-star-title" data-i18n="our_services">Our Services</h3>
-      <!-- Point 1: Top -->
-      <div class="service-circle pos-top">
-        <div class="service-circle-inner">
+    <h3 class="services-heading" data-i18n="our_services">Our Services</h3>
+    <div class="services-row">
+      <button class="svc" onclick="selectService(this,'preparedness')">
+        <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-          <span class="service-circle-name" data-i18n="service_preparedness">Emergency Preparedness</span>
-        </div>
-      </div>
-      <!-- Point 2: Middle-left -->
-      <div class="service-circle pos-mid-left">
-        <div class="service-circle-inner">
+        </span>
+        <span class="svc-label" data-i18n="service_preparedness">Emergency Preparedness</span>
+      </button>
+      <button class="svc" onclick="selectService(this,'monitoring')">
+        <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
-          <span class="service-circle-name" data-i18n="service_monitoring">Health & Location Monitoring</span>
-        </div>
-      </div>
-      <!-- Point 3: Middle-right -->
-      <div class="service-circle pos-mid-right">
-        <div class="service-circle-inner">
+        </span>
+        <span class="svc-label" data-i18n="service_monitoring">Health & Location Monitoring</span>
+      </button>
+      <button class="svc" onclick="selectService(this,'support')">
+        <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 019.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-          <span class="service-circle-name" data-i18n="service_support">Continuous Community Care</span>
-        </div>
-      </div>
-      <!-- Point 4: Bottom-left -->
-      <div class="service-circle pos-bot-left">
-        <div class="service-circle-inner">
+        </span>
+        <span class="svc-label" data-i18n="service_support">Continuous Community Care</span>
+      </button>
+      <button class="svc" onclick="selectService(this,'equipment')">
+        <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
-          <span class="service-circle-name" data-i18n="service_equipment">Assistive Equipment Access</span>
-        </div>
-      </div>
-      <!-- Point 5: Bottom-right -->
-      <div class="service-circle pos-bot-right">
-        <div class="service-circle-inner">
+        </span>
+        <span class="svc-label" data-i18n="service_equipment">Assistive Equipment Access</span>
+      </button>
+      <button class="svc" onclick="selectService(this,'education')">
+        <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          <span class="service-circle-name" data-i18n="service_education">Health Education & Resources</span>
-        </div>
-      </div>
+        </span>
+        <span class="svc-label" data-i18n="service_education">Health Education & Resources</span>
+      </button>
+    </div>
+    <div class="svc-desc-panel" id="svc-desc-panel">
+      <p id="svc-desc-text" data-i18n="service_preparedness_desc"></p>
     </div>
   </div>
 
@@ -1861,15 +1880,15 @@ const LANG = {
     our_mission:'Our Mission',
     our_services:'Our Services',
     service_equipment:'Assistive Equipment & Repair',
-    service_equipment_desc:'Rent, buy & repair',
+    service_equipment_desc:'Flexible rental and purchase options, plus professional repair and maintenance to keep your equipment in top condition.',
     service_monitoring:'Health & Location Monitoring',
-    service_monitoring_desc:'Track wellbeing & safety',
+    service_monitoring_desc:'Simple tools to track your wellbeing and keep loved ones informed of your safety and location.',
     service_preparedness:'Emergency Preparedness',
-    service_preparedness_desc:'Ready before it happens',
+    service_preparedness_desc:'Practical support and planning to help you prepare for life\'s uncertainties with confidence.',
     service_education:'Health Education & Resources',
-    service_education_desc:'Learn health & safety',
+    service_education_desc:'Accessible information to empower you with knowledge about health, safety, and independent living.',
     service_support:'Continuous Community Care',
-    service_support_desc:'Ongoing support & connection',
+    service_support_desc:'Ongoing support and connection with professionals who understand your journey.',
     our_vision:'Our Vision',
     vision_desc:'A Singapore where every person, regardless of age or ability, can live independently with dignity, confidence, and community support.',
     mission_desc:'As Singapore\'s population ages and more people live independently, we believe everyone deserves access to quality assistive equipment and support — before an emergency happens. We help you prepare, educate, and equip so that sudden disability or medical needs never catch you off guard.',
@@ -2038,15 +2057,15 @@ const LANG = {
     our_mission:'我们的使命',
     our_services:'我们的服务',
     service_equipment:'辅助设备与维修',
-    service_equipment_desc:'租、买与维修',
+    service_equipment_desc:'灵活的租赁和购买选择，加上专业的维修和保养，让您的设备保持最佳状态。',
     service_monitoring:'健康和位置监测',
-    service_monitoring_desc:'追踪健康与安全',
+    service_monitoring_desc:'简单的工具帮助追踪您的健康状况，并让亲人了解您的安全和位置。',
     service_preparedness:'紧急准备',
-    service_preparedness_desc:'防患于未然',
+    service_preparedness_desc:'实用的支持和规划，帮助您从容应对生活中的不确定性。',
     service_education:'健康教育与资源',
-    service_education_desc:'了解健康与安全',
+    service_education_desc:'易于获取的信息，让您掌握有关健康、安全和独立生活的知识。',
     service_support:'持续社区关怀',
-    service_support_desc:'持续支持与联系',
+    service_support_desc:'与了解您旅程的专业人员持续的支持和联系。',
     our_vision:'我们的愿景',
     vision_desc:'一个新加坡，每个人无论年龄或能力如何，都能独立生活，拥有尊严、信心和社区支持。',
     mission_desc:'随着新加坡人口老龄化，越来越多人独立生活。我们相信每个人都应在紧急情况发生前获得优质辅助设备和支持。我们帮助您做好准备、教育和装备，让突发残疾或医疗需求不会让您措手不及。',
@@ -2201,15 +2220,15 @@ const LANG = {
     our_mission:'Misi Kami',
     our_services:'Layanan Kami',
     service_equipment:'Peralatan Bantu & Perbaikan',
-    service_equipment_desc:'Sewa, beli & baiki',
+    service_equipment_desc:'Pilihan sewa dan beli yang fleksibel, serta pembaikan dan penyelenggaraan profesional untuk memastikan peralatan anda dalam keadaan terbaik.',
     service_monitoring:'Pemantauan Kesehatan & Lokasi',
-    service_monitoring_desc:'Jejak kesihatan & keselamatan',
+    service_monitoring_desc:'Alat mudah untuk menjejak kesejahteraan anda dan memaklumkan orang tersayang tentang keselamatan dan lokasi anda.',
     service_preparedness:'Kesiapan Darurat',
-    service_preparedness_desc:'Bersedia sebelum berlaku',
+    service_preparedness_desc:'Sokongan dan perancangan praktikal untuk membantu anda bersedia menghadapi ketidakpastian hidup dengan yakin.',
     service_education:'Pendidikan & Sumber Daya Kesehatan',
-    service_education_desc:'Pelajari kesihatan & keselamatan',
+    service_education_desc:'Maklumat mudah diakses untuk memperkasakan anda dengan pengetahuan tentang kesihatan, keselamatan, dan kehidupan berdikari.',
     service_support:'Perawatan Komunitas Berkelanjutan',
-    service_support_desc:'Sokongan berterusan',
+    service_support_desc:'Sokongan dan hubungan berterusan dengan profesional yang memahami perjalanan anda.',
     our_vision:'Visi Kami',
     vision_desc:'Singapura di mana setiap orang, tanpa memandang usia atau kemampuan, dapat hidup mandiri dengan martabat, percaya diri, dan dukungan komunitas.',
     mission_desc:'Apabila populasi Singapura semakin menua dan lebih ramai hidup berdikari, kami percaya semua orang berhak mendapat akses kepada peralatan bantuan dan sokongan berkualiti — sebelum kecemasan berlaku. Kami membantu anda bersedia, mendidik, dan melengkapkan supaya kecacatan mendadak atau keperluan perubatan tidak mengejutkan anda.',
@@ -2356,17 +2375,16 @@ const LANG = {
     our_mission:'எங்கள் நோக்கம்',
     our_services:'எங்கள் சேவைகள்',
     service_equipment:'உதவிக் கருவி மற்றும் பழுதுசரி',
-    service_equipment_desc:'வாடகை, வாங்க & பழுது',
+    service_equipment_desc:'நெகிழ்வான வாடகை மற்றும் வாங்கும் விருப்பங்கள், மேலும் உங்கள் உபகரணத்தை சிறந்த நிலையில் வைக்க தொழில்முறை பழுது மற்றும் பராமரிப்பு.',
     service_equipment:'உதவிக் கருவி மற்றும் பழுதுசரி',
-    service_equipment_desc:'வாடகை, வாங்க & பழுது',
     service_monitoring:'ஆரோக்கியம் மற்றும் இடம் கண்காணிப்பு',
-    service_monitoring_desc:'நலம் & பாதுகாப்பு கண்காணிப்பு',
+    service_monitoring_desc:'உங்கள் நலனைக் கண்காணிக்கவும், உங்கள் பாதுகாப்பு மற்றும் இருப்பிடத்தை அன்பானவர்களுக்குத் தெரிவிக்கவும் எளிய கருவிகள்.',
     service_preparedness:'அவசரநிலை தயாரிப்பு',
-    service_preparedness_desc:'முன்கூட்டியே தயார்',
+    service_preparedness_desc:'வாழ்க்கையின் நிச்சயமற்ற தன்மைகளை நம்பிக்கையுடன் எதிர்கொள்ள உதவும் நடைமுறை ஆதரவு மற்றும் திட்டமிடல்.',
     service_education:'ஆரோக்கியம் கல்வி மற்றும் வளங்கள்',
-    service_education_desc:'நலம் & பாதுகாப்பு அறிக',
+    service_education_desc:'ஆரோக்கியம், பாதுகாப்பு மற்றும் சுதந்திர வாழ்க்கை பற்றிய அறிவை வழங்கும் அணுகக்கூடிய தகவல்.',
     service_support:'தொடர்ச்சியான சமூக கவனிப்பு',
-    service_support_desc:'தொடர்ச்சியான ஆதரவு',
+    service_support_desc:'உங்கள் பயணத்தைப் புரிந்துகொள்ளும் நிபுணர்களுடன் தொடர்ச்சியான ஆதரவு மற்றும் தொடர்பு.',
     our_vision:'எங்கள் பார்வை',
     vision_desc:'சிங்கப்பூர், ஒவ்வொரு நபரும் வயது அல்லது திறன் பொருட்படுத்தாமல், கண்ணியம், நம்பிக்கை மற்றும் சமூக ஆதரவுடன் சுயாதீனமாக வாழக்கூடிய ஒரு நாடு.',
     mission_desc:'சிங்கப்பூரின் மக்கள்தொகை வயதாகி, அதிகமானோர் சுதந்திரமாக வாழ்கையில், அவசரநிலை ஏற்படுமுன் தரமான உதவி உபகரணங்களையும் ஆதரவையும் பெற அனைவருக்கும் உரிமை உண்டு என்று நாங்கள் நம்புகிறோம்.',
@@ -2513,15 +2531,15 @@ const LANG = {
     our_mission:'Aming Misyon',
     our_services:'Ang Aming Mga Serbisyo',
     service_equipment:'Tulong sa Kagamitan at Pagkukumpuni',
-    service_equipment_desc:'Umupa, bumili at ayusin',
+    service_equipment_desc:'Flexible na pagpapaupa at pagbili, kasama ang propesyonal na pagkukumpuni at pagpapanatili upang mapanatili ang iyong kagamitan sa pinakamahusay na kondisyon.',
     service_monitoring:'Kalusugan at Lokasyong Pagsubaybay',
-    service_monitoring_desc:'Subaybayan ang kalusugan at kaligtasan',
+    service_monitoring_desc:'Simpleng mga tool upang subaybayan ang iyong kalusugan at panatilihing alam ng mga mahal sa buhay ang iyong kaligtasan at lokasyon.',
     service_preparedness:'Paghahanda sa Emerhensya',
-    service_preparedness_desc:'Handa bago mangyari',
+    service_preparedness_desc:'Praktikal na suporta at pagpaplano upang matulungan kang maghanda para sa mga hindi inaasahan sa buhay nang may tiwala.',
     service_education:'Edukasyon sa Kalusugan at Mga Mapagkukunan',
-    service_education_desc:'Matuto ng kalusugan at kaligtasan',
+    service_education_desc:'Naa-access na impormasyon upang bigyan ka ng kaalaman tungkol sa kalusugan, kaligtasan, at malayang pamumuhay.',
     service_support:'Patuloy na Pag-aalaga ng Komunidad',
-    service_support_desc:'Tuloy-tuloy na suporta',
+    service_support_desc:'Patuloy na suporta at koneksyon sa mga propesyonal na nakakaunawa sa iyong paglalakbay.',
     our_vision:'Ang Aming Pananaw',
     vision_desc:'Isang Singapore kung saan ang bawat tao, anuman ang edad o kakayahan, ay maaaring mamuhay nang independyente nang may dignidad, kumpiyansa, at suporta ng komunidad.',
     mission_desc:'Habang tumatanda ang populasyon ng Singapore at mas maraming taong nakatira nang mag-isa, naniniwala kami na lahat ay nararapat sa de-kalidad na assistive equipment at suporta — bago pa man mangyari ang emergency.',
@@ -2668,15 +2686,15 @@ const LANG = {
     our_mission:'ကျွန်ုပ်တို့၏ ရည်ရွယ်ချက်',
     our_services:'ကျွန်ုပ်တို့၏ ဝန်ဆောင်မှုများ',
     service_equipment:'ကူညီရန် ကိရိယာ နှင့် ပြင်ဆင်ခြင်း',
-    service_equipment_desc:'ငှား၊ ဝယ် နှင့် ပြင်',
+    service_equipment_desc:'ပြောင်းလွယ်ပြင်လွယ် ငှားရမ်းနှင့် ဝယ်ယူမှု ရွေးချယ်စရာများအပြင် သင့်ကိရိယာကို အကောင်းဆုံးအခြေအနေတွင် ထိန်းသိမ်းရန် ကျွမ်းကျင်သော ပြုပြင်ထိန်းသိမ်းမှု။',
     service_monitoring:'ကျန်းမာရေး နှင့် တည်နေရာ စောင့်ကြည့်မှု',
-    service_monitoring_desc:'ကျန်းမာရေး နှင့် ဘေးကင်းမှု ခြေရာခံ',
+    service_monitoring_desc:'သင့်ကျန်းမာရေးကို ခြေရာခံရန်နှင့် သင့်ဘေးကင်းမှုနှင့် တည်နေရာကို ချစ်ရသူများသိရှိစေရန် ရိုးရှင်းသောကိရိယာများ။',
     service_preparedness:'အရေးပေါ်အတွက် ပြင်ဆင်ခြင်း',
-    service_preparedness_desc:'ကြိုတင်ပြင်ဆင်',
+    service_preparedness_desc:'ဘဝ၏ မသေချာမှုများကို ယုံကြည်မှုဖြင့် ကြိုတင်ပြင်ဆင်ရန် ကူညီပေးသော လက်တွေ့ကျသည့် ပံ့ပိုးမှုနှင့် စီစဉ်မှု။',
     service_education:'ကျန်းမာရေး ပညာသင်ခန်းစာ နှင့် ကမ္ဘာ့အသုံးအဆောင်သုံးစွဲမှုများ',
-    service_education_desc:'ကျန်းမာရေး နှင့် ဘေးကင်းမှု လေ့လာ',
+    service_education_desc:'ကျန်းမာရေး၊ ဘေးကင်းမှုနှင့် လွတ်လပ်စွာနေထိုင်ခြင်းအကြောင်း အသိပညာဖြင့် သင့်ကို စွမ်းအားဖြည့်ပေးသော လက်လှမ်းမီသောအချက်အလက်။',
     service_support:'အပ်နီးကပ် လူမှုအဖွဲ့အစည်း စောင့်ရှောက်မှု',
-    service_support_desc:'စဉ်ဆက်မပြတ် ပံ့ပိုးမှု',
+    service_support_desc:'သင့်ခရီးစဉ်ကို နားလည်သော ကျွမ်းကျင်သူများနှင့် စဉ်ဆက်မပြတ် ပံ့ပိုးမှုနှင့် ဆက်သွယ်မှု။',
     our_vision:'ကျွန်ုပ်တို့၏ အမြင်',
     vision_desc:'ကျေးဇူးရှိသည့် အသက်အရွယ် သို့မဟုတ် စွမ်းရည်မည်သည့် အခြေအခြင် လူတစ်ဦးတစ်ေတွ လွတ်လပ်စွာ ၊ ကျေးဇူးရှိသည့်အတူ ၊ သံသယမှလွတ်မြေ လူမှုအဖွဲ့အစည်းအကူအညီဖြင့် နေထိုင်နိုင်သည့် စင်ကာပူတစ်ခု။',
     mission_desc:'စင်ကာပူ၏ လူဦးရေ သက်ကြီးရွယ်အိုများ ပိုမိုများပြားလာသည်နှင့်အမျှ လူတိုင်းသည် အရေးပေါ်မတိုင်မီ အရည်အသွေးမြင့် အကူအညီပေးကိရိယာများ ရရှိသင့်ပါသည်။',
@@ -3731,6 +3749,34 @@ async function enterApp() {
     toast('Error loading app, please login again', 'error');
     doLogout();
   }
+}
+
+/* ── Services Selection ───────────────────── */
+let _activeService = null;
+function selectService(btn, key) {
+  const panel = $('svc-desc-panel');
+  const textEl = $('svc-desc-text');
+  if (!panel || !textEl) return;
+  const dict = LANG[currentLang] || LANG.en;
+
+  // Toggle: tapping the active one closes it
+  if (_activeService === key) {
+    panel.classList.remove('open');
+    btn.classList.remove('active');
+    _activeService = null;
+    return;
+  }
+
+  // Clear previous active state
+  document.querySelectorAll('.svc').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  _activeService = key;
+
+  // Set description text + keep data-i18n in sync so language switches update it
+  const descKey = 'service_' + key + '_desc';
+  textEl.setAttribute('data-i18n', descKey);
+  textEl.textContent = dict[descKey] || '';
+  panel.classList.add('open');
 }
 
 /* ── Tab Navigation ───────────────────────── */
