@@ -279,7 +279,12 @@ button{cursor:pointer;border:none;background:none}
   overflow:hidden;
   opacity:0;
   transition:max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
-  margin-bottom:0
+  margin-bottom:0;
+  /* Full-bleed the panel itself so its overflow:hidden doesn't clip the image sides */
+  width:100vw;
+  max-width:100vw;
+  margin-left:calc(-50vw + 50%);
+  margin-right:calc(-50vw + 50%)
 }
 .svc-desc-panel.open{
   max-height:600px;
@@ -289,11 +294,7 @@ button{cursor:pointer;border:none;background:none}
 /* Full-bleed hero image with overlaid text */
 .svc-hero{
   position:relative;
-  /* Full-bleed: break out of .tab-content padding + max-width to screen edges */
-  width:100vw;
-  max-width:100vw;
-  margin-left:calc(-50vw + 50%);
-  margin-right:calc(-50vw + 50%);
+  width:100%;
   aspect-ratio:16/10;
   overflow:hidden;
   display:none                 /* shown when image loads */
