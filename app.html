@@ -268,44 +268,37 @@ button{cursor:pointer;border:none;background:none}
   overflow:hidden
 }
 .svc-desc-text{
-  flex:1 1 55%;
-  padding:18px 18px;
+  flex:1 1 54%;
+  padding:18px;
   margin:0;
   font-size:13.5px;
   line-height:1.65;
   color:var(--text)
 }
 .svc-desc-img-wrap{
-  flex:0 0 42%;
-  align-self:stretch;
+  flex:0 0 44%;
+  align-self:center;
   display:none;            /* hidden unless a service has an image */
   align-items:center;
   justify-content:center;
-  padding:10px 12px 10px 0
+  padding:10px 12px 10px 4px
 }
 .svc-desc-img-wrap.has-img{
   display:flex
 }
 .svc-desc-img{
   width:100%;
-  height:auto;
-  max-height:180px;
+  aspect-ratio:1/1;
   object-fit:cover;
-  /* Playful water-splash / blob shape */
-  border-radius:47% 53% 45% 55% / 55% 45% 55% 45%;
-  animation:splashMorph 8s ease-in-out infinite
+  /* Organic blob splash mask (matches reference style) */
+  clip-path:url(#svc-blob-clip);
+  -webkit-clip-path:url(#svc-blob-clip)
 }
-@keyframes splashMorph{
-  0%,100%{border-radius:47% 53% 45% 55% / 55% 45% 55% 45%}
-  50%{border-radius:53% 47% 55% 45% / 45% 55% 45% 55%}
-}
-@media(max-width:480px){
+/* Stack image on top only on very small screens */
+@media(max-width:380px){
   .svc-desc-inner{flex-direction:column}
-  .svc-desc-img-wrap{flex:none;width:100%;padding:14px 14px 4px;order:-1}
-  .svc-desc-img{max-height:150px;max-width:200px}
-  .svc-desc-text{flex:none;width:100%;box-sizing:border-box}
-}
-@media(max-width:360px){
+  .svc-desc-img-wrap{flex:none;width:70%;padding:14px 14px 4px;order:-1}
+  .svc-desc-text{flex:none;width:100%;box-sizing:border-box;text-align:center}
   .svc-circle{width:40px;height:40px}
   .svc-circle svg{width:20px;height:20px}
   .svc-label{font-size:8.5px}
@@ -1098,6 +1091,13 @@ button{cursor:pointer;border:none;background:none}
         <p id="svc-desc-text" class="svc-desc-text" data-i18n="service_preparedness_desc"></p>
         <div class="svc-desc-img-wrap" id="svc-desc-img-wrap">
           <img id="svc-desc-img" class="svc-desc-img" alt="">
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+            <defs>
+              <clipPath id="svc-blob-clip" clipPathUnits="objectBoundingBox">
+                <path d="M0.70,0.02 C0.88,0.0 1.0,0.16 0.97,0.36 C0.95,0.50 1.02,0.62 0.94,0.78 C0.85,0.96 0.62,0.90 0.44,0.97 C0.24,1.04 0.04,1.0 0.02,0.76 C0.0,0.60 0.16,0.56 0.14,0.42 C0.12,0.26 0.02,0.14 0.16,0.06 C0.32,-0.02 0.52,0.06 0.70,0.02 Z"/>
+              </clipPath>
+            </defs>
+          </svg>
         </div>
       </div>
     </div>
