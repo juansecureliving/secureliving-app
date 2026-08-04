@@ -195,9 +195,9 @@ button{cursor:pointer;border:none;background:none}
 }
 .services-heading{
   font-family:var(--font-display);
-  font-size:19px;
+  font-size:20px;
   font-weight:600;
-  color:var(--text);
+  color:var(--pri);
   text-align:center;
   margin:0 0 16px
 }
@@ -306,14 +306,22 @@ button{cursor:pointer;border:none;background:none}
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover
+  object-fit:cover;
+  transition:opacity 0.35s ease
+}
+/* Fade image + text out during a service swap */
+.svc-hero.swapping .svc-hero-img,
+.svc-hero.swapping .svc-hero-text,
+.svc-hero.swapping .svc-hero-scrim{
+  opacity:0
 }
 /* Soft gradient scrim so white text stays readable; direction set per position */
 .svc-hero-scrim{
   position:absolute;
   inset:0;
   pointer-events:none;
-  z-index:1
+  z-index:1;
+  transition:opacity 0.35s ease
 }
 .svc-hero-text{
   position:absolute;
@@ -325,7 +333,8 @@ button{cursor:pointer;border:none;background:none}
   line-height:1.5;
   text-shadow:0 2px 6px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.6);
   max-width:66%;
-  box-sizing:border-box
+  box-sizing:border-box;
+  transition:opacity 0.35s ease
 }
 /* ── Per-service text position + matching scrim ── */
 /* Preparedness: bottom */
@@ -1138,7 +1147,6 @@ button{cursor:pointer;border:none;background:none}
 
   <!-- Our Services -->
   <div class="services-section">
-    <h3 class="services-heading" data-i18n="our_services">Our Services</h3>
     <div class="svc-desc-panel" id="svc-desc-panel">
       <div class="svc-hero" id="svc-hero">
         <img id="svc-desc-img" class="svc-hero-img" alt="">
@@ -1146,6 +1154,7 @@ button{cursor:pointer;border:none;background:none}
         <p id="svc-desc-text" class="svc-hero-text" data-i18n="service_preparedness_desc"></p>
       </div>
     </div>
+    <h3 class="services-heading" data-i18n="our_services">Our Services</h3>
     <div class="services-row">
       <button class="svc" style="--svc-i:0" onclick="selectService(this,'preparedness')">
         <span class="svc-circle">
@@ -3990,30 +3999,46 @@ function selectService(btn, key) {
   textEl.setAttribute('data-i18n', descKey);
   textEl.textContent = dict[descKey] || '';
 
-  // Set text position on the hero
-  if (hero) {
-    hero.className = 'svc-hero ' + (SERVICE_POS[key] || 'pos-bottom');
-  }
-
   // Show full-bleed image (gracefully hide hero if not uploaded)
   if (hero && img) {
     const imgFile = SERVICE_IMAGES[key];
+    const posClass = SERVICE_POS[key] || 'pos-bottom';
     if (imgFile) {
-      img.onerror = function() {
-        hero.classList.remove('has-img');
-        img.onerror = null;
+      // Fade out current content, swap image + position, then fade in
+      const applySwap = () => {
+        // set position class now (while faded out), preserving swapping state
+        const fading = hero.classList.contains('swapping');
+        hero.className = 'svc-hero ' + posClass + (hero.classList.contains('has-img') ? ' has-img' : '');
+        if (fading) hero.classList.add('swapping');
+        img.onerror = function() {
+          hero.classList.remove('has-img');
+          img.onerror = null;
+        };
+        img.onload = function() {
+          hero.classList.add('has-img');
+          requestAnimationFrame(() => hero.classList.remove('swapping'));
+        };
+        img.alt = dict['service_' + key] || '';
+        img.className = 'svc-hero-img' + (key === 'support' ? ' crop-support' : '');
+        img.id = 'svc-desc-img';
+        img.src = imgFile;
+        // if cached (onload may not fire), ensure fade-in
+        if (img.complete && img.naturalWidth > 0) {
+          hero.classList.add('has-img');
+          requestAnimationFrame(() => hero.classList.remove('swapping'));
+        }
       };
-      img.onload = function() {
-        hero.classList.add('has-img');
-      };
-      img.alt = dict['service_' + key] || '';
-      // Support-specific crop for the hands
-      img.className = 'svc-hero-img' + (key === 'support' ? ' crop-support' : '');
-      img.id = 'svc-desc-img';
-      img.src = imgFile;
+      // If hero already visible, fade out first then swap; else swap immediately
+      if (hero.classList.contains('has-img')) {
+        hero.classList.add('swapping');
+        setTimeout(applySwap, 220);
+      } else {
+        hero.className = 'svc-hero ' + posClass;
+        applySwap();
+      }
     } else {
       img.removeAttribute('src');
-      hero.classList.remove('has-img');
+      hero.className = 'svc-hero ' + posClass;
     }
   }
 
