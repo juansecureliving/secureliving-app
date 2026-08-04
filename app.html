@@ -188,8 +188,6 @@ button{cursor:pointer;border:none;background:none}
   width:44px;
   height:44px;
   border-radius:50%;
-  background:rgba(26,122,109,0.07);
-  border:1.5px solid rgba(26,122,109,0.15);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -209,28 +207,24 @@ button{cursor:pointer;border:none;background:none}
   50%{transform:translateY(-3px)}
 }
 .svc-circle svg{
-  width:22px;height:22px;
+  width:30px;height:30px;
   stroke:var(--pri);color:var(--pri);stroke-width:2;
   transition:transform 0.2s ease;
   /* Gentle continuous float on the icon, staggered */
   animation:svcFloat 3s ease-in-out infinite;
   animation-delay:calc(0.6s + var(--svc-i, 0) * 0.15s)
 }
-.svc:hover .svc-circle{
-  background:rgba(26,122,109,0.13);
-  border-color:var(--pri)
-}
 .svc:hover .svc-circle svg{
   transform:scale(1.15);
   animation-play-state:paused
 }
-.svc.active .svc-circle{
-  background:var(--pri);
-  border-color:var(--pri);
-  transform:scale(1.08)
-}
 .svc.active .svc-circle svg{
-  stroke:#fff;color:#fff
+  stroke:var(--pri);color:var(--pri);
+  transform:scale(1.15);
+  filter:drop-shadow(0 2px 4px rgba(26,122,109,0.35))
+}
+.svc.active .svc-label{
+  color:var(--pri)
 }
 .svc-label{
   font-size:9.5px;
@@ -242,9 +236,6 @@ button{cursor:pointer;border:none;background:none}
   word-break:break-word;
   hyphens:auto;
   width:100%
-}
-.svc.active .svc-label{
-  color:var(--pri)
 }
 .svc-desc-panel{
   max-height:0;
@@ -292,13 +283,18 @@ button{cursor:pointer;border:none;background:none}
   clip-path:url(#svc-blob-clip);
   -webkit-clip-path:url(#svc-blob-clip)
 }
+/* Zoom out: show more of the image within the blob (less cropping) */
+.svc-desc-img.svc-img-zoomout{
+  object-fit:contain;
+  background:rgba(26,122,109,0.06)
+}
 /* Stack image on top only on very small screens */
 @media(max-width:380px){
   .svc-desc-inner{flex-direction:column}
   .svc-desc-img-wrap{flex:none;width:75%;padding:8px 0 4px;order:-1}
   .svc-desc-text{flex:none;width:100%;box-sizing:border-box;text-align:center}
   .svc-circle{width:40px;height:40px}
-  .svc-circle svg{width:20px;height:20px}
+  .svc-circle svg{width:26px;height:26px}
   .svc-label{font-size:8.5px}
 }
 .update-item{padding:14px 0;border-bottom:1px solid var(--border)}.update-item:last-child{border-bottom:none}
@@ -3857,7 +3853,6 @@ async function enterApp() {
 }
 
 /* ── Services Selection ───────────────────── */
-// Map service keys to their image filenames (upload each to repo root)
 const SERVICE_IMAGES = {
   preparedness: 'svc-preparedness.jpg',
   monitoring:   'svc-monitoring.jpg',
@@ -3905,6 +3900,9 @@ function selectService(btn, key) {
         imgWrap.classList.add('has-img');
       };
       img.alt = dict['service_' + key] || '';
+      // Zoom out (show more of the image) for selected services
+      const zoomOut = (key === 'support' || key === 'education');
+      img.classList.toggle('svc-img-zoomout', zoomOut);
       img.src = imgFile;
     } else {
       img.removeAttribute('src');
@@ -3913,6 +3911,14 @@ function selectService(btn, key) {
   }
 
   panel.classList.add('open');
+}
+
+// Open a default service description on load (Support)
+function openDefaultService() {
+  const btn = document.querySelector('.svc[onclick*="support"]');
+  if (btn && _activeService === null) {
+    selectService(btn, 'support');
+  }
 }
 
 /* ── Tab Navigation ───────────────────────── */
@@ -6400,6 +6406,9 @@ window.addEventListener('DOMContentLoaded', () => {
   } else if (guestMode === 'true') {
     enterGuest();
   }
+  
+  // Open the default service description (Support) once loaded
+  setTimeout(openDefaultService, 900);
   
   // Track user activity
   document.addEventListener('click', () => { lastActivityTime = Date.now(); });
