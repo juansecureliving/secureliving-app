@@ -254,7 +254,7 @@ button{cursor:pointer;border:none;background:none}
   margin-top:0
 }
 .svc-desc-panel.open{
-  max-height:420px;
+  max-height:600px;
   opacity:1;
   margin-top:16px
 }
@@ -262,26 +262,24 @@ button{cursor:pointer;border:none;background:none}
   display:flex;
   align-items:center;
   gap:0;
-  background:rgba(26,122,109,0.06);
-  border-left:3px solid var(--pri);
   border-radius:12px;
-  overflow:hidden
+  overflow:visible
 }
 .svc-desc-text{
-  flex:1 1 54%;
-  padding:18px;
+  flex:1 1 50%;
+  padding:8px 8px 8px 4px;
   margin:0;
-  font-size:13.5px;
-  line-height:1.65;
+  font-size:15.5px;
+  line-height:1.7;
   color:var(--text)
 }
 .svc-desc-img-wrap{
-  flex:0 0 44%;
+  flex:0 0 50%;
   align-self:center;
   display:none;            /* hidden unless a service has an image */
   align-items:center;
   justify-content:center;
-  padding:10px 12px 10px 4px
+  padding:0
 }
 .svc-desc-img-wrap.has-img{
   display:flex
@@ -297,7 +295,7 @@ button{cursor:pointer;border:none;background:none}
 /* Stack image on top only on very small screens */
 @media(max-width:380px){
   .svc-desc-inner{flex-direction:column}
-  .svc-desc-img-wrap{flex:none;width:70%;padding:14px 14px 4px;order:-1}
+  .svc-desc-img-wrap{flex:none;width:75%;padding:8px 0 4px;order:-1}
   .svc-desc-text{flex:none;width:100%;box-sizing:border-box;text-align:center}
   .svc-circle{width:40px;height:40px}
   .svc-circle svg{width:20px;height:20px}
@@ -3859,13 +3857,13 @@ async function enterApp() {
 }
 
 /* ── Services Selection ───────────────────── */
-// Map service keys to their image filenames (add more as images are uploaded)
+// Map service keys to their image filenames (upload each to repo root)
 const SERVICE_IMAGES = {
-  preparedness: 'svc-preparedness.jpg'
-  // monitoring: 'svc-monitoring.jpg',
-  // support: 'svc-support.jpg',
-  // equipment: 'svc-equipment.jpg',
-  // education: 'svc-education.jpg'
+  preparedness: 'svc-preparedness.jpg',
+  monitoring:   'svc-monitoring.jpg',
+  support:      'svc-support.jpg',
+  equipment:    'svc-equipment.jpg',
+  education:    'svc-education.jpg'
 };
 let _activeService = null;
 function selectService(btn, key) {
@@ -3894,13 +3892,20 @@ function selectService(btn, key) {
   textEl.setAttribute('data-i18n', descKey);
   textEl.textContent = dict[descKey] || '';
 
-  // Show image if this service has one
+  // Show image if this service has one (gracefully hide if not yet uploaded)
   if (imgWrap && img) {
     const imgFile = SERVICE_IMAGES[key];
     if (imgFile) {
-      img.src = imgFile;
+      // If the image fails to load (e.g. not uploaded yet), fall back to text-only
+      img.onerror = function() {
+        imgWrap.classList.remove('has-img');
+        img.onerror = null;
+      };
+      img.onload = function() {
+        imgWrap.classList.add('has-img');
+      };
       img.alt = dict['service_' + key] || '';
-      imgWrap.classList.add('has-img');
+      img.src = imgFile;
     } else {
       img.removeAttribute('src');
       imgWrap.classList.remove('has-img');
