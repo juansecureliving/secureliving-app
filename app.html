@@ -278,13 +278,13 @@ button{cursor:pointer;border:none;background:none}
   max-height:0;
   overflow:hidden;
   opacity:0;
-  transition:max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
-  margin-top:0
+  transition:max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.3s ease;
+  margin-bottom:0
 }
 .svc-desc-panel.open{
   max-height:600px;
   opacity:1;
-  margin-top:16px
+  margin-bottom:18px
 }
 /* Full-bleed hero image with overlaid text */
 .svc-hero{
@@ -1139,6 +1139,13 @@ button{cursor:pointer;border:none;background:none}
   <!-- Our Services -->
   <div class="services-section">
     <h3 class="services-heading" data-i18n="our_services">Our Services</h3>
+    <div class="svc-desc-panel" id="svc-desc-panel">
+      <div class="svc-hero" id="svc-hero">
+        <img id="svc-desc-img" class="svc-hero-img" alt="">
+        <div class="svc-hero-scrim" id="svc-hero-scrim"></div>
+        <p id="svc-desc-text" class="svc-hero-text" data-i18n="service_preparedness_desc"></p>
+      </div>
+    </div>
     <div class="services-row">
       <button class="svc" style="--svc-i:0" onclick="selectService(this,'preparedness')">
         <span class="svc-circle">
@@ -1170,13 +1177,6 @@ button{cursor:pointer;border:none;background:none}
         </span>
         <span class="svc-label" data-i18n="service_education">Health Education & Resources</span>
       </button>
-    </div>
-    <div class="svc-desc-panel" id="svc-desc-panel">
-      <div class="svc-hero" id="svc-hero">
-        <img id="svc-desc-img" class="svc-hero-img" alt="">
-        <div class="svc-hero-scrim" id="svc-hero-scrim"></div>
-        <p id="svc-desc-text" class="svc-hero-text" data-i18n="service_preparedness_desc"></p>
-      </div>
     </div>
   </div>
 
