@@ -589,7 +589,7 @@ button{cursor:pointer;border:none;background:none}
 }
 .tagline-section{
   text-align:center;
-  padding:56px 24px;
+  padding:56px 24px 72px;
   margin-bottom:32px;
   /* Break out of the .tab-content 16px padding + max-width to reach screen edges */
   margin-left:calc(-50vw + 50%);
@@ -604,6 +604,21 @@ button{cursor:pointer;border:none;background:none}
   position:relative;
   overflow:hidden
 }
+/* Wavy bottom edge - background color curves up into the image */
+.tagline-section::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-1px;
+  width:100%;
+  height:48px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath fill='%23F7F4EF' d='M0,60 C360,110 1080,10 1440,60 L1440,100 L0,100 Z'/%3E%3C/svg%3E");
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  z-index:1;
+  pointer-events:none
+}
 .tagline{
   font-family:'Georgia','Times New Roman',serif;
   font-size:22px;
@@ -617,7 +632,7 @@ button{cursor:pointer;border:none;background:none}
   margin-left:auto;
   margin-right:auto;
   position:relative;
-  z-index:1;
+  z-index:2;
   animation:taglineFadeIn 1.2s ease-in 0.8s forwards;
   opacity:0
 }
