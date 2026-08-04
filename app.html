@@ -278,16 +278,14 @@ button{cursor:pointer;border:none;background:none}
 .svc-desc-img{
   width:100%;
   aspect-ratio:1/1;
-  object-fit:cover;
-  /* Organic blob splash mask (matches reference style) */
-  clip-path:url(#svc-blob-clip);
-  -webkit-clip-path:url(#svc-blob-clip)
+  object-fit:cover
 }
-/* Zoom out: show more of the image within the blob (less cropping) */
-.svc-desc-img.svc-img-zoomout{
-  object-fit:contain;
-  background:rgba(26,122,109,0.06)
-}
+/* Per-service organic blob shapes */
+.svc-desc-img.blob-preparedness{clip-path:url(#blob-preparedness);-webkit-clip-path:url(#blob-preparedness)}
+.svc-desc-img.blob-monitoring{clip-path:url(#blob-monitoring);-webkit-clip-path:url(#blob-monitoring)}
+.svc-desc-img.blob-support{clip-path:url(#blob-support);-webkit-clip-path:url(#blob-support)}
+.svc-desc-img.blob-equipment{clip-path:url(#blob-equipment);-webkit-clip-path:url(#blob-equipment)}
+.svc-desc-img.blob-education{clip-path:url(#blob-education);-webkit-clip-path:url(#blob-education)}
 /* Stack image on top only on very small screens */
 @media(max-width:380px){
   .svc-desc-inner{flex-direction:column}
@@ -1087,8 +1085,20 @@ button{cursor:pointer;border:none;background:none}
           <img id="svc-desc-img" class="svc-desc-img" alt="">
           <svg width="0" height="0" style="position:absolute" aria-hidden="true">
             <defs>
-              <clipPath id="svc-blob-clip" clipPathUnits="objectBoundingBox">
+              <clipPath id="blob-preparedness" clipPathUnits="objectBoundingBox">
                 <path d="M0.70,0.02 C0.88,0.0 1.0,0.16 0.97,0.36 C0.95,0.50 1.02,0.62 0.94,0.78 C0.85,0.96 0.62,0.90 0.44,0.97 C0.24,1.04 0.04,1.0 0.02,0.76 C0.0,0.60 0.16,0.56 0.14,0.42 C0.12,0.26 0.02,0.14 0.16,0.06 C0.32,-0.02 0.52,0.06 0.70,0.02 Z"/>
+              </clipPath>
+              <clipPath id="blob-monitoring" clipPathUnits="objectBoundingBox">
+                <path d="M0.5,0.0 C0.78,0.0 1.0,0.22 1.0,0.5 C1.0,0.72 0.9,0.82 0.82,0.92 C0.72,1.02 0.6,1.0 0.5,1.0 C0.3,1.0 0.08,0.94 0.02,0.72 C-0.02,0.54 0.06,0.44 0.04,0.28 C0.02,0.1 0.24,0.0 0.5,0.0 Z"/>
+              </clipPath>
+              <clipPath id="blob-support" clipPathUnits="objectBoundingBox">
+                <path d="M0.5,0.03 C0.72,-0.03 0.92,0.08 0.96,0.3 C1.0,0.5 0.9,0.6 0.95,0.76 C1.0,0.94 0.8,1.02 0.6,0.98 C0.44,0.95 0.4,1.0 0.24,0.96 C0.04,0.91 0.0,0.72 0.05,0.54 C0.09,0.4 0.0,0.28 0.1,0.14 C0.2,0.0 0.34,0.08 0.5,0.03 Z"/>
+              </clipPath>
+              <clipPath id="blob-equipment" clipPathUnits="objectBoundingBox">
+                <path d="M0.28,0.04 C0.5,-0.02 0.66,0.06 0.82,0.08 C0.98,0.1 1.0,0.3 0.96,0.5 C0.92,0.68 1.0,0.84 0.86,0.92 C0.7,1.02 0.5,0.94 0.32,0.96 C0.12,0.98 0.0,0.86 0.04,0.64 C0.07,0.48 0.0,0.34 0.06,0.2 C0.12,0.06 0.14,0.08 0.28,0.04 Z"/>
+              </clipPath>
+              <clipPath id="blob-education" clipPathUnits="objectBoundingBox">
+                <path d="M0.5,0.02 C0.68,0.0 0.8,0.1 0.9,0.16 C1.02,0.24 0.96,0.44 0.98,0.6 C1.0,0.8 0.88,0.96 0.68,0.96 C0.52,0.96 0.46,1.02 0.3,0.98 C0.1,0.93 0.02,0.8 0.04,0.6 C0.05,0.46 0.0,0.32 0.08,0.18 C0.18,0.02 0.32,0.05 0.5,0.02 Z"/>
               </clipPath>
             </defs>
           </svg>
@@ -3900,9 +3910,8 @@ function selectService(btn, key) {
         imgWrap.classList.add('has-img');
       };
       img.alt = dict['service_' + key] || '';
-      // Zoom out (show more of the image) for selected services
-      const zoomOut = (key === 'support' || key === 'education');
-      img.classList.toggle('svc-img-zoomout', zoomOut);
+      // Apply this service's unique blob shape
+      img.className = 'svc-desc-img blob-' + key;
       img.src = imgFile;
     } else {
       img.removeAttribute('src');
