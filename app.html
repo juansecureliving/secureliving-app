@@ -250,23 +250,60 @@ button{cursor:pointer;border:none;background:none}
   max-height:0;
   overflow:hidden;
   opacity:0;
-  transition:max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+  transition:max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
   margin-top:0
 }
 .svc-desc-panel.open{
-  max-height:200px;
+  max-height:420px;
   opacity:1;
   margin-top:16px
 }
-.svc-desc-panel p{
+.svc-desc-inner{
+  display:flex;
+  align-items:center;
+  gap:0;
   background:rgba(26,122,109,0.06);
   border-left:3px solid var(--pri);
-  border-radius:8px;
-  padding:14px 16px;
+  border-radius:12px;
+  overflow:hidden
+}
+.svc-desc-text{
+  flex:1 1 55%;
+  padding:18px 18px;
   margin:0;
-  font-size:13px;
-  line-height:1.6;
+  font-size:13.5px;
+  line-height:1.65;
   color:var(--text)
+}
+.svc-desc-img-wrap{
+  flex:0 0 42%;
+  align-self:stretch;
+  display:none;            /* hidden unless a service has an image */
+  align-items:center;
+  justify-content:center;
+  padding:10px 12px 10px 0
+}
+.svc-desc-img-wrap.has-img{
+  display:flex
+}
+.svc-desc-img{
+  width:100%;
+  height:auto;
+  max-height:180px;
+  object-fit:cover;
+  /* Playful water-splash / blob shape */
+  border-radius:47% 53% 45% 55% / 55% 45% 55% 45%;
+  animation:splashMorph 8s ease-in-out infinite
+}
+@keyframes splashMorph{
+  0%,100%{border-radius:47% 53% 45% 55% / 55% 45% 55% 45%}
+  50%{border-radius:53% 47% 55% 45% / 45% 55% 45% 55%}
+}
+@media(max-width:480px){
+  .svc-desc-inner{flex-direction:column}
+  .svc-desc-img-wrap{flex:none;width:100%;padding:14px 14px 4px;order:-1}
+  .svc-desc-img{max-height:150px;max-width:200px}
+  .svc-desc-text{flex:none;width:100%;box-sizing:border-box}
 }
 @media(max-width:360px){
   .svc-circle{width:40px;height:40px}
@@ -1057,7 +1094,12 @@ button{cursor:pointer;border:none;background:none}
       </button>
     </div>
     <div class="svc-desc-panel" id="svc-desc-panel">
-      <p id="svc-desc-text" data-i18n="service_preparedness_desc"></p>
+      <div class="svc-desc-inner">
+        <p id="svc-desc-text" class="svc-desc-text" data-i18n="service_preparedness_desc"></p>
+        <div class="svc-desc-img-wrap" id="svc-desc-img-wrap">
+          <img id="svc-desc-img" class="svc-desc-img" alt="">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3817,10 +3859,20 @@ async function enterApp() {
 }
 
 /* ── Services Selection ───────────────────── */
+// Map service keys to their image filenames (add more as images are uploaded)
+const SERVICE_IMAGES = {
+  preparedness: 'svc-preparedness.jpg'
+  // monitoring: 'svc-monitoring.jpg',
+  // support: 'svc-support.jpg',
+  // equipment: 'svc-equipment.jpg',
+  // education: 'svc-education.jpg'
+};
 let _activeService = null;
 function selectService(btn, key) {
   const panel = $('svc-desc-panel');
   const textEl = $('svc-desc-text');
+  const imgWrap = $('svc-desc-img-wrap');
+  const img = $('svc-desc-img');
   if (!panel || !textEl) return;
   const dict = LANG[currentLang] || LANG.en;
 
@@ -3841,6 +3893,20 @@ function selectService(btn, key) {
   const descKey = 'service_' + key + '_desc';
   textEl.setAttribute('data-i18n', descKey);
   textEl.textContent = dict[descKey] || '';
+
+  // Show image if this service has one
+  if (imgWrap && img) {
+    const imgFile = SERVICE_IMAGES[key];
+    if (imgFile) {
+      img.src = imgFile;
+      img.alt = dict['service_' + key] || '';
+      imgWrap.classList.add('has-img');
+    } else {
+      img.removeAttribute('src');
+      imgWrap.classList.remove('has-img');
+    }
+  }
+
   panel.classList.add('open');
 }
 
