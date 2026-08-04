@@ -194,15 +194,35 @@ button{cursor:pointer;border:none;background:none}
   align-items:center;
   justify-content:center;
   transition:all 0.2s ease;
-  flex-shrink:0
+  flex-shrink:0;
+  /* Entrance: staggered pop-in */
+  opacity:0;
+  animation:svcPopIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  animation-delay:calc(var(--svc-i, 0) * 0.1s)
+}
+@keyframes svcPopIn{
+  from{opacity:0;transform:scale(0.4) translateY(8px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+@keyframes svcFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
 }
 .svc-circle svg{
   width:22px;height:22px;
-  stroke:var(--pri);color:var(--pri);stroke-width:2
+  stroke:var(--pri);color:var(--pri);stroke-width:2;
+  transition:transform 0.2s ease;
+  /* Gentle continuous float on the icon, staggered */
+  animation:svcFloat 3s ease-in-out infinite;
+  animation-delay:calc(0.6s + var(--svc-i, 0) * 0.15s)
 }
 .svc:hover .svc-circle{
   background:rgba(26,122,109,0.13);
   border-color:var(--pri)
+}
+.svc:hover .svc-circle svg{
+  transform:scale(1.15);
+  animation-play-state:paused
 }
 .svc.active .svc-circle{
   background:var(--pri);
@@ -253,8 +273,7 @@ button{cursor:pointer;border:none;background:none}
   .svc-circle svg{width:20px;height:20px}
   .svc-label{font-size:8.5px}
 }
-.update-item{padding:14px 0;border-bottom:1px solid var(--border)}
-.update-item:last-child{border-bottom:none}
+.update-item{padding:14px 0;border-bottom:1px solid var(--border)}.update-item:last-child{border-bottom:none}
 .update-item .update-date{font-size:11px;color:var(--muted);margin-bottom:4px}
 .update-item h4{font-size:15px;margin-bottom:4px}
 .update-item p{font-size:13px;color:var(--muted);line-height:1.4}
@@ -640,6 +659,48 @@ button{cursor:pointer;border:none;background:none}
   z-index:1;
   pointer-events:none
 }
+/* ── Full-width Info Bands (Mission / Vision) ──────────────── */
+.info-band{
+  /* Break out of .tab-content padding + max-width to reach screen edges */
+  margin-left:calc(-50vw + 50%);
+  margin-right:calc(-50vw + 50%);
+  width:100vw;
+  max-width:100vw;
+  margin-bottom:0;
+  padding:40px 0
+}
+.info-band + .info-band{
+  margin-top:0
+}
+.info-band-inner{
+  max-width:600px;
+  margin:0 auto;
+  padding:0 28px;
+  text-align:center
+}
+.info-band-title{
+  font-family:var(--font-display);
+  font-size:22px;
+  font-weight:600;
+  margin:0 0 12px
+}
+.info-band-text{
+  font-size:14.5px;
+  line-height:1.7;
+  margin:0
+}
+/* Mission — soft teal */
+.info-band-mission{
+  background:#EAF3F1
+}
+.info-band-mission .info-band-title{ color:var(--pri) }
+.info-band-mission .info-band-text{ color:#3A5551 }
+/* Vision — soft warm sand */
+.info-band-vision{
+  background:#F3ECE2
+}
+.info-band-vision .info-band-title{ color:#B5764A }
+.info-band-vision .info-band-text{ color:#5A4A3A }
 .tagline{
   font-family:'Georgia','Times New Roman',serif;
   font-size:22px;
@@ -964,31 +1025,31 @@ button{cursor:pointer;border:none;background:none}
   <div class="services-section">
     <h3 class="services-heading" data-i18n="our_services">Our Services</h3>
     <div class="services-row">
-      <button class="svc" onclick="selectService(this,'preparedness')">
+      <button class="svc" style="--svc-i:0" onclick="selectService(this,'preparedness')">
         <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
         </span>
         <span class="svc-label" data-i18n="service_preparedness">Emergency Preparedness</span>
       </button>
-      <button class="svc" onclick="selectService(this,'monitoring')">
+      <button class="svc" style="--svc-i:1" onclick="selectService(this,'monitoring')">
         <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
         </span>
         <span class="svc-label" data-i18n="service_monitoring">Health & Location Monitoring</span>
       </button>
-      <button class="svc" onclick="selectService(this,'support')">
+      <button class="svc" style="--svc-i:2" onclick="selectService(this,'support')">
         <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 019.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
         </span>
         <span class="svc-label" data-i18n="service_support">Continuous Community Care</span>
       </button>
-      <button class="svc" onclick="selectService(this,'equipment')">
+      <button class="svc" style="--svc-i:3" onclick="selectService(this,'equipment')">
         <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
         </span>
         <span class="svc-label" data-i18n="service_equipment">Assistive Equipment Access</span>
       </button>
-      <button class="svc" onclick="selectService(this,'education')">
+      <button class="svc" style="--svc-i:4" onclick="selectService(this,'education')">
         <span class="svc-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         </span>
@@ -1001,22 +1062,26 @@ button{cursor:pointer;border:none;background:none}
   </div>
 
   <!-- Mission -->
-  <div class="card">
-    <h3 style="font-family:var(--font-display);margin-bottom:8px" data-i18n="our_mission">Our Mission</h3>
-    <p class="text-sm text-muted" style="line-height:1.6" data-i18n="mission_desc">
-      As Singapore's population ages and more people live independently, we believe everyone
-      deserves access to quality assistive equipment and support — before an emergency happens.
-      We help you prepare, educate, and equip so that sudden disability or medical needs
-      never catch you off guard.
-    </p>
+  <div class="info-band info-band-mission">
+    <div class="info-band-inner">
+      <h3 class="info-band-title" data-i18n="our_mission">Our Mission</h3>
+      <p class="info-band-text" data-i18n="mission_desc">
+        As Singapore's population ages and more people live independently, we believe everyone
+        deserves access to quality assistive equipment and support — before an emergency happens.
+        We help you prepare, educate, and equip so that sudden disability or medical needs
+        never catch you off guard.
+      </p>
+    </div>
   </div>
 
   <!-- Vision -->
-  <div class="card">
-    <h3 style="font-family:var(--font-display);margin-bottom:8px" data-i18n="our_vision">Our Vision</h3>
-    <p class="text-sm text-muted" style="line-height:1.6" data-i18n="vision_desc">
-      A Singapore where every person, regardless of age or ability, can live independently with dignity, confidence, and community support.
-    </p>
+  <div class="info-band info-band-vision">
+    <div class="info-band-inner">
+      <h3 class="info-band-title" data-i18n="our_vision">Our Vision</h3>
+      <p class="info-band-text" data-i18n="vision_desc">
+        A Singapore where every person, regardless of age or ability, can live independently with dignity, confidence, and community support.
+      </p>
+    </div>
   </div>
 
   <!-- Updates -->
