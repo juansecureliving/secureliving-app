@@ -134,24 +134,61 @@ button{cursor:pointer;border:none;background:none}
 .badge-category{background:var(--pri-light);color:var(--pri)}
 
 /* ── Home Tab ─────────────────────────────────── */
-.hero-card{background:var(--card);
-  color:var(--text);border-radius:20px;padding:28px 24px;margin-bottom:28px;
-  box-shadow:var(--shadow);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  position:relative}
-.hero-card::after{
-  content:'';
-  position:absolute;
-  bottom:-14px;
-  left:36px;
-  width:0;
-  height:0;
-  border-left:16px solid transparent;
-  border-right:0 solid transparent;
-  border-top:16px solid var(--card);
-  filter:drop-shadow(0 3px 2px rgba(0,0,0,0.04))
+/* Airy website-style greeting (no box) */
+.hero-greeting{
+  padding:14px 4px 26px;
+  margin-bottom:8px
 }
-.hero-card h2{font-family:var(--font-display);font-size:24px;margin-bottom:6px;font-weight:400}
-.hero-card p{opacity:.85;font-size:14px;line-height:1.5}
+.hero-greeting-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px
+}
+.hero-greeting h2{
+  font-family:var(--font-display);
+  font-size:30px;
+  font-weight:400;
+  line-height:1.2;
+  margin:0;
+  color:var(--text);
+  /* gentle fade-up entrance */
+  opacity:0;
+  animation:greetFadeUp 1s ease-out 0.2s forwards
+}
+.hero-greeting-sub{
+  font-size:15px;
+  line-height:1.6;
+  color:var(--muted);
+  margin:0;
+  max-width:520px;
+  opacity:0;
+  animation:greetFadeUp 1s ease-out 0.5s forwards
+}
+@keyframes greetFadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+/* Time-of-day icon */
+.hero-time-icon{
+  width:38px;height:38px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  animation:greetIconPop 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.1s forwards
+}
+.hero-time-icon svg{width:34px;height:34px}
+@keyframes greetIconPop{
+  from{opacity:0;transform:scale(0.3) rotate(-30deg)}
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
+/* Sun rays gentle rotation / moon gentle glow */
+.hero-time-icon.is-sun svg{animation:sunSpin 24s linear infinite}
+@keyframes sunSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.hero-time-icon.is-moon svg{animation:moonGlow 4s ease-in-out infinite}
+@keyframes moonGlow{0%,100%{opacity:0.85}50%{opacity:1}}
 /* ── Services Star Formation ──────────────────────────────── */
 .services-section{
   margin-bottom:16px
@@ -689,17 +726,6 @@ button{cursor:pointer;border:none;background:none}
   to{opacity:1;transform:translateY(0)}
 }
 
-/* ── Welcome/Greeting Card Animation ──────────────────────────────── */
-/* Uses the fadeInUp keyframe defined above */
-.hero-card{
-  animation:fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  opacity:0
-}
-.hero-card h2{
-  animation:fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  opacity:0
-}
-
 /* ── Tagline Section ──────────────────────────────────────────────── */
 @keyframes taglineFadeIn{
   from{opacity:0}
@@ -750,11 +776,19 @@ button{cursor:pointer;border:none;background:none}
 .info-band + .info-band{
   margin-top:0
 }
+/* Slow fade-in for Mission/Vision when scrolled into view */
 .info-band-inner{
   max-width:600px;
   margin:0 auto;
   padding:0 28px;
-  text-align:center
+  text-align:center;
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity 1.4s ease, transform 1.4s ease
+}
+.info-band.band-visible .info-band-inner{
+  opacity:1;
+  transform:translateY(0)
 }
 .info-band-title{
   font-family:var(--font-display);
@@ -1094,9 +1128,12 @@ button{cursor:pointer;border:none;background:none}
     <p class="tagline" data-i18n="app_tagline">Because living well matters more than living long.</p>
   </div>
 
-  <div class="hero-card">
-    <h2 id="greeting" style="display:flex;gap:8px;align-items:center"><span id="greeting-text">Welcome</span></h2>
-    <p data-i18n="hero_desc_new">We are your partner in independent living. We provide equipment, consultation, and ongoing support so you're prepared for whatever comes.</p>
+  <div class="hero-greeting">
+    <div class="hero-greeting-row">
+      <span class="hero-time-icon" id="hero-time-icon" aria-hidden="true"></span>
+      <h2 id="greeting"><span id="greeting-text">Welcome</span></h2>
+    </div>
+    <p class="hero-greeting-sub" data-i18n="hero_desc_new">We are your partner in independent living. We provide equipment, consultation, and ongoing support so you're prepared for whatever comes.</p>
   </div>
 
   <!-- Our Services -->
@@ -3047,6 +3084,18 @@ function applyLanguage() {
   if ($('greeting-text')) {
     const greetingName = ME ? ME.name.split(' ')[0] : 'Guest';
     $('greeting-text').textContent = `${greet}, ${greetingName}`;
+  }
+  // Time-of-day icon: sun (day) or moon (evening/night)
+  const timeIcon = $('hero-time-icon');
+  if (timeIcon) {
+    const isNight = (hour >= 18 || hour < 6);
+    if (isNight) {
+      timeIcon.className = 'hero-time-icon is-moon';
+      timeIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#B5764A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#F3D9A4" fill-opacity="0.35"/></svg>';
+    } else {
+      timeIcon.className = 'hero-time-icon is-sun';
+      timeIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#E0A44E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5" fill="#F5C46B" fill-opacity="0.4"/><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg>';
+    }
   }
   // Update greeting initials
   // Update greeting initials (avatar removed from greeting card)
@@ -6508,6 +6557,18 @@ window.addEventListener('DOMContentLoaded', () => {
         });
       }
     });
+
+    // Slow fade-in for Mission/Vision info bands
+    const bandObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('band-visible');
+        } else {
+          entry.target.classList.remove('band-visible');
+        }
+      });
+    }, { threshold: 0.25 });
+    document.querySelectorAll('.info-band').forEach(band => bandObserver.observe(band));
     
     // Add animation to quick-action buttons (Home tab only)
     const homeTab = document.getElementById('tab-home');
