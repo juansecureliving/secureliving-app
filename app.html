@@ -121,7 +121,7 @@ button{cursor:pointer;border:none;background:none}
   to{opacity:1;transform:translateX(0)}
 }
 .swipe-in-right{
-  animation:swipeInRight 0.45s cubic-bezier(0.22,1,0.36,1) both
+  animation:swipeInRight 0.8s cubic-bezier(0.22,1,0.36,1) both
 }
 .tab-content.active{display:block}
 
@@ -4145,7 +4145,7 @@ function animateProductsSwipeIn() {
   }
   seq.forEach((el, i) => {
     el.classList.remove('swipe-in-right');
-    el.style.animationDelay = (i * 0.09) + 's';
+    el.style.animationDelay = (i * 0.15) + 's';
     void el.offsetWidth;            // force reflow so it replays each visit
     el.classList.add('swipe-in-right');
   });
