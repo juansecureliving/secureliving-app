@@ -4223,6 +4223,10 @@ async function loadUpdates() {
 }
 
 const UPDATE_LANG = {
+  en: {
+    'Welcome to AssistLiving': { title:'Welcome to QI AN Living', content:'We are here to support independent living. Browse our equipment, book a consultation, or track your health — all in one place.' },
+    'Welcome to Juan SecureLiving': { title:'Welcome to QI AN Living', content:'We are here to support independent living. Browse our equipment, book a consultation, or track your health — all in one place.' }
+  },
   zh: {
     'Welcome to AssistLiving': { title:'欢迎来到 QI AN Living', content:'我们致力于支持独立生活。浏览我们的设备、预约咨询或追踪您的健康——一切尽在一处。' },
     'Welcome to Juan SecureLiving': { title:'欢迎来到 QI AN Living', content:'我们致力于支持独立生活。浏览我们的设备、预约咨询或追踪您的健康——一切尽在一处。' },
@@ -4277,7 +4281,6 @@ function unitLabel(unitKey) {
 }
 
 function getUpdateText(originalTitle, field) {
-  if (currentLang === 'en') return null;
   const langData = UPDATE_LANG[currentLang];
   if (!langData || !langData[originalTitle]) return null;
   return langData[originalTitle][field] || null;
