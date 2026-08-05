@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>Ju An SecureLiving</title>
+<title>QI AN Living</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -53,8 +53,13 @@ button{cursor:pointer;border:none;background:none}
 .auth-logo .logo-icon{width:72px;height:72px;background:var(--pri);color:#fff;
   border-radius:20px;display:flex;align-items:center;justify-content:center;
   font-size:32px;margin:0 auto 12px}
+.auth-logo .logo-icon-svg{width:88px;height:auto;margin:0 auto 14px;display:flex;justify-content:center}
+.auth-logo .logo-icon-svg svg{width:88px;height:auto}
 .auth-logo h1{font-family:var(--font-display);font-size:28px;color:var(--pri)}
 .auth-logo p{color:var(--muted);font-size:13px;margin-top:4px}
+.header-logo{display:flex;align-items:center;gap:9px}
+.header-logo svg{width:30px;height:38px;flex-shrink:0}
+.header-logo-text{font-family:var(--font-display);font-size:20px;font-weight:600;color:#fff;letter-spacing:0.3px}
 .auth-card{background:var(--card);border-radius:var(--radius);padding:28px;
   width:100%;max-width:400px;box-shadow:var(--shadow)}
 .auth-card h2{font-family:var(--font-display);font-size:22px;margin-bottom:20px;text-align:center}
@@ -912,8 +917,22 @@ button{cursor:pointer;border:none;background:none}
 <!-- Login -->
 <div id="login-screen" class="auth-wrapper">
   <div class="auth-logo">
-    <div class="logo-icon">🏠</div>
-    <h1>Ju An SecureLiving</h1>
+    <div class="logo-icon-svg">
+      <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="QI AN Living logo">
+        <g stroke="var(--pri)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="70" y1="52" x2="170" y2="52"/>
+          <line x1="120" y1="24" x2="120" y2="120"/>
+          <line x1="116" y1="66" x2="74" y2="118"/>
+          <line x1="124" y1="66" x2="166" y2="118"/>
+        </g>
+        <g stroke="var(--pri)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <line x1="68" y1="158" x2="172" y2="158" stroke-width="20"/>
+          <rect x="76" y="192" width="66" height="56" rx="4" stroke-width="16"/>
+          <path d="M154 158 L154 262 Q154 280 132 282" stroke-width="20"/>
+        </g>
+      </svg>
+    </div>
+    <h1>QI AN Living</h1>
     <p data-i18n="supporting_independent">Supporting Independent Living</p>
   </div>
   <div class="auth-card">
@@ -946,8 +965,22 @@ button{cursor:pointer;border:none;background:none}
 <!-- Register -->
 <div id="register-screen" class="auth-wrapper hidden">
   <div class="auth-logo">
-    <div class="logo-icon">🏠</div>
-    <h1>Ju An SecureLiving</h1>
+    <div class="logo-icon-svg">
+      <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="QI AN Living logo">
+        <g stroke="var(--pri)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="70" y1="52" x2="170" y2="52"/>
+          <line x1="120" y1="24" x2="120" y2="120"/>
+          <line x1="116" y1="66" x2="74" y2="118"/>
+          <line x1="124" y1="66" x2="166" y2="118"/>
+        </g>
+        <g stroke="var(--pri)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+          <line x1="68" y1="158" x2="172" y2="158" stroke-width="20"/>
+          <rect x="76" y="192" width="66" height="56" rx="4" stroke-width="16"/>
+          <path d="M154 158 L154 262 Q154 280 132 282" stroke-width="20"/>
+        </g>
+      </svg>
+    </div>
+    <h1>QI AN Living</h1>
     <p data-i18n="create_your_account">Create Your Account</p>
   </div>
   <div class="auth-card">
@@ -1103,7 +1136,22 @@ button{cursor:pointer;border:none;background:none}
 
 <!-- Top Bar -->
 <div class="top-bar">
-  <h1>Ju An SecureLiving</h1>
+  <div class="header-logo" aria-label="QI AN Living">
+    <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g stroke="#fff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="70" y1="52" x2="170" y2="52"/>
+        <line x1="120" y1="24" x2="120" y2="120"/>
+        <line x1="116" y1="66" x2="74" y2="118"/>
+        <line x1="124" y1="66" x2="166" y2="118"/>
+      </g>
+      <g stroke="#fff" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <line x1="68" y1="158" x2="172" y2="158" stroke-width="20"/>
+        <rect x="76" y="192" width="66" height="56" rx="4" stroke-width="16"/>
+        <path d="M154 158 L154 262 Q154 280 132 282" stroke-width="20"/>
+      </g>
+    </svg>
+    <span class="header-logo-text">QI AN Living</span>
+  </div>
   <div style="display:flex;align-items:center;gap:10px">
     <!-- Clock (only visible on Appointment tab) - tap to toggle weather -->
     <div id="header-clock" class="header-clock" style="display:none" onclick="toggleApptWeather(event)">
@@ -3587,7 +3635,7 @@ async function registerBiometric(phone, pw) {
     const cred = await navigator.credentials.create({
       publicKey: {
         challenge,
-        rp: { name: 'Ju An SecureLiving' },
+        rp: { name: 'QI AN Living' },
         user: {
           id: userId,
           name: phone,
