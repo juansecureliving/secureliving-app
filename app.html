@@ -115,13 +115,13 @@ button{cursor:pointer;border:none;background:none}
 .tab-btn-camera span{white-space:nowrap}
 
 .tab-content{display:none;padding:16px;max-width:600px;margin:0 auto}
-/* Swipe-in-from-right animation (used on Products tab) */
+/* Slide-in-from-right animation (used on Products tab items) */
 @keyframes swipeInRight{
   from{opacity:0;transform:translateX(40px)}
   to{opacity:1;transform:translateX(0)}
 }
-.tab-content.swipe-in-right{
-  animation:swipeInRight 0.4s cubic-bezier(0.22,1,0.36,1)
+.swipe-in-right{
+  animation:swipeInRight 0.45s cubic-bezier(0.22,1,0.36,1) both
 }
 .tab-content.active{display:block}
 
@@ -4119,24 +4119,36 @@ function switchTab(tab) {
   if (tab === 'history' && !isGuest) renderHistoryTab();
   if (tab === 'products') {
     setTimeout(() => addFilterSwipeListeners(), 100);
-    animateProductsSwipeIn();
+    requestAnimationFrame(() => requestAnimationFrame(animateProductsSwipeIn));
   }
 }
 
-// Swipe each Products tab item in from the right, staggered
+// Slide each Products tab item in from the right, staggered top-to-bottom
 function animateProductsSwipeIn() {
   const container = $('tab-products');
   if (!container) return;
-  const items = container.children;
-  for (let i = 0; i < items.length; i++) {
-    const el = items[i];
-    // restart animation each time the tab is opened
-    el.classList.remove('swipe-in-right');
-    el.style.animationDelay = (i * 0.07) + 's';
-    // force reflow so the animation replays
-    void el.offsetWidth;
-    el.classList.add('swipe-in-right');
+  // Build the ordered list: top-level items, but expand product-list into its cards
+  const seq = [];
+  for (let i = 0; i < container.children.length; i++) {
+    const child = container.children[i];
+    if (child.id === 'product-list') {
+      // add each product card individually for a top-to-bottom cascade
+      const cards = child.children;
+      if (cards.length) {
+        for (let j = 0; j < cards.length; j++) seq.push(cards[j]);
+      } else {
+        seq.push(child);
+      }
+    } else {
+      seq.push(child);
+    }
   }
+  seq.forEach((el, i) => {
+    el.classList.remove('swipe-in-right');
+    el.style.animationDelay = (i * 0.09) + 's';
+    void el.offsetWidth;            // force reflow so it replays each visit
+    el.classList.add('swipe-in-right');
+  });
 }
 
 /* ── Updates (Home) ───────────────────────── */
